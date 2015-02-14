@@ -1,25 +1,28 @@
-import java.sql.*;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+
+import com.sun.net.httpserver.*;
 
 // Notice, do not import com.mysql.jdbc.*
 // or you will have problems!
 
 public class ConnectionTest {
-    public static void main(String[] args) {
-        try {
-            // The newInstance() call is a work around for some
-            // broken Java implementations
+    public static void main(String[] args) throws Exception {
+    	setErrorStream();
+    	Datasource.setLoggingPref();
+        Datasource d = new Datasource();
+    	SQLExecutable.setSharedDatasource(d);
+        if(d.connect()) System.out.println("Connection valid.");
 
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            Connection conn = null;
-            conn = DriverManager.getConnection("jdbc:mysql://localhost/testdb?user=root&password=cs307team");
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Table1;");
-            while (rs.next()) {
-              System.out.println(rs.getInt("testcol"));
-            }
-        } catch (Exception ex) {
-          System.out.println(ex);
-            // handle the error
-        }
+        
+    }
+    private static void setErrorStream() {
+    	try {
+    		PrintStream ps = new PrintStream("errlog.log");
+    		System.setErr(ps);
+    	} catch (FileNotFoundException e) {
+    		System.err.println(e.getMessage());
+    	}
     }
 }
