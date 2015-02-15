@@ -30,74 +30,12 @@ Content-Type : application/json
 	reason : "Token has expired."
 }
 ```
-<hr>
-### Authentication 
-<hr>
-####User Login<br>
-<b>Request Format<b>
-```
-GET /users/login/
+###Table of Contents
+[Authentication](/api/APIAuthentication.md)
+[User Information](/api/APIUserInfo.md)
 
-HTTP Headers
-Authorization : Basic base64(emailAddress:sha256(password))
-```
-<b>Response Format</b><br>
-Authentication Successful
-```
-HTTP 200 OK
-
-HTTP Headers
-Content-Type : application/json
-
-{
-  firstName : "John",
-  lastName : "Doe",
-  userID: 123456,
-  token: "1284b68d36840496fbec62f34f40295de18e2bbffc3f2ec24cfab92fc734c9a9",
-  token-expiration: 1423956647
-}
-```
-Authentication Failure
-```
-HTTP 401 UNAUTHORIZED
-
-HTTP Headers
-WWW-Authenticate : Basic realm="api"
-```
-<hr>
-####User Registration<br>
-<b>Request Format<b>
-```
-POST /users/register/
-
-HTTP Headers
-Content-Type : application/json
-
-{
-  email : "emailAddress@domain.com",
-  firstName : "First",
-  lastName : "Last",
-  password : sha256(password)
-}
-```
-<b>Response Format</b><br>
-Registration Successful
-```
-HTTP 201 CREATED
-```
-Registration Failure
-```
-HTTP 403 FORBIDDEN
-
-HTTP Headers
-Content-Type : application/json
-
-{
-  reason : "Email address is already in use."
-}
-```
-<hr>
-### User Information
+<hr><a name="userinfo">
+### User Information</a>
 <hr>
 ####Update User's Name<br>
 <b>Request Format<b>
@@ -195,25 +133,6 @@ Content-Type : application/json
 <b>Response Format</b><br>
 ```
 HTTP 201 CREATED
-
-HTTP Headers
-Content-Type : application/json
-
-{
-  householdID : 543216,
-  householdName : "Stash",
-  householdDescription : "For keeping everyone else's grubby hands off my stuff",
-  members : [
-	  {
-		  userID: 123456,
-		  firstName : "First",
-		  lastName : "Last"
-	  }
-  ],
-  recipes : [],
-  shoppingLists : [],
-  headOfHousehold : 123456
-}
 ```
 <hr>
 ####Invite a user to a household<br>
@@ -229,8 +148,92 @@ Content-Type : application/json
 	userID : 789101
 }
 ```
+<b>Response Format</b>
+```
+HTTP 202 ACCEPTED
+```
 Note : Only one of the above fields is required. If both are included the request will only process if the ID and emails belong to the same user.  If one or the other is included, make the other value null, or do not include.
+<hr>
+####Get a user's active households<br>
+<b>Request Format</b>
+```
+GET /users/:USERID/households?token=SESSION_TOKEN
+```
 <b>Response Format</b>
 ```
 HTTP 200 OK
+{
+	userID : 123456
+	households : [
+		{
+			householdID : 908546,
+			householdName : "Stash",
+			householdDescription : "Joe's Private Stash",
+		} , 
+		{
+			householdID : 203458,
+			householdName : "Apartment",
+			householdDescription : "Joe and Tina's Shared Pantry"
+		}
+	]
+}
+```
+<hr>
+####Get Information about a Household<br>
+<b>Request Format</b>
+```
+GET /households/:HOUSEHOLD_ID/info?token=SESSION_TOKEN
+```
+<b>Response Format</b>
+```
+HTTP 200 OK
+
+HTTP Headers
+Content-Type : application/json
+
+{
+  householdID : 908908,
+  householdName : "Family",
+  headOfHousehold : 678901,
+  householdDescription : "Wilson family inventory",
+  members : [
+	  {
+		  userID: 678901,
+		  public:true,
+		  info : {
+			  firstName : "Billy",
+			  lastName : "Wilson",
+			  email : "emailAddress@domain.com"
+		  }
+	  },
+	  {
+		  userID: 345678,
+		  public:false,
+		  info : {
+			  firstName : "Julia",
+			  lastName : "Wilson",
+			  email : "emailAddress@domain.com"
+		  }
+	  }
+  ],
+  recipes : [
+	  {
+		  recipeID: 756123,
+		  recipeName: "Chicken Alfredo"
+	  }
+  ],
+  shoppingLists : [
+	  {
+		  listID : 347089,
+		  listName : "Groceries"
+	  }
+  ],
+  pending : [
+	  {
+		  userID: 576123,
+		  public: false,
+		  info : null
+	  }
+  ]
+}
 ```
