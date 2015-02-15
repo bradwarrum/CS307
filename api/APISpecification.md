@@ -31,6 +31,6 @@ Content-Type : application/json
 }
 ```
 ###Table of Contents
-[Authentication](/api/APIAuthentication.md)
-[User Information](/api/APIUserInfo.md)
-[Household Management](/api/APIHouseholds.md)
+[Authentication](APIAuthentication.md)<br>
+[User Information](APIUserInfo.md)<br>
+[Household Management](APIHouseholds.md)
