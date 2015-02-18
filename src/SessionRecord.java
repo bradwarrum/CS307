@@ -4,7 +4,7 @@ public final class SessionRecord {
 	private final long expirationTime;
 	public SessionRecord(int userID, int expiration) {
 		this.userID = userID;
-		expirationTime = (long)(expiration * 60) + System.currentTimeMillis() / 1000L;
+		expirationTime = (long)(expiration) + System.currentTimeMillis() / 1000L;
 	}
 	
 	public final int getUserID() {
@@ -17,5 +17,9 @@ public final class SessionRecord {
 	@Override
 	public String toString() {
 		return "" + userID + ":" + expirationTime;
+	}
+	
+	public final boolean isExpired() {
+		return System.currentTimeMillis() / 1000L > expirationTime;
 	}
 }
