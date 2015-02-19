@@ -4,6 +4,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import core.SessionTable;
+import core.SessionToken;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;

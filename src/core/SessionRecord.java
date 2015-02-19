@@ -1,3 +1,4 @@
+package core;
 
 public final class SessionRecord {
 	private final int userID;

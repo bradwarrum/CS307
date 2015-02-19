@@ -1,3 +1,4 @@
+package sql;
 
 public class SQLParam {
 	private final SQLType _type;

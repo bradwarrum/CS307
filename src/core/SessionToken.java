@@ -1,3 +1,4 @@
+package core;
 import java.security.*;
 import org.apache.commons.codec.binary.*;
 public class SessionToken {
