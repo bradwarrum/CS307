@@ -4,28 +4,30 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 
-import com.sun.net.httpserver.HttpServer;
-
 import routes.*;
-import sql.Datasource;
+import sql.SQLDatasource;
 import sql.SQLExecutable;
+
+import com.sun.net.httpserver.HttpServer;
 
 public class Server {
 
-	private static SessionTable sessions = new SessionTable(60 * 30, 60);
+	private static SessionTable sessions = new SessionTable(10 * 60, 20);
 	public static SessionTable sessionTable() {
 		return sessions;
 	}
     public static void main(String[] args) throws Exception {
     	setErrorStream();
-    	//Datasource.setLoggingPref();
-        //Datasource d = new Datasource();
-    	//SQLExecutable.setSharedDatasource(d);
-        //if(d.connect()) System.out.println("Connection valid.");
+    	SessionToken.startRNG();
+    	SQLDatasource.setLoggingPref();
+        SQLDatasource d = new SQLDatasource();
+    	SQLExecutable.setSharedDatasource(d);
+        if(d.connect()) System.out.println("Connection valid.");
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         //Setup routing
-        server.createContext("/users/login", new RouteUserLogin());
+        server.createContext("/users/login", new UserLoginRoute());
+        server.createContext("/users/register", new UserRegistrationRoute());
         System.out.println("Server running.");
         server.start();
         

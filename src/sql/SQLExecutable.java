@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Queue;
 abstract public class SQLExecutable  {
 	
-	private static Datasource ds = null;
+	private static SQLDatasource ds = null;
 	private Connection c = null;
 	private Queue<Statement> stmts = new LinkedList<Statement>();
-	public final static void setSharedDatasource(Datasource d) {
+	public final static void setSharedDatasource(SQLDatasource d) {
 		ds = d;
 	}
 	
@@ -26,7 +26,7 @@ abstract public class SQLExecutable  {
 			fillParameters(ps, parameters);
 			val =  ps.executeUpdate();
 		} catch (SQLException sqle) {
-			throw new Exception ("Could not prepare statement.", sqle);
+			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
 		}
 		try {
 			if (ps != null ) ps.close();
@@ -49,7 +49,9 @@ abstract public class SQLExecutable  {
 			s = c.createStatement();
 			val =  s.executeUpdate(SQLStatement);
 		} catch (SQLException sqle) {
-			throw new Exception ("Could not prepare statement.", sqle);
+			System.out.println(sqle.getMessage());
+			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
+
 		}
 		try {
 			if (s != null) s.close();
@@ -68,7 +70,7 @@ abstract public class SQLExecutable  {
 			fillParameters(ps, parameters);
 			return ps.executeQuery();
 		} catch (SQLException sqle) {
-			throw new Exception ("Could not prepare statement.", sqle);
+			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
 		}
 	}
 	
@@ -85,12 +87,12 @@ abstract public class SQLExecutable  {
 			stmts.add(s);
 			return s.executeQuery(SQLStatement);
 		} catch (SQLException sqle) {
-			throw new Exception ("Could not prepare statement.", sqle);
+			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
 		}
 	}
 	
 	private final void fillParameters(PreparedStatement ps, SQLParam[] parameters) throws SQLException {
-		int i = 0;
+		int i = 1;
 		for (SQLParam p : parameters) {
 			SQLType t = p.getType();
 			Object o = p.getValue();

@@ -1,6 +1,7 @@
 package core;
-import java.security.*;
-import org.apache.commons.codec.binary.*;
+import java.security.SecureRandom;
+
+import org.apache.commons.codec.binary.Base64;
 public class SessionToken {
 	private String token;
 	private static SecureRandom rand;
@@ -13,11 +14,11 @@ public class SessionToken {
 		} catch(Exception e) {
 			rand = new SecureRandom();
 		}
-		rand.nextBytes(new byte[16]);
+		rand.nextBytes(new byte[24]);
 	}
 	public static SessionToken generate() throws NullPointerException {
 		if (running == false || rand == null) throw new NullPointerException();
-		byte[] bytes = new byte[16];
+		byte[] bytes = new byte[24];
 		rand.nextBytes(bytes);
 		return new SessionToken(bytes);
 	}

@@ -1,17 +1,20 @@
-package sql;
+package sql.wrappers;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-import com.google.gson.annotations.*;
-
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-import core.*;
-public class UserLoginModel extends SQLExecutable{
+import sql.SQLExecutable;
+import sql.SQLParam;
+import sql.SQLType;
+
+import com.google.gson.annotations.Expose;
+
+import core.Server;
+public class UserLoginWrapper extends SQLExecutable{
 	@Expose(serialize = true)
 	private String firstName = null;
 	@Expose(serialize = true)
@@ -24,7 +27,7 @@ public class UserLoginModel extends SQLExecutable{
 	private transient String emailAddress, sha256pwd;
 	private transient boolean validated = false;
 	
-	public UserLoginModel(String emailAddress, String base64sha256pwd) {
+	public UserLoginWrapper(String emailAddress, String base64sha256pwd) {
 		this.emailAddress = emailAddress;
 		this.sha256pwd = base64sha256pwd;
 	}
@@ -47,7 +50,7 @@ public class UserLoginModel extends SQLExecutable{
 		
 		ResultSet results = null;
 		try {
-			results = query("SELECT * FROM Users WHERE (emailAddress is ?)", new SQLParam(emailAddress, SQLType.VARCHAR));
+			results = query("SELECT * FROM Users WHERE (emailAddress = ?);", new SQLParam(emailAddress, SQLType.VARCHAR));
 		}catch (Exception e) {
 			release();
 			return AuthResult.INTERNAL_ERROR;

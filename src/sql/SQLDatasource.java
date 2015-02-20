@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import com.mchange.v2.c3p0.*;
-public class Datasource {
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+public class SQLDatasource {
 	private ComboPooledDataSource cpds;
-	public Datasource() {
+	public SQLDatasource() {
 		cpds = new ComboPooledDataSource();
 	}
 	public static void setLoggingPref() {
@@ -27,7 +27,7 @@ public class Datasource {
 			cpds.setAcquireIncrement(5);
 			cpds.setJdbcUrl("jdbc:mysql://localhost/testdb");
 			
-			cpds.setUnreturnedConnectionTimeout(60); // Any connection not returned within 60 seconds is assumed to be orphaned
+			cpds.setUnreturnedConnectionTimeout(600); // Any connection not returned within 600 seconds is assumed to be orphaned
 			cpds.setMaxIdleTime(3600); //Connections idling for more than 1 hour are returned to the pool
 			cpds.setMaxIdleTimeExcessConnections(300); //Connections in excess of minimum pool size are shrunk back to min size quickly
 			boolean validity;
