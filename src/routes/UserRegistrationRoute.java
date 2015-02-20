@@ -42,7 +42,7 @@ public class UserRegistrationRoute extends Route {
 		
 		public boolean valid() {
 			return (emailAddress != null && firstName != null && lastName != null && password != null &&
-					emailAddress.length() < 50 && firstName.length() < 32 && lastName.length() < 32);
+					emailAddress.length() < 254 && firstName.length() < 20 && lastName.length() < 20);
 		}
 		
 		public void clean() {

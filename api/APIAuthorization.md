@@ -46,10 +46,10 @@ HTTP 400 BAD REQUEST
 ##User Registration<br>
 ####Request Format
 Maximum field lengths are as follows:
- - email : 50 characters
- - firstName : 32 characters
- - lastName : 32 characters
- - password : 64 characters
+ - email : 254 characters
+ - firstName : 20 characters
+ - lastName : 20 characters
+ - password : 64 characters (32 byte hash, hex encoded)
 
 The sha256() function references the same hex-encoded SHA-256 function as described above.
 ```

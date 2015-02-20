@@ -50,7 +50,7 @@ public class UserLoginWrapper extends SQLExecutable{
 		
 		ResultSet results = null;
 		try {
-			results = query("SELECT * FROM Users WHERE (emailAddress = ?);", new SQLParam(emailAddress, SQLType.VARCHAR));
+			results = query("SELECT * FROM User WHERE (Email = ?);", new SQLParam(emailAddress, SQLType.VARCHAR));
 		}catch (Exception e) {
 			release();
 			return AuthResult.INTERNAL_ERROR;
@@ -59,11 +59,11 @@ public class UserLoginWrapper extends SQLExecutable{
 		String hashed = null;
 		try {
 			while (results.next()) {
-				salt = results.getString("salt");
-				userID = results.getInt("userID");
-				hashed = results.getString("hash");
-				lastName = results.getString("lastName");
-				firstName = results.getString("firstName");
+				salt = results.getString("PasswordSalt");
+				userID = results.getInt("UserID");
+				hashed = results.getString("Password");
+				lastName = results.getString("LastName");
+				firstName = results.getString("FirstName");
 			}
 		} catch (SQLException sqle) {
 			return AuthResult.INTERNAL_ERROR;

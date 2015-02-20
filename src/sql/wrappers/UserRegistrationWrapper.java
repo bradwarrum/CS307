@@ -44,7 +44,7 @@ public class UserRegistrationWrapper extends SQLExecutable {
 		//Fail fast if email address already exists
 		ResultSet results = null;
 		try {
-			results = query("SELECT COUNT(emailAddress) AS count FROM Users WHERE (emailAddress = ?);", new SQLParam(emailAddress, SQLType.VARCHAR)); 
+			results = query("SELECT COUNT(Email) AS count FROM User WHERE (Email = ?);", new SQLParam(emailAddress, SQLType.VARCHAR)); 
 		} catch (Exception s) {
 			release();
 			return RegistrationResult.INTERNAL_ERROR;
@@ -73,7 +73,7 @@ public class UserRegistrationWrapper extends SQLExecutable {
 		String salt = Hex.encodeHexString(byteSALT);
 		//Now try to insert the new user into the database
 		try {
-			int count = update("INSERT INTO Users (emailAddress, hash, salt, firstName, lastName) VALUES (?, ?, ?, ?, ?);",
+			int count = update("INSERT INTO User (Email, Password, PasswordSalt, FirstName, LastName) VALUES (?, ?, ?, ?, ?);",
 					new SQLParam(emailAddress, SQLType.VARCHAR),
 					new SQLParam(hash, SQLType.CHAR),
 					new SQLParam(salt, SQLType.CHAR),
