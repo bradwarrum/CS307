@@ -8,12 +8,12 @@ URLs are in the form of */api/request/path/*, and are assumed to be appended to 
 		<h5><a href="APIAuthorization.md">Authentication</a></h5>
 	</th></tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>User Login</td>
-		<td><code>GET /users/login/</code></td>
+		<td><code>POST /users/login/</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>User Registration</td>
 		<td><code>POST /users/register/</code></td>
 	</tr>
