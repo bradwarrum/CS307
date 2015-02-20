@@ -1,15 +1,21 @@
-### Authentication
-<hr>
-####User Login<br>
-<b>Request Format<b>
+# Authentication
+##User Login<br>
+####Request Format
+The password should be hashed using SHA-256 and encoded into a hex string, as shown below
 ```
-GET /users/login/
+POST /users/login/
 
 HTTP Headers
-Authorization : Basic base64(emailAddress:sha256(password))
+Content-Type : application/json
+
+{
+	"emailAddress" : "email@domain.com",
+	"password" : "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+}
 ```
-<b>Response Format</b><br>
-Authentication Successful
+####Response Format
+#####Authentication Successful
+The token field is a 24-byte value encoded in Base64-URLSafe.  This version of Base64 uses - and _ as encoding characters as they are not URL special characters, and does not use the = sign for padding.
 ```
 HTTP 200 OK
 
@@ -17,23 +23,35 @@ HTTP Headers
 Content-Type : application/json
 
 {
-  firstName : "John",
-  lastName : "Doe",
-  userID: 123456,
-  token: "1284b68d36840496fbec62f34f40295de18e2bbffc3f2ec24cfab92fc734c9a9",
-  token-expiration: 1423956647
+	"firstName": "Jason",
+	"lastName": "MacO'Dougal",
+	"userID": 123456,
+	"token": "0JKb0QNLMQVcMB0-fqx48fGch5zu9zOS"
 }
 ```
-Authentication Failure
+#####Authentication Failures
+Invalid Password
 ```
-HTTP 401 UNAUTHORIZED
-
-HTTP Headers
-WWW-Authenticate : Basic realm="api"
+HTTP 403 FORBIDDEN
+```
+User Not Found
+```
+HTTP 404 NOT FOUND
+```
+Any type of malformed input
+```
+HTTP 400 BAD REQUEST
 ```
 <hr>
-####User Registration<br>
-<b>Request Format<b>
+##User Registration<br>
+####Request Format
+Maximum field lengths are as follows:
+ - email : 50 characters
+ - firstName : 32 characters
+ - lastName : 32 characters
+ - password : 64 characters
+
+The sha256() function references the same hex-encoded SHA-256 function as described above.
 ```
 POST /users/register/
 
@@ -41,25 +59,23 @@ HTTP Headers
 Content-Type : application/json
 
 {
-  email : "emailAddress@domain.com",
-  firstName : "First",
-  lastName : "Last",
-  password : sha256(password)
+  "email" : "emailAddress@domain.com",
+  "firstName" : "First",
+  "lastName" : "Last",
+  "password" : sha256(password)
 }
 ```
-<b>Response Format</b><br>
-Registration Successful
+####Response Format####
+#####Registration Successful
 ```
 HTTP 201 CREATED
 ```
-Registration Failure
+#####Registration Failures
+Email address taken
 ```
 HTTP 403 FORBIDDEN
-
-HTTP Headers
-Content-Type : application/json
-
-{
-  reason : "Email address is already in use."
-}
+```
+Any type of malformed input
+```
+HTTP 400 BAD REQUEST
 ```

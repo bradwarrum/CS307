@@ -1,8 +1,9 @@
+package core;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.net.InetSocketAddress;
 
-import com.sun.net.httpserver.*;
+import sql.SQLDatasource;
+import sql.SQLExecutable;
 
 // Notice, do not import com.mysql.jdbc.*
 // or you will have problems!
@@ -10,8 +11,8 @@ import com.sun.net.httpserver.*;
 public class ConnectionTest {
     public static void main(String[] args) throws Exception {
     	setErrorStream();
-    	Datasource.setLoggingPref();
-        Datasource d = new Datasource();
+    	SQLDatasource.setLoggingPref();
+        SQLDatasource d = new SQLDatasource();
     	SQLExecutable.setSharedDatasource(d);
         if(d.connect()) System.out.println("Connection valid.");
 

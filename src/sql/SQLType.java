@@ -1,3 +1,4 @@
+package sql;
 
 public enum SQLType {
 	BYTE(java.sql.Types.TINYINT),
@@ -7,7 +8,10 @@ public enum SQLType {
 	INT(java.sql.Types.INTEGER),
 	LONG(java.sql.Types.BIGINT),
 	SHORT(java.sql.Types.SMALLINT),
-	STRING(java.sql.Types.VARCHAR),
+	VARCHAR(java.sql.Types.VARCHAR),
+	CHAR(java.sql.Types.CHAR),
+	VARBINARY(java.sql.Types.VARBINARY),
+	BINARY(java.sql.Types.BINARY),
 	TIME(java.sql.Types.TIME),
 	TIMESTAMP(java.sql.Types.TIMESTAMP),
 	AUTO(0);
