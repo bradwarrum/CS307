@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ ! -e /root/server/.pid ] 
+then
+	nohup java -Xmx64m -cp "bin/:lib/*" core.Server > /root/server/server.log 2>&1 & echo $! > /root/server/.pid
+	echo "Server started"
+else
+	echo "Server is already running"
+fi

@@ -1,0 +1,9 @@
+#!/bin/bash
+if [ -e /root/server/.pid ];
+then
+	kill -15 $(cat /root/server/.pid)
+	rm -f /root/server/.pid
+	echo "Server stopped"
+else
+	echo "Could not stop server; instance not running"
+fi
