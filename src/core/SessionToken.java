@@ -41,7 +41,7 @@ public class SessionToken {
 	
 	@Override
 	public boolean equals(Object o) {
-		return (o != null) && o.getClass().equals(this) && ((SessionToken) o).token.equals(this.token);
+		return (o != null) && o.getClass().equals(this.getClass()) && ((SessionToken) o).token.equals(this.token);
 	}
 	
 	@Override
