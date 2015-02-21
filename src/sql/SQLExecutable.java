@@ -16,9 +16,8 @@ abstract public class SQLExecutable  {
 		ds = d;
 	}
 	
-	protected final int update(String SQLStatement, SQLParam... parameters) throws Exception {
-		if (!verifyConnection())
-			throw new Exception("Shared data source is invalid, or connection cannot be established on data source");
+	protected final int update(String SQLStatement, SQLParam... parameters) throws SQLException {
+		verifyConnection();
 		int val = 0;
 		PreparedStatement ps = null;
 		try {
@@ -26,69 +25,58 @@ abstract public class SQLExecutable  {
 			fillParameters(ps, parameters);
 			val =  ps.executeUpdate();
 		} catch (SQLException sqle) {
-			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
+			throw sqle;
+		}finally {
+			try {
+				if (ps != null ) ps.close();
+			} catch (SQLException sqle) {
+				System.out.println("Possible leak: Could not close PreparedStatement");
+			} 
 		}
-		try {
-			if (ps != null ) ps.close();
-		} catch (SQLException sqle) {
-			System.out.println("Possible leak: Could not close PreparedStatement");
-		} 
 		return val;
 	}
 	
-	protected final int update(String SQLStatement, List<SQLParam> parameters) throws Exception {
+	protected final int update(String SQLStatement, List<SQLParam> parameters) throws SQLException {
 		return update(SQLStatement, (SQLParam[]) parameters.toArray());
 	}
 	
-	protected final int update(String SQLStatement) throws Exception {
-		if (!verifyConnection())
-			throw new Exception("Shared data source is invalid, or connection cannot be established on data source");
+	protected final int update(String SQLStatement) throws SQLException {
+		verifyConnection();
 		Statement s = null;
 		int val = 0;
 		try {
 			s = c.createStatement();
 			val =  s.executeUpdate(SQLStatement);
 		} catch (SQLException sqle) {
-			System.out.println(sqle.getMessage());
-			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
-
-		}
-		try {
-			if (s != null) s.close();
-		} catch (SQLException sqle) {
-			System.out.println("Possible leak: Could not close Statement");
+			throw sqle;
+		} finally {
+			try {
+				if (s != null) s.close();
+			} catch (SQLException sqle) {
+				System.out.println("Possible leak: Could not close Statement");
+			}
 		}
 		return val;
 	}
 	
-	protected final ResultSet query(String SQLStatement, SQLParam...parameters) throws Exception {
-		if (!verifyConnection())
-			throw new Exception("Shared data source is invalid, or connection cannot be established on data source");
-		try {
-			PreparedStatement ps = c.prepareStatement(SQLStatement);
-			stmts.add(ps);
-			fillParameters(ps, parameters);
-			return ps.executeQuery();
-		} catch (SQLException sqle) {
-			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
-		}
+	protected final ResultSet query(String SQLStatement, SQLParam...parameters) throws SQLException {
+		verifyConnection();
+		PreparedStatement ps = c.prepareStatement(SQLStatement);
+		stmts.add(ps);
+		fillParameters(ps, parameters);
+		return ps.executeQuery();
 	}
 	
-	protected final ResultSet query(String SQLStatement, List<SQLParam> parameters) throws Exception {
+	protected final ResultSet query(String SQLStatement, List<SQLParam> parameters) throws SQLException {
 		return query(SQLStatement, (SQLParam[]) parameters.toArray());
 	
 	}
 	
-	protected final ResultSet query (String SQLStatement) throws Exception {
-		if (!verifyConnection())
-			throw new Exception("Shared data source is invalid, or connection cannot be established on data source");
-		try {
-			Statement s = c.createStatement();
-			stmts.add(s);
-			return s.executeQuery(SQLStatement);
-		} catch (SQLException sqle) {
-			throw new Exception ("Could not prepare statement.\n" + sqle.getMessage(), sqle);
-		}
+	protected final ResultSet query (String SQLStatement) throws SQLException {
+		verifyConnection();
+		Statement s = c.createStatement();
+		stmts.add(s);
+		return s.executeQuery(SQLStatement);
 	}
 	
 	private final void fillParameters(PreparedStatement ps, SQLParam[] parameters) throws SQLException {
@@ -106,16 +94,11 @@ abstract public class SQLExecutable  {
 		}
 	}
 	
-	private final boolean verifyConnection() {
-		if (ds == null) return false;
+	private final void verifyConnection() throws SQLException{
+		if (ds == null) throw new SQLException("The DataSource object is not set up.", "HY000");
 		if (c == null) {
-			try {
 				c = ds.getConnection();
-			} catch (SQLException s) {
-				return false;
-			}
 		}
-		return true;
 	}
 	/**
 	 * Closes all open statements and frees the connection.
@@ -142,6 +125,19 @@ abstract public class SQLExecutable  {
 			} finally {
 				c = null;
 			}
+		}
+	}
+	/**
+	 * Releases a ResultSet resource.<p>
+	 * Has no effect if the ResultSet is null or already closed.
+	 * @param rs The ResultSet to close.
+	 */
+	public final void release(ResultSet rs) {
+		if (rs == null) return;
+		try {
+			rs.close();
+		}catch (SQLException sqle) {
+				System.out.println("Possible leak: Could not close ResultSet");
 		}
 	}
 }

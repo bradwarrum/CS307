@@ -68,6 +68,7 @@ public class UserLoginWrapper extends SQLExecutable{
 		} catch (SQLException sqle) {
 			return AuthResult.INTERNAL_ERROR;
 		} finally {
+			release(results);
 			release();
 		}
 		if (userID == -1) return AuthResult.USER_NOT_FOUND;
