@@ -115,7 +115,7 @@ public class SessionTableTest {
 		Thread.sleep(4000);
 		st.forceStartCleaner();
 		Thread.sleep(100);
-		st.sessions.clear();
+		//st.sessions.clear();
 		for (int i = 0; i < 1000000; i++) {
 			if (i % 100000 == 0) System.out.println("" + i);
 			st.login(i);

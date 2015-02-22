@@ -13,6 +13,8 @@ public class UserRegistrationRoute extends Route {
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		if (!"post".equalsIgnoreCase(xchg.getRequestMethod())) {respond(xchg, 404); return;}
+		String path = xchg.getRequestURI().getPath();
+		if (!(path.equals("/users/register") || path.equals("/users/register/"))) {respond(xchg, 404); return;}
 		String request = getRequest(xchg.getRequestBody());
 		UserInformation info;
 		try {

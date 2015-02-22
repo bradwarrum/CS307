@@ -13,6 +13,8 @@ public class UserLoginRoute extends Route {
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		if (!"post".equalsIgnoreCase(xchg.getRequestMethod())) {respond(xchg, 404); return;}
+		String path = xchg.getRequestURI().getPath();
+		if (!(path.equals("/users/login") || path.equals("/users/login/"))) {respond(xchg, 404); return;}
 		String request = getRequest(xchg.getRequestBody());
 		UserCredentials cred;
 		try {

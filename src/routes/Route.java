@@ -8,6 +8,8 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import core.SessionToken;
+
 public class Route implements HttpHandler{
 	protected Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
 	@Override
@@ -78,6 +80,19 @@ public class Route implements HttpHandler{
 		xchg.sendResponseHeaders(code, json.length);
 		xchg.getResponseBody().write(json);
 		xchg.close();
+	}
+	
+	/**
+	 * Returns the token passed in the URL query string.<p>
+	 * @param xchg
+	 * @return The token if the token exists, or null if it does not exist
+	 */
+	protected SessionToken getToken(HttpExchange xchg) {
+		if (xchg.getRequestURI().getQuery() == null) return null;
+		for (String p : xchg.getRequestURI().getQuery().split("&")) {
+			if (p.startsWith("token=")) return SessionToken.fromString(p.substring(6));
+		}
+		return null;
 	}
 
 }
