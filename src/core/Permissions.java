@@ -49,7 +49,7 @@ public class Permissions {
 		return intflags;
 	}
 	
-	public EnumSet<Flag> asEnum() {
+	public EnumSet<Flag> set() {
 		return permissions;
 	}
 	
