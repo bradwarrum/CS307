@@ -41,17 +41,9 @@ public class HouseholdCreationWrapper extends SQLExecutable {
 			return HouseholdCreationResult.INTERNAL_ERROR;
 		}
 		if (affected == 0) {rollback(); release(); return HouseholdCreationResult.INTERNAL_ERROR;}
-		Permissions perms = Permissions.all();
-		try {
-			affected = update("INSERT INTO HouseholdPermissions (UserId, HouseholdId, PermissionLevel) VALUES (?, LAST_INSERT_ID(), ?);", 
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(perms.asInt(), SQLType.INT));
-		} catch (SQLException e) {
-			rollback();
-			release();
-			return HouseholdCreationResult.INTERNAL_ERROR;
-		}
-		if (affected == 0) {rollback(); release(); return HouseholdCreationResult.INTERNAL_ERROR;}
+		
+		
+		
 		ResultSet results = null;
 		try {
 			results = query("SELECT LAST_INSERT_ID() AS lastID;");
@@ -69,8 +61,23 @@ public class HouseholdCreationWrapper extends SQLExecutable {
 			return HouseholdCreationResult.INTERNAL_ERROR;
 		} finally {
 			release(results);
-			release();
+		}		
+		
+		
+		
+		Permissions perms = Permissions.all();
+		try {
+			affected = update("INSERT INTO HouseholdPermissions (UserId, HouseholdId, PermissionLevel) VALUES (?, ?, ?);", 
+					new SQLParam(userID, SQLType.INT),
+					new SQLParam(householdID, SQLType.INT),
+					new SQLParam(perms.asInt(), SQLType.INT));
+		} catch (SQLException e) {
+			rollback();
+			return HouseholdCreationResult.INTERNAL_ERROR;
 		}
+		if (affected == 0) {rollback(); release(); return HouseholdCreationResult.INTERNAL_ERROR;}
+		release();
+
 		return HouseholdCreationResult.CREATED;
 		
 	}
