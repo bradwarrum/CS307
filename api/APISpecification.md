@@ -84,10 +84,16 @@ URLs are in the form of */api/request/path/*, and are assumed to be appended to 
 	</th></tr>
 
 	<tr>
+		<td>:heavy_check_mark:</td>
+		<td>Link a UPC to a Household</td>
+		<td><code>POST /households/:HOUSEHOLD_ID/items/:UPC/link?token = SESSION_TOKEN</code></td>
+	</tr>
+	<tr>
 		<td>:heavy_multiplication_x:</td>
 		<td>Get UPC Description Suggestions</td>
 		<td><code>GET /suggest/:UPC?source=[ext,int,both]&token=SESSION_TOKEN</code></td>
-	</tr>	
+	</tr>
+
 	
 	<tr><th colspan="3">
 		<h5><a href="APIRecipes.md">Recipes</a></h5>
