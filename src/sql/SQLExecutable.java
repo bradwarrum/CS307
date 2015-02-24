@@ -98,10 +98,12 @@ abstract public class SQLExecutable  {
 		if (ds == null) throw new SQLException("The DataSource object is not set up.", "HY000");
 		if (c == null) {
 				c = ds.getConnection();
+				c.setAutoCommit(false);
+				c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 		}
 	}
 	/**
-	 * Closes all open statements and frees the connection.
+	 * Closes all open statements and frees the connection.  This MUST be called to commit a transaction.
 	 * <p>
 	 * This method should be called as often as possible to ensure the connection is returned to the connection pool when no longer needed.
 	 */
@@ -119,6 +121,7 @@ abstract public class SQLExecutable  {
 		}
 		if (c != null) {
 			try {
+				c.commit();
 				c.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing connection");
@@ -138,6 +141,19 @@ abstract public class SQLExecutable  {
 			rs.close();
 		}catch (SQLException sqle) {
 				System.out.println("Possible leak: Could not close ResultSet");
+		}
+	}
+	
+	/**
+	 * If changes have been made within a transaction, this method rolls back all changes made.
+	 */
+	public final void rollback() {
+		if (c != null) {
+			try {
+				c.rollback();
+			} catch (SQLException e) {
+				System.out.println("WARNING: Could not rollback SQL query. Database may be in an unstable state.");
+			} 
 		}
 	}
 }

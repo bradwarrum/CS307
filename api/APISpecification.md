@@ -3,6 +3,9 @@ This document specifies all API requests that may be made against the VirtualPan
 <br>
 URLs are in the form of */api/request/path/*, and are assumed to be appended to the base domain (IP or registered domain name)
 ###Overview
+ - :heavy_multiplication_x:  Not Implemented
+ - :heavy_check_mark:  Implemented
+ 
 <table>
 	<tr><th colspan="3">
 		<h5><a href="APIAuthorization.md">Authentication</a></h5>
@@ -46,9 +49,9 @@ URLs are in the form of */api/request/path/*, and are assumed to be appended to 
 		<h5><a href="APIHouseholds.md">Household Management</a></h5>
 	</th></tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>	
+		<td>:heavy_check_mark:</td>	
 		<td>Create Household</td>
-		<td><code>POST /households?token=SESSION_TOKEN</code></td>
+		<td><code>POST /households/create?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
 		<td>:heavy_multiplication_x:</td>	
@@ -134,35 +137,4 @@ URLs are in the form of */api/request/path/*, and are assumed to be appended to 
 	</th></tr>	
 	
 </table>
- - :heavy_multiplication_x:  Not Implemented
- - :heavy_check_mark:  Implemented
- 
-###Notes
-All malformed requests will invoke a response of 
-```
-HTTP 400 BAD REQUEST
-```
-Some 400 class responses may include error information, in this form:
-```
-HTTP 400 BAD REQUEST
 
-HTTP Headers
-Content-Type : application/json
-
-{
-  reason: "The emailaddress used for registration is not valid."
-}
-```
-Additionally, when requests require a SESSION_TOKEN as a URL parameter, the SESSION_TOKEN refers to the token received by a <b>GET /users/login/</b> request.  All requests requiring the session token may invoke a response of this type if the session token is malformed or expired:
-```
-HTTP 403 FORBIDDEN
-
-HTTP Headers
-Content-Type : application/json
-
-{
-	reason : "Token has expired."
-}
-```
-[implemented]: http://www.wpclipart.com/signs_symbol/checkmarks/checkmark._16_green.webp "Implemented"
-[missing]: http://midamericaweb.com/wp-content/uploads/2014/12/icon-x.png "Not Implemented"
