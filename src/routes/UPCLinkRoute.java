@@ -29,7 +29,7 @@ public class UPCLinkRoute extends Route {
 		}
 		if (upcjson == null || !upcjson.valid() || householdID < 0 || UPC == null ) {respond(xchg, 400); return;}
 		Barcode barcode = new Barcode(UPC);
-		if (barcode.getFormat() == Barcode.Format.INVALID_FORMAT) {error(xchg, 400, "[1]Barcode format was invalid."); return;}
+		if (barcode.getFormat() == Barcode.Format.INVALID_FORMAT || barcode.getFormat() == Barcode.Format.PRODUCE_5) {error(xchg, 400, "[1]Barcode format was invalid."); return;}
 		else if (barcode.getFormat() == Barcode.Format.INVALID_CHECKSUM) {error(xchg, 400, "[2]Invalid checksum found for 12/13 digit barcode"); return;}
 		UPCLinkWrapper upclw =  new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName);
 		UPCLinkResult result = upclw.link();

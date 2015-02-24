@@ -55,9 +55,8 @@ public class UPCLinkWrapper extends SQLExecutable {
 		Permissions permissions = new Permissions(permissionraw);
 		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return UPCLinkResult.INSUFFICIENT_PERMISSIONS;}
 		
-		int affected = 0;
 		try {
-			affected = update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, UnitQuantity, UnitName, Hidden) VALUES (?, ?, ?, ?, ?, ?)"
+			update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, UnitQuantity, UnitName, Hidden) VALUES (?, ?, ?, ?, ?, ?)"
 							+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), UnitName=VALUES(UnitName);",
 					new SQLParam(barcode.toString(), SQLType.VARCHAR),
 					new SQLParam(householdID, SQLType.INT),
