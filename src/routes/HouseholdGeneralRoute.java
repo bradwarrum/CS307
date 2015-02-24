@@ -16,14 +16,20 @@ public class HouseholdGeneralRoute extends Route {
 			String hidStr = path.substring(HOUSEHOLD_OFS, path.indexOf('/', HOUSEHOLD_OFS));
 			int householdID = Integer.parseInt(hidStr);
 			xchg.setAttribute("householdID", householdID);
-			String remainder = path.substring(HOUSEHOLD_OFS + hidStr.length() + 1);
-			String separated = remainder.split("?")[0];
-			if (separated == "/link") LINK_ROUTE.handle(xchg);
-			else respond(xchg,404);
+			String remainder = path.substring(HOUSEHOLD_OFS + hidStr.length());
+			String separated = remainder.split("\\?")[0];
+			
+			if (separated.startsWith("/items/")) {
+				String UPC = separated.substring(7, separated.indexOf('/', 7));
+				xchg.setAttribute("UPC", UPC);
+				String itemCommand = separated.substring(7+ UPC.length());
+				if (itemCommand.equals("/link")) {LINK_ROUTE.handle(xchg); return;}
+			}
 		} catch (IndexOutOfBoundsException e) {
 			respond(xchg, 404);
 		} catch (NumberFormatException e) {
 			respond(xchg, 404);
 		}
+		respond(xchg, 404);
 	}
 }

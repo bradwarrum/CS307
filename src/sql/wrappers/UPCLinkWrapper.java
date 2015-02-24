@@ -15,18 +15,20 @@ public class UPCLinkWrapper extends SQLExecutable {
 	private int userID, householdID;
 	private Barcode barcode;
 	private String description;
+	private String unitName;
 	
 	public static enum UPCLinkResult {
-		CREATED,
+		OK,
 		INTERNAL_ERROR,
 		HOUSEHOLD_NOT_FOUND,
 		INSUFFICIENT_PERMISSIONS
 	}
-	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description) {
+	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, String unitName) {
 		this.userID = userID;
 		this.householdID = householdID;
 		this.barcode = barcode;
 		this.description = description;
+		this.unitName = unitName;
 	}
 	
 	public UPCLinkResult link() {
@@ -55,16 +57,20 @@ public class UPCLinkWrapper extends SQLExecutable {
 		
 		int affected = 0;
 		try {
-			affected = update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, UnitQuantity, UnitId) VALUES (?, ?, ?, ?, ?);",
+			affected = update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, UnitQuantity, UnitName, Hidden) VALUES (?, ?, ?, ?, ?, ?)"
+							+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), UnitName=VALUES(UnitName);",
 					new SQLParam(barcode.toString(), SQLType.VARCHAR),
 					new SQLParam(householdID, SQLType.INT),
-					new SQLParam(description, SQLType.VARCHAR));
-							//TODO: Insert unit stuff
+					new SQLParam(description, SQLType.VARCHAR),
+					new SQLParam(0f,SQLType.FLOAT),
+					new SQLParam(unitName, SQLType.VARCHAR),
+					new SQLParam(0, SQLType.BYTE));
+		} catch (SQLException e) {
+			rollback();
+			return UPCLinkResult.INTERNAL_ERROR;
+		} finally {
+			release();
 		}
-		
-		
-		
-		
-		return UPCLinkResult.CREATED;
+		return UPCLinkResult.OK;
 	}
 }
