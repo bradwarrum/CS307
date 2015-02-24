@@ -1,7 +1,6 @@
-### Household Management
-<hr>
-####Create a new household<br>
-<b>Request Format<b>
+# Household Management
+##Create a new household<br>
+####Request Format
 ```
 POST /households/create?token=SESSION_TOKEN
 
@@ -9,14 +8,29 @@ HTTP Headers
 Content-Type : application/json
 
 {
-  userID : 123456,
-  householdName : "Stash",
-  householdDescription : "For keeping everyone else's grubby hands off my stuff"
+  "householdName" : "Stash",
+  "householdDescription" : "Personal Inventory"
 }
 ```
-<b>Response Format</b><br>
+####Response Format
+#####Successful Creation
 ```
 HTTP 201 CREATED
+
+HTTP Headers
+Content-Type : application/json
+
+{
+	"householdID" : 46512
+}
+```
+#####Token Expired, Invalid or Not Present
+```
+HTTP 403 FORBIDDEN
+```
+#####Any type of malformed input
+```
+HTTP 400 BAD REQUEST
 ```
 <hr>
 ####Invite a user to a household<br>
