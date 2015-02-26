@@ -2,8 +2,13 @@ package sql.wrappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import sql.SQLType;
+
 import java.util.List;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import core.Permissions;
 import routes.ListUpdateRoute.ListUpdateItemJSON;
@@ -12,14 +17,17 @@ import sql.SQLParam;
 
 public class ListUpdateWrapper extends SQLExecutable {
 	private int userID, householdID, listID;
+	@Expose(serialize = true)
+	@SerializedName("version")
 	private long timestamp;
 	private List<ListUpdateItemJSON> items;
-	
+
 	public static enum ListUpdateResult {
 		OK,
 		INTERNAL_ERROR,
 		INSUFFICIENT_PERMISSIONS,
-		OUTDATED_INFORMATION
+		OUTDATED_INFORMATION,
+		ITEM_NOT_FOUND
 	}
 
 	public ListUpdateWrapper(int userID, int householdID, int listID, long timestamp, List<ListUpdateItemJSON> items) {
@@ -29,7 +37,7 @@ public class ListUpdateWrapper extends SQLExecutable {
 		this.timestamp = timestamp;
 		this.items = items;
 	}
-	
+
 	public ListUpdateResult update() {
 		// 1) Read permissions and ensure the user ID can modify lists
 		Permissions permissions= getPermissions();
@@ -40,23 +48,24 @@ public class ListUpdateWrapper extends SQLExecutable {
 		if (DBtimestamp < 0) {release(); return ListUpdateResult.INTERNAL_ERROR;}
 		if (timestamp != DBtimestamp ) {release(); return ListUpdateResult.OUTDATED_INFORMATION;}
 		// 3) Update all the entries in the table
-		if (!updateRows()) {return ListUpdateResult.INTERNAL_ERROR;}
-		
+		if (!updateRows()) {return ListUpdateResult.ITEM_NOT_FOUND;}
+
 		// 4) Write the timestamp to the household
 		long newstamp = writeTimestamp();
 		if (newstamp == -1) {return ListUpdateResult.INTERNAL_ERROR;}
 		release();
+		timestamp = newstamp;
 		return ListUpdateResult.OK;
-		
+
 	}
-	
+
 	private Permissions getPermissions() {
 		ResultSet results = null;
 		try{
 			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
-				new SQLParam(userID, SQLType.INT),
-				new SQLParam(householdID, SQLType.INT));
-			
+					new SQLParam(userID, SQLType.INT),
+					new SQLParam(householdID, SQLType.INT));
+
 		} catch (SQLException e) {
 			release();
 			return null;
@@ -74,7 +83,7 @@ public class ListUpdateWrapper extends SQLExecutable {
 		Permissions p = new Permissions(permissionRaw);
 		return p;
 	}
-	
+
 	private long readAndLockTimestamp() {
 		long stamp = -1;
 		ResultSet results = null;
@@ -92,29 +101,50 @@ public class ListUpdateWrapper extends SQLExecutable {
 		}
 		return stamp;
 	}
-	
+
 	private boolean updateRows() {
 		int updated = 0;
 		int fail;
 		SQLParam listidp = new SQLParam(listID, SQLType.INT);
+		SQLParam houseidp = new SQLParam(householdID, SQLType.INT);
+
+		ResultSet results= null;
 		try {
 			for (ListUpdateItemJSON item : items) {
-				fail = update("UPDATE ShoppingListItem SET Quantity=? WHERE ListId=? AND UPC=?;",
-						new SQLParam(item.quantity, SQLType.INT),
-						listidp, 
-						new SQLParam(item.UPC, SQLType.VARCHAR));
-				if (fail < 0) {rollback(); release(); return false;}
-				updated += fail;
+				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=?);",
+						new SQLParam(item.UPC, SQLType.VARCHAR),
+						houseidp);
+				if (results == null || !results.next()) {release(results); rollback(); release(); return false;}
+				int itemID = results.getInt(1);
+				SQLParam itemidp = new SQLParam(itemID, SQLType.INT);
+				SQLParam quantityp = new SQLParam(item.quantity * 100 + item.fractional, SQLType.INT);
+				if (item.quantity == 0 && item.fractional == 0) {
+					fail = update("DELETE FROM ShoppingListItem WHERE (ListId=? AND ItemId=?);",
+							listidp,
+							itemidp);
+				} else {
+					fail = update("INSERT INTO ShoppingListItem (ListId, ItemId, Quantity) VALUES (?, ?, ?)"
+							+ " ON DUPLICATE KEY UPDATE Quantity=?;",
+							listidp,
+							itemidp,
+							quantityp,
+							quantityp);
+				}
+				if (fail <= 0) {release(results); rollback(); release(); return false;}
+				updated += 1;
+				release(results);
 			}
 		} catch (SQLException e) {
+			release(results);
 			rollback();
 			release();
 			return false;
 		}
+		release(results);
 		if (updated != items.size()) {rollback(); release(); return false;}
 		return true;
 	}
-	
+
 	private long writeTimestamp() {
 		long stamp = System.currentTimeMillis();
 		int affected = -1;
@@ -129,5 +159,9 @@ public class ListUpdateWrapper extends SQLExecutable {
 		}
 		if (affected <= 0) {rollback(); release(); return -1;}
 		return stamp;
+	}
+	
+	public long getTimestamp() {
+		return timestamp;
 	}
 }

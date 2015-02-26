@@ -33,7 +33,8 @@ public class ListUpdateRoute extends Route {
 		if (result == ListUpdateResult.INTERNAL_ERROR) {respond(xchg, 500);}
 		else if (result == ListUpdateResult.INSUFFICIENT_PERMISSIONS) {respond(xchg, 403);}
 		else if (result == ListUpdateResult.OUTDATED_INFORMATION) {error(xchg, 400, "[0]Outdated timestamp.");}
-		else if (result == ListUpdateResult.OK) {respond(xchg, 200);}
+		else if (result == ListUpdateResult.ITEM_NOT_FOUND) {error(xchg, 400, "[1]One or more invalid UPCs for this household. Ensure they are added to the inventory");}
+		else if (result == ListUpdateResult.OK) {xchg.getResponseHeaders().set("ETag", "\"" + luw.getTimestamp() + "\"");respond(xchg, 200, gson.toJson(luw, ListUpdateWrapper.class));}
 		
 	}
 	public static class ListUpdateJSON {
@@ -56,10 +57,13 @@ public class ListUpdateRoute extends Route {
 		public String UPC;
 		@Expose(deserialize = true)
 		public int quantity;
+		@Expose(deserialize = true)
+		public int fractional = 0;
 		
 		public boolean valid() {
 			if (UPC == null || UPC.length() > 13 ) return false;
 			if (quantity < 0) return false;
+			if (fractional <0 || fractional > 99) return false;
 			return true;
 		}
 	}
