@@ -57,6 +57,7 @@ CREATE TABLE HouseholdShoppingList(
 	ListId INT NOT NULL AUTO_INCREMENT,
 	HouseholdId INT NOT NULL,
 	Name VARCHAR(40) NOT NULL,
+	Timestamp LONG NOT NULL,
 	UserId INT,
 	AmountSpent FLOAT,
 	DateCompleted DATE,

@@ -53,9 +53,10 @@ public class ListCreateWrapper extends SQLExecutable {
 		
 		int affected = 0;
 		try {
-			affected = update("INSERT INTO HouseholdShoppingList (HouseholdId, Name) VALUES (?, ?);", 
+			affected = update("INSERT INTO HouseholdShoppingList (HouseholdId, Name, Timestamp) VALUES (?, ?);", 
 					new SQLParam(householdID, SQLType.INT),
-					new SQLParam(listName, SQLType.VARCHAR));
+					new SQLParam(listName, SQLType.VARCHAR),
+					new SQLParam(System.currentTimeMillis(), SQLType.LONG));
 			
 		} catch (SQLException e) {
 			rollback();
