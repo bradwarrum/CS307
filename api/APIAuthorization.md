@@ -42,7 +42,6 @@ Any type of malformed input
 ```
 HTTP 400 BAD REQUEST
 ```
-<hr>
 ##User Registration<br>
 ####Request Format
 Maximum field lengths are as follows:
