@@ -28,6 +28,7 @@ public class Server {
         //Setup routing
         server.createContext("/users/login", new UserLoginRoute());
         server.createContext("/users/register", new UserRegistrationRoute());
+        server.createContext("/users/me", new UserMeRoute());
         server.createContext("/households/create", new HouseholdCreateRoute());
         server.createContext("/households/", new HouseholdGeneralRoute());
         System.out.println("Server running.");

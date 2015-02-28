@@ -21,9 +21,10 @@ public class ListFetchWrapper extends SQLExecutable {
 	private long timestamp;
 	@Expose(serialize = true)
 	private String name;
-	private List<ListFetchItemsJSON> itemslist = null;
 	@Expose(serialize = true)
-	private ListFetchItemsJSON[] items;
+	private List<ListFetchItemsJSON> items = null;
+
+	//private ListFetchItemsJSON[] items;
 	
 	public ListFetchWrapper(int userID, int householdID, int listID, long timestamp) {
 		this.userID = userID;
@@ -128,7 +129,7 @@ public class ListFetchWrapper extends SQLExecutable {
 					new SQLParam(listID, SQLType.INT));
 			if (results == null) {release(); return false;}
 			
-			itemslist = new ArrayList<ListFetchItemsJSON>();
+			items = new ArrayList<ListFetchItemsJSON>();
 			String UPC, description, unitName;
 			int quantity, fractional, temp;
 			while (results.next()) {
@@ -136,12 +137,10 @@ public class ListFetchWrapper extends SQLExecutable {
 				description = results.getString(2);
 				unitName=  results.getString(3);
 				temp = results.getInt(4);
-				quantity = (temp / 100) * 100;
-				fractional = temp - quantity;
-				itemslist.add(new ListFetchItemsJSON(unitName, UPC, description, quantity, fractional));
+				quantity = (temp / 100);
+				fractional = temp - quantity * 100;
+				items.add(new ListFetchItemsJSON(unitName, UPC, description, quantity, fractional));
 			}
-			items = new ListFetchItemsJSON[itemslist.size()];
-			items = itemslist.toArray(items);
 		} catch (SQLException e) {
 			release();
 			return false;

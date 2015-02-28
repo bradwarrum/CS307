@@ -130,7 +130,7 @@ public class SessionTable {
 		public void run() {
 			if (RUNNING) return;
 			RUNNING = true;
-			System.out.println("Starting SessionTable cleaner");
+			//System.out.println("Starting SessionTable cleaner");
 			int cleanseCount = 0;
 			try {
 
@@ -158,7 +158,7 @@ public class SessionTable {
 			}
 			finally {
 				RUNNING = false;
-				System.out.println("SessionTable cleansing completed\n" + cleanseCount + " records removed");
+				System.out.println(cleanseCount + " records removed from SessionTable");
 			}
 			
 		}

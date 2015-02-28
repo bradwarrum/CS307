@@ -28,7 +28,7 @@ public class ListUpdateRoute extends Route {
 			respond(xchg, 400); return;
 		}
 		if (luj == null || !luj.valid()) { respond(xchg, 400); return;}
-		ListUpdateWrapper luw = new ListUpdateWrapper(userID, householdID, listID, luj.timestamp, luj.items);
+		ListUpdateWrapper luw = new ListUpdateWrapper(userID, householdID, listID, luj.version, luj.items);
 		ListUpdateResult result = luw.update();
 		if (result == ListUpdateResult.INTERNAL_ERROR) {respond(xchg, 500);}
 		else if (result == ListUpdateResult.INSUFFICIENT_PERMISSIONS) {respond(xchg, 403);}
@@ -39,12 +39,12 @@ public class ListUpdateRoute extends Route {
 	}
 	public static class ListUpdateJSON {
 		@Expose(deserialize = true)
-		public long timestamp;
+		public long version;
 		@Expose(deserialize = true)
 		public List<ListUpdateItemJSON> items;
 		
 		public boolean valid() {
-			if (timestamp < 0) return false;
+			if (version < 0) return false;
 			if (items == null) return false;
 			for (ListUpdateItemJSON l : items) {
 				if (!l.valid()) return false;

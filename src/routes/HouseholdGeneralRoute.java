@@ -12,14 +12,23 @@ public class HouseholdGeneralRoute extends Route {
 	private static final Route LIST_CREATE_ROUTE = new ListCreateRoute();
 	private static final Route LIST_UPDATE_ROUTE = new ListUpdateRoute();
 	private static final Route LIST_FETCH_ROUTE = new ListFetchRoute();
+	private static final Route HOUSEHOLD_FETCH_ROUTE = new HouseholdFetchRoute();
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		String path = xchg.getRequestURI().getPath();
 		try {
-			String hidStr = path.substring(HOUSEHOLD_OFS, path.indexOf('/', HOUSEHOLD_OFS));
+			int slindex = path.indexOf('/', HOUSEHOLD_OFS);
+			String hidStr;
+			if (slindex < 0) {
+				hidStr = path.substring(HOUSEHOLD_OFS, path.length());
+			}else {
+				hidStr = path.substring(HOUSEHOLD_OFS, slindex);
+			}
 			int householdID = Integer.parseUnsignedInt(hidStr);
 			xchg.setAttribute("householdID", householdID);
 			String remainder = path.substring(HOUSEHOLD_OFS + hidStr.length());
+			if (remainder.equals("")) {HOUSEHOLD_FETCH_ROUTE.handle(xchg); return;}
+			
 			String separated = remainder.split("\\?")[0];
 			
 			if (separated.startsWith("/items/")) {
@@ -29,7 +38,13 @@ public class HouseholdGeneralRoute extends Route {
 				if (itemCommand.equals("/link")) {LINK_ROUTE.handle(xchg); return;}
 			} else if (separated.equals("/lists/create")) {LIST_CREATE_ROUTE.handle(xchg); return;}
 			else if (separated.startsWith("/lists/")) {
-				String liststr = separated.substring(7, Math.max(separated.length(), separated.indexOf('/', 7)));
+				slindex = separated.indexOf('/', 7);
+				String liststr;
+				if (slindex < 0) {
+					liststr = separated.substring(7, separated.length());
+				}else {
+					liststr = separated.substring(7, slindex);
+				}
 				int listID = Integer.parseUnsignedInt(liststr);
 				xchg.setAttribute("listID", listID);
 				String listCommand = separated.substring(7 + liststr.length());

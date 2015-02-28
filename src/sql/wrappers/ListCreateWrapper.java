@@ -13,7 +13,7 @@ public class ListCreateWrapper extends SQLExecutable {
 	@Expose(serialize = true)
 	private int listID = -1;
 	@Expose(serialize = true)
-	private long timestamp = -1;
+	private long version = -1;
 	private int userID, householdID;
 	
 	public ListCreateWrapper(int userID, int householdID, String listName) {
@@ -54,12 +54,12 @@ public class ListCreateWrapper extends SQLExecutable {
 		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ListCreateResult.INSUFFICIENT_PERMISSIONS;}
 		
 		int affected = 0;
-		timestamp = System.currentTimeMillis();
+		version = System.currentTimeMillis();
 		try {
 			affected = update("INSERT INTO HouseholdShoppingList (HouseholdId, Name, Timestamp) VALUES (?, ?, ?);", 
 					new SQLParam(householdID, SQLType.INT),
 					new SQLParam(listName, SQLType.VARCHAR),
-					new SQLParam(timestamp, SQLType.LONG));
+					new SQLParam(version, SQLType.LONG));
 			
 		} catch (SQLException e) {
 			rollback();
