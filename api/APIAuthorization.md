@@ -46,7 +46,7 @@ HTTP 400 BAD REQUEST
 ##User Registration<br>
 ####Request Format
 Maximum field lengths are as follows:
- - email : 254 characters
+ - emailAddress : 254 characters
  - firstName : 20 characters
  - lastName : 20 characters
  - password : 64 characters (32 byte hash, hex encoded)
@@ -59,7 +59,7 @@ HTTP Headers
 Content-Type : application/json
 
 {
-  "email" : "emailAddress@domain.com",
+  "emailAddress" : "emailAddress@domain.com",
   "firstName" : "First",
   "lastName" : "Last",
   "password" : sha256(password)
