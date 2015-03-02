@@ -57,6 +57,7 @@ CREATE TABLE HouseholdShoppingList(
 	ListId INT NOT NULL AUTO_INCREMENT,
 	HouseholdId INT NOT NULL,
 	Name VARCHAR(40) NOT NULL,
+	Timestamp LONG NOT NULL,
 	UserId INT,
 	AmountSpent FLOAT,
 	DateCompleted DATE,
@@ -67,13 +68,11 @@ CREATE TABLE HouseholdShoppingList(
 CREATE TABLE ShoppingListItem (
 	ListItemId INT NOT NULL AUTO_INCREMENT,
 	ListId INT NOT NULL,
-	UPC VARCHAR(13) NOT NULL,
-	Name VARCHAR(40) NOT NULL,
-	Quantity FLOAT,
+	ItemId INT NOT NULL,
+	Quantity INT NOT NULL,
 	UnitId INT,
 	PRIMARY KEY ( ListItemId ),
-	FOREIGN KEY ( UPC ) REFERENCES InventoryItem ( UPC ),
-	FOREIGN KEY ( UnitId ) REFERENCES MeasurementUnit ( UnitId )
+	FOREIGN KEY (ItemId) REFERENCES InventoryItem(ItemId),
+	FOREIGN KEY ( UnitId ) REFERENCES MeasurementUnit ( UnitId ),
+	UNIQUE (ItemId, ListId)
 );
-
-	
