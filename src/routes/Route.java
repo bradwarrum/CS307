@@ -48,6 +48,7 @@ public class Route implements HttpHandler{
 	 * @throws IOException
 	 */
 	protected void respond(HttpExchange xchg, int code) throws IOException {
+		xchg.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
 		xchg.sendResponseHeaders(code, -1L);
 		xchg.close();
 	}
@@ -60,6 +61,7 @@ public class Route implements HttpHandler{
 	 * @throws IOException
 	 */
 	protected void error(HttpExchange xchg, int code, String error) throws IOException{
+		xchg.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
 		xchg.getResponseHeaders().add("Content-Type", "application/json");
 		String jsonError = "{\n\t\"reason\" : \"" + error + "\"\n}";
 		byte [] json = jsonError.getBytes();
@@ -75,6 +77,7 @@ public class Route implements HttpHandler{
 	 * @param JSONresponse The JSON payload for this response
 	 */
 	protected void respond(HttpExchange xchg, int code, String JSONresponse) throws IOException {
+		xchg.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
 		xchg.getResponseHeaders().add("Content-Type", "application/json");
 		byte [] json = JSONresponse.getBytes();
 		xchg.sendResponseHeaders(code, json.length);
