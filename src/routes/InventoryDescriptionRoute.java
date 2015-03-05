@@ -2,8 +2,7 @@ package routes;
 
 import java.io.IOException;
 
-import sql.wrappers.HouseholdCreationWrapper;
-import sql.wrappers.HouseholdCreationWrapper.HouseholdCreationResult;
+import sql.wrappers.InventoryDescriptionWrapper;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
@@ -30,7 +29,7 @@ public class InventoryDescriptionRoute extends Route {
 			return;			
 		}
 		String UPC=(String) xchg.getAttribute("UPC");
-		InventoryDescriptionWrapper idw= new InventoryDescriptionWrapper(householdID, upc);
+		InventoryDescriptionWrapper idw= new InventoryDescriptionWrapper(householdID, UPC);
 		if(!idw.fetch()){
 			respond(xchg,500);
 			return;
