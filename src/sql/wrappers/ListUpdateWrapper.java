@@ -27,6 +27,7 @@ public class ListUpdateWrapper extends SQLExecutable {
 		INTERNAL_ERROR,
 		INSUFFICIENT_PERMISSIONS,
 		OUTDATED_INFORMATION,
+		LIST_NOT_FOUND,
 		ITEM_NOT_FOUND
 	}
 
@@ -40,12 +41,15 @@ public class ListUpdateWrapper extends SQLExecutable {
 
 	public ListUpdateResult update() {
 		// 1) Read permissions and ensure the user ID can modify lists
-		Permissions permissions= getPermissions();
-		if (permissions == null) {return ListUpdateResult.INTERNAL_ERROR;}
+		int permissionsraw = getPermissions();
+		if (permissionsraw == -1) {return ListUpdateResult.INTERNAL_ERROR;}
+		else if (permissionsraw == -2) {return ListUpdateResult.LIST_NOT_FOUND;}
+		Permissions permissions = new Permissions(permissionsraw);
 		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ListUpdateResult.INSUFFICIENT_PERMISSIONS;}
 		// 2) Read the household record and ensure the timestamp has not been updated
 		long DBtimestamp = readAndLockTimestamp();
-		if (DBtimestamp < 0) {release(); return ListUpdateResult.INTERNAL_ERROR;}
+		if (DBtimestamp == -1) {release(); return ListUpdateResult.INTERNAL_ERROR;}
+		else if (DBtimestamp == -2) {release(); return ListUpdateResult.INSUFFICIENT_PERMISSIONS;}
 		if (timestamp != DBtimestamp ) {release(); return ListUpdateResult.OUTDATED_INFORMATION;}
 		// 3) Update all the entries in the table
 		if (!updateRows()) {return ListUpdateResult.ITEM_NOT_FOUND;}
@@ -59,7 +63,7 @@ public class ListUpdateWrapper extends SQLExecutable {
 
 	}
 
-	private Permissions getPermissions() {
+	private int getPermissions() {
 		ResultSet results = null;
 		try{
 			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
@@ -68,30 +72,31 @@ public class ListUpdateWrapper extends SQLExecutable {
 
 		} catch (SQLException e) {
 			release();
-			return null;
+			return -1;
 		}
 		int permissionRaw = 0;
 		try {
-			if (results == null || !results.next()) { release(); return null;}
+			if (results == null) { release(); return -1;}
+			if	(!results.next()) { release(results); return -2;}
 			permissionRaw = results.getInt(1);
 		} catch (SQLException e) {
 			release();
-			return null;
+			return -1;
 		}finally {
 			release(results);
 		}
-		Permissions p = new Permissions(permissionRaw);
-		return p;
+		return permissionRaw;
 	}
 
 	private long readAndLockTimestamp() {
 		long stamp = -1;
 		ResultSet results = null;
 		try {
-			results = query ("SELECT Timestamp FROM HouseholdShoppingList WHERE ListID=? FOR UPDATE;",
-					new SQLParam(listID, SQLType.INT));
+			results = query ("SELECT Timestamp FROM HouseholdShoppingList WHERE ListID=? AND HouseholdId=? FOR UPDATE;",
+					new SQLParam(listID, SQLType.INT),
+					new SQLParam(householdID, SQLType.INT));
 			if (results == null) {release(); return -1;}
-			if (!results.next()) {release(results); release(); return -1;}
+			if (!results.next()) {release(results); release(); return -2;}
 			stamp = results.getLong(1);
 		} catch (SQLException e) {
 			release(results);

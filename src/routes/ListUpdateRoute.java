@@ -31,9 +31,10 @@ public class ListUpdateRoute extends Route {
 		ListUpdateWrapper luw = new ListUpdateWrapper(userID, householdID, listID, luj.version, luj.items);
 		ListUpdateResult result = luw.update();
 		if (result == ListUpdateResult.INTERNAL_ERROR) {respond(xchg, 500);}
-		else if (result == ListUpdateResult.INSUFFICIENT_PERMISSIONS) {respond(xchg, 403);}
+		else if (result == ListUpdateResult.INSUFFICIENT_PERMISSIONS) {error(xchg, 403, "[2]Insufficient permissions to modify that list. Check that household ID is valid and user has modify permissions.");}
 		else if (result == ListUpdateResult.OUTDATED_INFORMATION) {error(xchg, 400, "[0]Outdated timestamp.");}
 		else if (result == ListUpdateResult.ITEM_NOT_FOUND) {error(xchg, 400, "[1]One or more invalid UPCs for this household. Ensure they are added to the inventory");}
+		else if (result == ListUpdateResult.LIST_NOT_FOUND) {error(xchg, 404, "[3]List not found under household.");}
 		else if (result == ListUpdateResult.OK) {xchg.getResponseHeaders().set("ETag", "\"" + luw.getTimestamp() + "\"");respond(xchg, 200, gson.toJson(luw, ListUpdateWrapper.class));}
 		
 	}

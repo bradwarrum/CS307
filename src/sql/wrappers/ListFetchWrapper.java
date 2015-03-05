@@ -37,7 +37,8 @@ public class ListFetchWrapper extends SQLExecutable {
 		OK,
 		NOT_MODIFIED,
 		INTERNAL_ERROR,
-		INSUFFICIENT_PERMISSIONS
+		INSUFFICIENT_PERMISSIONS,
+		LIST_NOT_FOUND
 	}
 	
 	public static class ListFetchItemsJSON {
@@ -61,11 +62,14 @@ public class ListFetchWrapper extends SQLExecutable {
 	}
 	
 	public ListFetchResults fetch() {
-		Permissions permissions = getPermissions();
-		if (permissions == null) {return ListFetchResults.INTERNAL_ERROR;}
+		int permissionsraw = getPermissions();
+		if (permissionsraw == -1) return ListFetchResults.INTERNAL_ERROR;
+		else if (permissionsraw == -2) return ListFetchResults.LIST_NOT_FOUND;
+		Permissions permissions = new Permissions(permissionsraw);
 		if (!permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) { release(); return ListFetchResults.INSUFFICIENT_PERMISSIONS;}
 		int modresult = isModified(timestamp);
 		if (modresult == -1) return ListFetchResults.INTERNAL_ERROR;
+		else if (modresult == -2) return ListFetchResults.LIST_NOT_FOUND;
 		else if (modresult == 0) return ListFetchResults.NOT_MODIFIED;
 		else {
 			if (!selectAll()) return ListFetchResults.INTERNAL_ERROR;
@@ -75,7 +79,7 @@ public class ListFetchWrapper extends SQLExecutable {
 		
 	}
 	
-	private Permissions getPermissions() {
+	private int getPermissions() {
 		ResultSet results = null;
 		try{
 			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
@@ -84,30 +88,31 @@ public class ListFetchWrapper extends SQLExecutable {
 
 		} catch (SQLException e) {
 			release();
-			return null;
+			return -1;
 		}
 		int permissionRaw = 0;
 		try {
-			if (results == null || !results.next()) { release(); return null;}
+			if (results == null) { release(); return -1;}
+			if	(!results.next()) { release(results); return -2;}
 			permissionRaw = results.getInt(1);
 		} catch (SQLException e) {
 			release();
-			return null;
+			return -1;
 		}finally {
 			release(results);
 		}
-		Permissions p = new Permissions(permissionRaw);
-		return p;
+		return permissionRaw;
 	}
 	
 	private int isModified(long since) {
 		ResultSet results = null;
 		long dbstamp = 0;
 		try {
-			results = query("SELECT Timestamp, Name FROM HouseholdShoppingList WHERE ListId=?;",
-					new SQLParam(listID, SQLType.INT));
+			results = query("SELECT Timestamp, Name FROM HouseholdShoppingList WHERE ListId=? AND HouseholdId=?;",
+					new SQLParam(listID, SQLType.INT),
+					new SQLParam(householdID, SQLType.INT));
 			if (results == null) {release(); return -1;}
-			if (!results.next()) {release(results); release(); return -1;}
+			if (!results.next()) {release(results); release(); return -2;}
 			dbstamp = results.getLong(1);
 			name = results.getString(2);
 		} catch (SQLException e) {

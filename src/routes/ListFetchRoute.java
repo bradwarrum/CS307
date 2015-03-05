@@ -34,6 +34,7 @@ public class ListFetchRoute extends Route {
 			xchg.getResponseHeaders().set("ETag", "\"" + lfw.getTimestamp() + "\"");
 			respond(xchg, 304);
 		}else if (results == ListFetchResults.INSUFFICIENT_PERMISSIONS) respond(xchg, 403);
+		else if (results == ListFetchResults.LIST_NOT_FOUND) respond(xchg, 404);
 		else if (results == ListFetchResults.OK) {
 			xchg.getResponseHeaders().set("ETag", "\"" + lfw.getTimestamp() + "\"");
 			respond(xchg, 200, gson.toJson(lfw, ListFetchWrapper.class));
