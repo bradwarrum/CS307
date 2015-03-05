@@ -13,6 +13,7 @@ public class HouseholdGeneralRoute extends Route {
 	private static final Route LIST_UPDATE_ROUTE = new ListUpdateRoute();
 	private static final Route LIST_FETCH_ROUTE = new ListFetchRoute();
 	private static final Route HOUSEHOLD_FETCH_ROUTE = new HouseholdFetchRoute();
+	private static final Route INVENTORY_DESCRIPTION_ROUTE = new InventoryDescriptionRoute();
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		String path = xchg.getRequestURI().getPath();
@@ -35,8 +36,17 @@ public class HouseholdGeneralRoute extends Route {
 				String UPC = separated.substring(7, separated.indexOf('/', 7));
 				xchg.setAttribute("UPC", UPC);
 				String itemCommand = separated.substring(7+ UPC.length());
-				if (itemCommand.equals("/link")) {LINK_ROUTE.handle(xchg); return;}
-			} else if (separated.equals("/lists/create")) {LIST_CREATE_ROUTE.handle(xchg); return;}
+				if (itemCommand.equals("/link")) {
+					LINK_ROUTE.handle(xchg); 
+					return;
+				}else if(itemCommand.equals("/description")){
+					INVENTORY_DESCRIPTION_ROUTE.handle(xchg);
+					return;
+				}
+			} else if (separated.equals("/lists/create")) {
+				LIST_CREATE_ROUTE.handle(xchg);
+				return;
+			}
 			else if (separated.startsWith("/lists/")) {
 				slindex = separated.indexOf('/', 7);
 				String liststr;
