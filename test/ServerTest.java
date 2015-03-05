@@ -149,6 +149,11 @@ public class ServerTest {
 		assertEquals("Get self pass", 200, rcode);
 		getHousehold();
 		assertEquals("Get household pass", 200, rcode);
+		removeList();
+		assertEquals("List removal pass", 200, rcode);
+		getHousehold();
+		assertEquals("Get household pass", 200, rcode);
+		
 		
 	}
 	
@@ -344,6 +349,19 @@ public class ServerTest {
 		}catch (IOException e) {}
 		request.close();
 	}
-	
+	public void removeList() throws IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/lists/" + listID + "/remove?token=" + token);
+		request.setPostMethod();
+		System.out.println(delimiter + "\nRequest: UPDATE LIST");
+		System.out.println(request.getRequestURL());
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
+	}
 
 }
