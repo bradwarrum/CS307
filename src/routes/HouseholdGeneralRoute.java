@@ -12,6 +12,7 @@ public class HouseholdGeneralRoute extends Route {
 	private static final Route LIST_CREATE_ROUTE = new ListCreateRoute();
 	private static final Route LIST_UPDATE_ROUTE = new ListUpdateRoute();
 	private static final Route LIST_FETCH_ROUTE = new ListFetchRoute();
+	private static final Route LIST_REMOVE_ROUTE = new ListDeleteRoute();
 	private static final Route HOUSEHOLD_FETCH_ROUTE = new HouseholdFetchRoute();
 	private static final Route INVENTORY_DESCRIPTION_ROUTE = new InventoryDescriptionRoute();
 	@Override
@@ -59,6 +60,7 @@ public class HouseholdGeneralRoute extends Route {
 				xchg.setAttribute("listID", listID);
 				String listCommand = separated.substring(7 + liststr.length());
 				if (listCommand.equals("/update")) {LIST_UPDATE_ROUTE.handle(xchg); return;}
+				else if (listCommand.equals("/remove")) {LIST_REMOVE_ROUTE.handle(xchg); return;}
 				else if (listCommand.equals("")) {LIST_FETCH_ROUTE.handle(xchg);return;}
 			}
 				

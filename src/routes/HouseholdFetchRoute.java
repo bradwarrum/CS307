@@ -3,6 +3,7 @@ package routes;
 import java.io.IOException;
 
 import sql.wrappers.HouseholdFetchWrapper;
+import sql.wrappers.HouseholdFetchWrapper.HouseholdFetchResult;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -17,7 +18,9 @@ public class HouseholdFetchRoute extends Route {
 		if ((userID = Server.sessionTable().authenticate(getToken(xchg))) < 0) {respond(xchg, 403); return;}
 		if (householdID < 0) {respond(xchg,400); return;}
 		HouseholdFetchWrapper hfw = new HouseholdFetchWrapper(userID, householdID);
-		if (!hfw.fetch()) {respond(xchg, 500); return;}
+		HouseholdFetchResult results = hfw.fetch();
+		if (results == HouseholdFetchResult.INTERNAL_ERROR) {respond(xchg, 500); return;}
+		else if (results == HouseholdFetchResult.HOUSEHOLD_NOT_FOUND) {error(xchg, 404, "Could not find a household with that ID."); return;}
 		respond(xchg, 200, gson.toJson(hfw, HouseholdFetchWrapper.class));
 	}
 }
