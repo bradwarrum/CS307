@@ -113,7 +113,7 @@ URLs are in the form of */api/request/path/*, and are assumed to be appended to 
 		<td><code>GET /households/:HOUSEHOLD_ID/lists/:LIST_ID?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Remove Shopping List</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/lists/:LIST_ID/remove?token=SESSION_TOKEN</code></td>
 	</tr>

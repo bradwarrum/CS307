@@ -117,3 +117,13 @@ ETag : "1425107935796"
   ]
 }
 ```
+##Remove Shopping List<br>
+####Request Format
+```
+POST /households/:HOUSEHOLD_ID/lists/:LIST_ID/remove?token=SESSION_TOKEN
+```
+####Response Format
+If no errors occurred
+```
+HTTP 200 OK
+```
