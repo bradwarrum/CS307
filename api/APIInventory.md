@@ -35,3 +35,33 @@ HTTP 400 BAD REQUEST
 ```
 Note: Barcodes currently accepted are UPC-A, EAN-13 and UPC-E/EAN-8.  UPC-A and EAN-13 have a checksum method that is carried out on the server.  A HTTP 400 BAD REQUEST response will occur if the checksum bit is invalid.<p>
 EAN-8 and UPC-E checksums are not calculated because it is not possible to tell if the barcode is UPC-E or EAN-8 (same number of digits)
+##Get UPC Description Suggestions<br>
+####Request Format
+```
+GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN
+```
+####Response Format
+```
+HTTP 200
+{
+  "UPC": "04963406",
+  "householdId": 24839,
+  "currentDescription": "Can of Coke",
+  "internalSuggestions": [
+    {
+      "householdID": 19283,
+      "description": "Coca Cola, Can"
+    }
+  ],
+  "externalSuggestions": [
+    {
+      "source": "www.upcdatabase.org",
+      "description": "Coca Cola Classic"
+    }
+  ]
+}
+```
+ - currentDescription is the description linked to the household :HOUSEHOLD_ID provided in the URL.
+ - currentDescription is null if the household :HOUSEHOLD_ID provided in the URL does not have a linked description for :UPC.
+ - internalSuggestions are all the descriptions for that :UPC from the user's other households. If they have no linked description for :UPC in another household, this field is an empty array.
+ - externalSuggestions are all the descriptions for that :UPC from external APIs.  The source field designates which API produced the description.  If no APIs have a description for :UPC, this field is an empty array.

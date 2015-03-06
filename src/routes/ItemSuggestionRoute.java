@@ -2,16 +2,14 @@ package routes;
 
 import java.io.IOException;
 
-import sql.wrappers.InventoryDescriptionWrapper;
+import sql.wrappers.ItemSuggestionWrapper;
+import sql.wrappers.ItemSuggestionWrapper.ItemSuggestionResult;
 
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import com.sun.net.httpserver.HttpExchange;
 
 import core.Server;
 
-public class InventoryDescriptionRoute extends Route {
+public class ItemSuggestionRoute extends Route {
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		if (!"get".equalsIgnoreCase(xchg.getRequestMethod())){
@@ -29,12 +27,16 @@ public class InventoryDescriptionRoute extends Route {
 			return;			
 		}
 		String UPC=(String) xchg.getAttribute("UPC");
-		InventoryDescriptionWrapper idw= new InventoryDescriptionWrapper(householdID, UPC);
-		if(!idw.fetch()){
+		ItemSuggestionWrapper idw= new ItemSuggestionWrapper(householdID, userID, UPC);
+		ItemSuggestionResult results = idw.fetch();
+		if (results == ItemSuggestionResult.INTERNAL_ERROR) {
 			respond(xchg,500);
 			return;
+		} else if (results == ItemSuggestionResult.HOUSEHOLD_NOT_FOUND) {
+			error(xchg, 404, "Household " + householdID + " does not exist for that user.");
+			return;
 		}
-		respond(xchg,200,gson.toJson(idw,InventoryDescriptionWrapper.class));
+		respond(xchg,200,gson.toJson(idw,ItemSuggestionWrapper.class));
 	}
 }
 

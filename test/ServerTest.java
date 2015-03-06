@@ -153,6 +153,13 @@ public class ServerTest {
 		assertEquals("List removal pass", 200, rcode);
 		getHousehold();
 		assertEquals("Get household pass", 200, rcode);
+		createHousehold("Apartment", "John and Julia's Inventory");
+		assertEquals("Household creation pass", 201, rcode);
+		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
+		link("04963406", "Can of Coke", "oz.");
+		assertEquals("Link 3 pass", 200, rcode);
+		getSuggestions("04963406");
+		assertEquals("Suggestion pass", 200, rcode);
 		
 		
 	}
@@ -352,7 +359,21 @@ public class ServerTest {
 	public void removeList() throws IOException {
 		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/lists/" + listID + "/remove?token=" + token);
 		request.setPostMethod();
-		System.out.println(delimiter + "\nRequest: UPDATE LIST");
+		System.out.println(delimiter + "\nRequest: REMOVE LIST");
+		System.out.println(request.getRequestURL());
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
+	}	
+	public void getSuggestions(String UPC) throws IOException{
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID +"/items/" + UPC + "/suggestions?token=" + token);
+		request.setGetMethod();
+		System.out.println(delimiter + "\nRequest: GET ITEM SUGGESTIONS");
 		System.out.println(request.getRequestURL());
 		System.out.println("Response:");
 		rcode = request.getResponseCode();

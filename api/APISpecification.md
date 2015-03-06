@@ -89,9 +89,9 @@ URLs are in the form of */api/request/path/*, and are assumed to be appended to 
 		<td><code>POST /households/:HOUSEHOLD_ID/items/:UPC/link?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Get UPC Description Suggestions</td>
-		<td><code>GET /suggest/:UPC?source=[ext,int,both]&token=SESSION_TOKEN</code></td>
+		<td><code>GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN</code></td>
 	</tr>
 	
 	<tr><th colspan="3">

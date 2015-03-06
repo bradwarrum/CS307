@@ -19,7 +19,7 @@ CREATE TABLE HouseholdPermissions (
 	UserId INT NOT NULL,
 	HouseholdId INT NOT NULL,
 	PermissionLevel INT NOT NULL, 
-	PRIMARY KEY ( UserId, HouseholdId )
+	PRIMARY KEY ( UserId, HouseholdId ),
 	INDEX User(UserId),
 	FOREIGN KEY (UserId)
 	REFERENCES User ( UserId ),
