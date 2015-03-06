@@ -45,22 +45,22 @@ public class InventoryDescriptionWrapper extends SQLExecutable{
 			results= query("SELECT Description FROM InventoryItem WHERE (UPC=? AND HouseholdId=?);",upcsql,hidp);
 			if(results==null){
 				//hit API for default description
-							
 				String surl= "http://api.upcdatabase.org/json/72aaf1c920ed0cd53c54c6bc52b4c7ad/"+UPC;
+				
 				URL url = new URL(surl);
 				HttpURLConnection request = (HttpURLConnection) url.openConnection();
 				request.connect();
-
-				JsonParser jp = new JsonParser(); //from gson
+			
+				JsonParser jp = new JsonParser(); 
 			    JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //convert the input stream to a json element
 			    JsonObject rootobj = root.getAsJsonObject(); 
 			    String res=rootobj.get("valid").getAsString();
-								
-				if(!res.equals("false")){
+			    
+				if(res.equals("true")){
 					description=rootobj.get("itemname").getAsString();
 				}else{
 					description= "";
-				}
+				}			
 				//TODO: add more api hits in case there is over 1000 a day or buy more hits
 			}else{
 				description=results.getString(1);			
