@@ -197,7 +197,12 @@ public class ServerTest {
 		}
 		
 		public String getResponse() throws IOException {
-			InputStream is = connection.getInputStream();
+			
+			InputStream is;
+			if (connection.getResponseCode() == 200 || connection.getResponseCode() == 201 || connection.getResponseCode() == 304) 
+				is = connection.getInputStream();
+			else
+				is = connection.getErrorStream();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 			String line;
 			StringBuffer response = new StringBuffer();
@@ -226,6 +231,12 @@ public class ServerTest {
 		System.out.println("Response:");
 		rcode = request.getResponseCode();
 		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {
+			System.out.println(e);
+		}
 		request.close();	
 	}
 
@@ -277,6 +288,10 @@ public class ServerTest {
 		System.out.println("Response:");
 		rcode = request.getResponseCode();
 		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
 		request.close();
 	}
 	

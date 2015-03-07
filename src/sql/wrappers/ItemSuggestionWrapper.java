@@ -8,6 +8,8 @@ import java.util.List;
 import com.google.gson.*;
 import com.google.gson.annotations.Expose;
 
+import core.ResponseCode;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
@@ -57,13 +59,8 @@ public class ItemSuggestionWrapper extends SQLExecutable{
 		this.UPC = UPC;
 		this.userID = userID;
 	}
-	
-	public static enum ItemSuggestionResult {
-		OK,
-		INTERNAL_ERROR,
-		HOUSEHOLD_NOT_FOUND
-	}
-	public ItemSuggestionResult fetch(){
+
+	public ResponseCode fetch(){
 		ResultSet results= null;
 		SQLParam upcsql = new SQLParam(UPC, SQLType.VARCHAR);
 		SQLParam usersql = new SQLParam(userID, SQLType.INT);
@@ -71,15 +68,15 @@ public class ItemSuggestionWrapper extends SQLExecutable{
 			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE (UserId=? AND HouseholdId=?);",
 					usersql,
 					new SQLParam(householdId, SQLType.INT));
-			if (results == null) {release(); return  ItemSuggestionResult.INTERNAL_ERROR;}
-			if (!results.next()) {release(results); release(); return  ItemSuggestionResult.HOUSEHOLD_NOT_FOUND;}
+			if (results == null) {release(); return  ResponseCode.INTERNAL_ERROR;}
+			if (!results.next()) {release(results); release(); return  ResponseCode.HOUSEHOLD_NOT_FOUND;}
 			release(results);
 			results = query ("SELECT InventoryItem.Description, HouseholdPermissions.HouseholdId FROM HouseholdPermissions "
 					+ "INNER JOIN InventoryItem ON (InventoryItem.HouseholdId = HouseholdPermissions.HouseholdId) "
 					+ "WHERE (HouseholdPermissions.UserId=? AND InventoryItem.UPC=?);",
 					usersql,
 					upcsql);
-			if (results == null) {release(); return  ItemSuggestionResult.INTERNAL_ERROR;}
+			if (results == null) {release(); return  ResponseCode.INTERNAL_ERROR;}
 			int houseTEMP = -1;
 			String descriptionTEMP;
 			while (results.next()) {
@@ -111,19 +108,19 @@ public class ItemSuggestionWrapper extends SQLExecutable{
 		}catch (SQLException e){
 			release(results);
 			release();
-			return  ItemSuggestionResult.INTERNAL_ERROR;
+			return  ResponseCode.INTERNAL_ERROR;
 		}catch (MalformedURLException e){
 			release(results);
 			release();
-			return ItemSuggestionResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		}catch (Exception e){
 			release(results);
 			release();
-			return  ItemSuggestionResult.INTERNAL_ERROR;
+			return  ResponseCode.INTERNAL_ERROR;
 		}
 		release(results);
 		release();
-		return  ItemSuggestionResult.OK;
+		return  ResponseCode.OK;
 	}
 
 }

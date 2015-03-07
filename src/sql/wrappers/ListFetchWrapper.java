@@ -9,6 +9,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import core.Permissions;
+import core.ResponseCode;
 import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
@@ -33,13 +34,6 @@ public class ListFetchWrapper extends SQLExecutable {
 		this.timestamp = timestamp;
 	}
 	
-	public static enum ListFetchResults {
-		OK,
-		NOT_MODIFIED,
-		INTERNAL_ERROR,
-		INSUFFICIENT_PERMISSIONS,
-		LIST_NOT_FOUND
-	}
 	
 	public static class ListFetchItemsJSON {
 		@Expose(serialize = true)		
@@ -61,20 +55,20 @@ public class ListFetchWrapper extends SQLExecutable {
 		}
 	}
 	
-	public ListFetchResults fetch() {
+	public ResponseCode fetch() {
 		int permissionsraw = getPermissions();
-		if (permissionsraw == -1) return ListFetchResults.INTERNAL_ERROR;
-		else if (permissionsraw == -2) return ListFetchResults.LIST_NOT_FOUND;
+		if (permissionsraw == -1) return ResponseCode.INTERNAL_ERROR;
+		else if (permissionsraw == -2) return ResponseCode.LIST_NOT_FOUND;
 		Permissions permissions = new Permissions(permissionsraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) { release(); return ListFetchResults.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) { release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		int modresult = isModified(timestamp);
-		if (modresult == -1) return ListFetchResults.INTERNAL_ERROR;
-		else if (modresult == -2) return ListFetchResults.LIST_NOT_FOUND;
-		else if (modresult == 0) return ListFetchResults.NOT_MODIFIED;
+		if (modresult == -1) return ResponseCode.INTERNAL_ERROR;
+		else if (modresult == -2) return ResponseCode.LIST_NOT_FOUND;
+		else if (modresult == 0) return ResponseCode.NOT_MODIFIED;
 		else {
-			if (!selectAll()) return ListFetchResults.INTERNAL_ERROR;
+			if (!selectAll()) return ResponseCode.INTERNAL_ERROR;
 			release();
-			return ListFetchResults.OK;
+			return ResponseCode.OK;
 		}
 		
 	}

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import core.Permissions;
 import core.Barcode;
+import core.ResponseCode;
 import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
@@ -17,12 +18,6 @@ public class UPCLinkWrapper extends SQLExecutable {
 	private String description;
 	private String unitName;
 	
-	public static enum UPCLinkResult {
-		OK,
-		INTERNAL_ERROR,
-		HOUSEHOLD_NOT_FOUND,
-		INSUFFICIENT_PERMISSIONS
-	}
 	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, String unitName) {
 		this.userID = userID;
 		this.householdID = householdID;
@@ -31,7 +26,7 @@ public class UPCLinkWrapper extends SQLExecutable {
 		this.unitName = unitName;
 	}
 	
-	public UPCLinkResult link() {
+	public ResponseCode link() {
 		ResultSet results = null;
 		try {
 			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId = ? AND HouseholdId = ?;", 
@@ -39,21 +34,21 @@ public class UPCLinkWrapper extends SQLExecutable {
 					new SQLParam(householdID, SQLType.INT));
 		} catch (SQLException e) {
 			release();
-			return UPCLinkResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		}
 		int permissionraw = 0;
-		if (results == null) {release(); return UPCLinkResult.INTERNAL_ERROR;}
+		if (results == null) {release(); return ResponseCode.INTERNAL_ERROR;}
 		try {
-			if (!results.next()) {release(results); release(); return UPCLinkResult.HOUSEHOLD_NOT_FOUND;}
+			if (!results.next()) {release(results); release(); return ResponseCode.HOUSEHOLD_NOT_FOUND;}
 			permissionraw = results.getInt("PermissionLevel");
 		} catch (SQLException e) {
 			release();
-			return UPCLinkResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		} finally {
 			release(results);
 		}
 		Permissions permissions = new Permissions(permissionraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return UPCLinkResult.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		try {
 			update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, UnitQuantity, UnitName, Hidden) VALUES (?, ?, ?, ?, ?, ?)"
@@ -66,10 +61,10 @@ public class UPCLinkWrapper extends SQLExecutable {
 					new SQLParam(0, SQLType.BYTE));
 		} catch (SQLException e) {
 			rollback();
-			return UPCLinkResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		} finally {
 			release();
 		}
-		return UPCLinkResult.OK;
+		return ResponseCode.OK;
 	}
 }

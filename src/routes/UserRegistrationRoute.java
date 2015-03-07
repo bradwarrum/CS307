@@ -3,11 +3,12 @@ package routes;
 import java.io.IOException;
 
 import sql.wrappers.UserRegistrationWrapper;
-import sql.wrappers.UserRegistrationWrapper.RegistrationResult;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.sun.net.httpserver.HttpExchange;
+
+import core.ResponseCode;
 
 public class UserRegistrationRoute extends Route {
 	@Override
@@ -20,16 +21,16 @@ public class UserRegistrationRoute extends Route {
 		try {
 			info = gson.fromJson(request, UserInformation.class);
 		}catch (JsonSyntaxException jse) {
-			respond(xchg, 400); return;
+			error(xchg, ResponseCode.INVALID_PAYLOAD); return;
 		}
-		if (info == null || !info.valid()) {error(xchg, 400, "Malformed input."); return;}
+		if (info == null || !info.valid()) {error(xchg, ResponseCode.INVALID_PAYLOAD); return;}
 		info.clean();
 		UserRegistrationWrapper urm = new UserRegistrationWrapper(info.emailAddress, info.firstName, info.lastName, info.password);
-		RegistrationResult result = urm.register();
-		if (result == RegistrationResult.MALFORMED_INPUT) error(xchg, 400, "Malformed input.");
-		else if (result == RegistrationResult.INTERNAL_ERROR) respond(xchg, 500);
-		else if (result == RegistrationResult.EMAIL_TAKEN) error(xchg, 403, "Email address is already in use.");
-		else respond(xchg, 201);
+		ResponseCode result = urm.register();
+		if (!result.success()) 
+			error(xchg, result);
+		else
+			respond(xchg, result.getHttpCode());
 	}
 	
 	public static class UserInformation {

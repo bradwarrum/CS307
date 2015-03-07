@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import com.google.gson.annotations.Expose;
 
 import core.Permissions;
+import core.ResponseCode;
 import sql.*;
 
 public class ListCreateWrapper extends SQLExecutable {
@@ -22,14 +23,8 @@ public class ListCreateWrapper extends SQLExecutable {
 		this.householdID = householdID;
 	}
 	
-	public static enum ListCreateResult {
-		CREATED,
-		INTERNAL_ERROR,
-		INSUFFICIENT_PERMISSIONS,
-		HOUSEHOLD_NOT_FOUND
-	}
 	
-	public ListCreateResult create() {
+	public ResponseCode create() {
 		ResultSet results = null;
 		try {
 			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
@@ -37,21 +32,21 @@ public class ListCreateWrapper extends SQLExecutable {
 					new SQLParam(householdID, SQLType.INT));
 		} catch (SQLException e) {
 			release();
-			return ListCreateResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		}
 		
 		int permLevel = 0;
 		try {
-			if (results == null || !results.next()) {release(); return ListCreateResult.HOUSEHOLD_NOT_FOUND;}
+			if (results == null || !results.next()) {release(); return ResponseCode.HOUSEHOLD_NOT_FOUND;}
 			permLevel = results.getInt(1);
 		}catch (SQLException e) {
 			release();
-			return ListCreateResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		} finally {
 			release(results);
 		}
 		Permissions permissions = new Permissions(permLevel);
-		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ListCreateResult.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		int affected = 0;
 		version = System.currentTimeMillis();
@@ -64,19 +59,19 @@ public class ListCreateWrapper extends SQLExecutable {
 		} catch (SQLException e) {
 			rollback();
 			release();
-			return ListCreateResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		}
-		if (affected == 0) {rollback(); release(); return ListCreateResult.INTERNAL_ERROR;}
+		if (affected == 0) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
 		try {
 			results = query("SELECT LAST_INSERT_ID() AS lastID;");
-			if (results == null || !results.next()) {rollback(); release(); return ListCreateResult.INTERNAL_ERROR;}
+			if (results == null || !results.next()) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
 			listID = results.getInt(1);
 		}catch (SQLException e) {
 			rollback(); release();
-			return ListCreateResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		} 
 		release();
-		return ListCreateResult.CREATED;
+		return ResponseCode.CREATED;
 		
 		
 		

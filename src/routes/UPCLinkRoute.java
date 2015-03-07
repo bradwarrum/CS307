@@ -3,13 +3,13 @@ package routes;
 import java.io.IOException;
 
 import sql.wrappers.UPCLinkWrapper;
-import sql.wrappers.UPCLinkWrapper.UPCLinkResult;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.sun.net.httpserver.HttpExchange;
 
 import core.Barcode;
+import core.ResponseCode;
 import core.Server;
 
 public class UPCLinkRoute extends Route {
@@ -19,44 +19,39 @@ public class UPCLinkRoute extends Route {
 			respond(xchg, 404);
 			return;
 		}
-		int userID = -1;
+		
+		int userID = Server.sessionTable().authenticate(getToken(xchg));
+		if (userID == -2) {error(xchg, ResponseCode.TOKEN_EXPIRED); return;}
+		else if (userID == -1) {error(xchg, ResponseCode.INVALID_TOKEN); return;}
+		
 		int householdID = (int) xchg.getAttribute("householdID");
 		String UPC = (String) xchg.getAttribute("UPC");
-		if ((userID = Server.sessionTable().authenticate(getToken(xchg))) < 0) {
-			respond(xchg, 403);
-			return;
-		}
 		String request = getRequest(xchg.getRequestBody());
 		UPCJson upcjson = null;
 		try {
 			upcjson = gson.fromJson(request, UPCJson.class);
 		} catch (JsonSyntaxException e) {
-			respond(xchg, 400); return;
+			error(xchg, ResponseCode.INVALID_PAYLOAD); return;
 		}
 		if (upcjson == null || !upcjson.valid() || householdID < 0 || UPC == null ) {
-			respond(xchg, 400);
+			error(xchg, ResponseCode.INVALID_PAYLOAD);
 			return;
 		}
 		Barcode barcode = new Barcode(UPC);
 		if (barcode.getFormat() == Barcode.Format.INVALID_FORMAT || barcode.getFormat() == Barcode.Format.PRODUCE_5) {
-			error(xchg, 400, "[1]Barcode format was invalid."); 
+			error(xchg, ResponseCode.UPC_FORMAT_NOT_SUPPORTED); 
 			return;
 		}
 		else if (barcode.getFormat() == Barcode.Format.INVALID_CHECKSUM) {
-			error(xchg, 400, "[2]Invalid checksum found for 12/13 digit barcode");
+			error(xchg, ResponseCode.UPC_CHECKSUM_INVALID);
 			return;
 		}
 		UPCLinkWrapper upclw =  new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName);
-		UPCLinkResult result = upclw.link();
-		
-		if (result == UPCLinkResult.HOUSEHOLD_NOT_FOUND) 
-			error(xchg, 400, "[3]Household not found.");
-		else if (result == UPCLinkResult.INSUFFICIENT_PERMISSIONS)
-			error(xchg, 403, "[4]Insufficient permissions");
-		else if (result == UPCLinkResult.INTERNAL_ERROR)
-			respond(xchg, 500);
-		else 
-			respond(xchg, 200);
+		ResponseCode result = upclw.link();
+		if (!result.success())
+			error(xchg, result);
+		else
+			respond(xchg, result.getHttpCode());
 	}
 
 	private static class UPCJson {

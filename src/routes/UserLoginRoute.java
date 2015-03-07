@@ -3,11 +3,12 @@ package routes;
 import java.io.IOException;
 
 import sql.wrappers.UserLoginWrapper;
-import sql.wrappers.UserLoginWrapper.AuthResult;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.sun.net.httpserver.HttpExchange;
+
+import core.ResponseCode;
 
 public class UserLoginRoute extends Route {
 	@Override
@@ -20,16 +21,14 @@ public class UserLoginRoute extends Route {
 		try {
 			cred = gson.fromJson(request, UserCredentials.class);
 		}catch (JsonSyntaxException jse) {
-			respond(xchg, 400); return;
+			error(xchg, ResponseCode.INVALID_PAYLOAD); return;
 		}
-		if (cred == null || !cred.valid()) {error(xchg, 400, "Malformed input."); return;}
+		if (cred == null || !cred.valid()) {error(xchg, ResponseCode.INVALID_PAYLOAD); return;}
 		cred.clean();
 		UserLoginWrapper ulm = new UserLoginWrapper(cred.emailAddress, cred.password);
-		AuthResult res = ulm.isAuthenticated();
-		if (res == AuthResult.INTERNAL_ERROR) respond(xchg, 500);
-		else if (res == AuthResult.INVALID_PWD) error(xchg, 403, "Password invalid.");
-		else if (res == AuthResult.USER_NOT_FOUND) error(xchg, 404, "No user found with that email.");
-		else if (res == AuthResult.MALFORMED_INPUT) error(xchg, 400, "Malformed input.");
+		ResponseCode result = ulm.isAuthenticated();
+		if (!result.success()) 
+			error(xchg, result);
 		else {
 			ulm.produceToken();
 			respond(xchg, 200, gson.toJson(ulm));
