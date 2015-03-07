@@ -84,6 +84,7 @@ public class ServerTest {
 	public static String host;
 	public static String protocol = "http";
 	public static int port = 8000;
+	public static String prefix = "";
 	
 	public static String token = null;
 	public static int householdID;
@@ -106,6 +107,8 @@ public class ServerTest {
 		} else {
 			System.out.println("Enter host address (without http://): ");
 			host = in.readLine();
+			port = 80;
+			prefix = "/api";
 		}
 	}
 	@Test
@@ -168,7 +171,7 @@ public class ServerTest {
 	public static class Transaction {
 		private HttpURLConnection connection;
 		public Transaction(String protocol, String host, int port, String file) throws MalformedURLException, IOException {
-			connection = (HttpURLConnection) new URL(protocol, host, port, file).openConnection();
+			connection = (HttpURLConnection) new URL(protocol, host, port, prefix + file).openConnection();
 		}
 		
 		public String getRequestURL() {
