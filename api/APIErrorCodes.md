@@ -105,7 +105,7 @@ Content-Type : application/json
 
 {
   "errorCode" : 6,
-  "errorName" : EMAIL_TAKEN,
+  "errorName" : "EMAIL_TAKEN",
   "httpStatus" : 403,
   "errorDescription" : "Cannot register a user for that email address, the email address is already taken"
 }
