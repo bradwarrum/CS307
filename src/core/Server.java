@@ -2,6 +2,7 @@ package core;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import routes.*;
@@ -24,7 +25,7 @@ public class Server {
     	SQLExecutable.setSharedDatasource(d);
         if(d.connect()) System.out.println("Connection valid.");
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 8000), 0);
         //Setup routing
         server.createContext("/users/login", new UserLoginRoute());
         server.createContext("/users/register", new UserRegistrationRoute());
