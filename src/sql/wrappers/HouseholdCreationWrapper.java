@@ -9,6 +9,7 @@ import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
 import core.Permissions;
+import core.ResponseCode;
 
 public class HouseholdCreationWrapper extends SQLExecutable {
 	@Expose(serialize = true)
@@ -23,12 +24,7 @@ public class HouseholdCreationWrapper extends SQLExecutable {
 		householdDescription = description;
 	}
 	
-	public static enum HouseholdCreationResult {
-		CREATED,
-		INTERNAL_ERROR
-	}
-	
-	public HouseholdCreationResult create() {
+	public ResponseCode create() {
 		int affected = 0;
 		try {
 			affected = update("INSERT INTO Household (Name, Description, HeadOfHousehold) VALUES (?, ?, ?);",
@@ -38,9 +34,9 @@ public class HouseholdCreationWrapper extends SQLExecutable {
 		} catch (SQLException e) {
 			rollback();
 			release();
-			return HouseholdCreationResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		}
-		if (affected == 0) {rollback(); release(); return HouseholdCreationResult.INTERNAL_ERROR;}
+		if (affected == 0) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
 		
 		
 		
@@ -50,15 +46,15 @@ public class HouseholdCreationWrapper extends SQLExecutable {
 		} catch (SQLException e) {
 			rollback();
 			release();
-			return HouseholdCreationResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		}
-		if (results == null) {rollback(); release(); return HouseholdCreationResult.INTERNAL_ERROR;}
+		if (results == null) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
 		try {
 			results.next();
 			householdID = results.getInt("lastID");
 		} catch (SQLException e) {
 			rollback();
-			return HouseholdCreationResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		} finally {
 			release(results);
 		}		
@@ -73,12 +69,12 @@ public class HouseholdCreationWrapper extends SQLExecutable {
 					new SQLParam(perms.asInt(), SQLType.INT));
 		} catch (SQLException e) {
 			rollback();
-			return HouseholdCreationResult.INTERNAL_ERROR;
+			return ResponseCode.INTERNAL_ERROR;
 		}
-		if (affected == 0) {rollback(); release(); return HouseholdCreationResult.INTERNAL_ERROR;}
+		if (affected == 0) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
 		release();
 
-		return HouseholdCreationResult.CREATED;
+		return ResponseCode.CREATED;
 		
 	}
 	

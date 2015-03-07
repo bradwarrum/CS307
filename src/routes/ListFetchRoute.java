@@ -3,21 +3,23 @@ package routes;
 import java.io.IOException;
 
 import sql.wrappers.ListFetchWrapper;
-import sql.wrappers.ListFetchWrapper.ListFetchResults;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import core.ResponseCode;
 import core.Server;
 
 public class ListFetchRoute extends Route {
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		if (!"get".equalsIgnoreCase(xchg.getRequestMethod())) {respond(xchg, 404); return;}
-		int userID = -1;
 		int householdID = (int)xchg.getAttribute("householdID");
 		int listID = (int)xchg.getAttribute("listID");
-		if ((userID = Server.sessionTable().authenticate(getToken(xchg))) < 0) {respond(xchg, 403); return;}
-		if (householdID < 0 || listID < 0) {respond(xchg,400); return;}
+		
+		int userID = Server.sessionTable().authenticate(getToken(xchg));
+		if (userID == -2) {error(xchg, ResponseCode.TOKEN_EXPIRED); return;}
+		else if (userID == -1) {error(xchg, ResponseCode.INVALID_TOKEN); return;}
+		
 		long etag = 0;
 		String etagstr = xchg.getRequestHeaders().getFirst("If-None-Match");
 		if (etagstr != null) {
@@ -28,16 +30,16 @@ public class ListFetchRoute extends Route {
 			}
 		}
 		ListFetchWrapper lfw = new ListFetchWrapper(userID, householdID, listID, etag);
-		ListFetchResults results = lfw.fetch();
-		if (results == ListFetchResults.INTERNAL_ERROR) respond(xchg, 500);
-		else if (results == ListFetchResults.NOT_MODIFIED) {
+		ResponseCode result = lfw.fetch();
+		if (!result.success()) 
+			error(xchg, result);
+		else {
 			xchg.getResponseHeaders().set("ETag", "\"" + lfw.getTimestamp() + "\"");
-			respond(xchg, 304);
-		}else if (results == ListFetchResults.INSUFFICIENT_PERMISSIONS) respond(xchg, 403);
-		else if (results == ListFetchResults.LIST_NOT_FOUND) respond(xchg, 404);
-		else if (results == ListFetchResults.OK) {
-			xchg.getResponseHeaders().set("ETag", "\"" + lfw.getTimestamp() + "\"");
-			respond(xchg, 200, gson.toJson(lfw, ListFetchWrapper.class));
+			if (result == ResponseCode.OK)
+				respond(xchg, 200, gson.toJson(lfw, ListFetchWrapper.class));
+			else
+				respond(xchg, 304);
+				
 		}
 	}
 	

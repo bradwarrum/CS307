@@ -1,7 +1,10 @@
 ## Virtual Pantry API Specification
 This document specifies all API requests that may be made against the VirtualPantry backend API.
 <br>
-URLs are in the form of */api/request/path/*, and are assumed to be appended to the base domain (IP or registered domain name)
+URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
+<br>
+<h5>Error codes have been normalized.</h5>
+<a href="APIErrorCodes.md">Find the documentation here.</a>
 ###Overview
  - :heavy_multiplication_x:  Not Implemented
  - :heavy_check_mark:  Implemented

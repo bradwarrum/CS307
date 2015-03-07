@@ -111,7 +111,7 @@ public class SessionTable {
 		if (rec == null) return -1;
 		if (rec.isExpired()) {
 			sessions.remove(token, rec);
-			return -1;
+			return -2;
 		}
 		return rec.getUserID();
 	}

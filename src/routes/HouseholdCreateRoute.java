@@ -3,13 +3,13 @@ package routes;
 import java.io.IOException;
 
 import sql.wrappers.HouseholdCreationWrapper;
-import sql.wrappers.HouseholdCreationWrapper.HouseholdCreationResult;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.sun.net.httpserver.HttpExchange;
 
+import core.ResponseCode;
 import core.Server;
 
 public class HouseholdCreateRoute extends Route {
@@ -19,22 +19,24 @@ public class HouseholdCreateRoute extends Route {
 		if (!"post".equalsIgnoreCase(xchg.getRequestMethod())) {respond(xchg, 404); return;}
 		String path = xchg.getRequestURI().getPath();
 		if (!path.equals("/households/create")) {respond(xchg, 404); return;}
-		int userID = -1;
-		if ((userID = Server.sessionTable().authenticate(getToken(xchg))) < 0) {respond(xchg, 403); return;}
+		int userID = Server.sessionTable().authenticate(getToken(xchg));
+		if (userID == -2) {error(xchg, ResponseCode.TOKEN_EXPIRED); return;}
+		else if (userID == -1) {error(xchg, ResponseCode.INVALID_TOKEN); return;}
 		String request = getRequest(xchg.getRequestBody());
 		HouseholdCreationJSON hcrt = null;
 		try {
 			hcrt = gson.fromJson(request, HouseholdCreationJSON.class);
 		} catch (JsonSyntaxException e) {
-			respond(xchg, 400); return;
+			error(xchg, ResponseCode.INVALID_PAYLOAD); return;
 		}
-		if (hcrt == null || !hcrt.valid()) {error(xchg, 400, "Malformed input."); return;}
+		if (hcrt == null || !hcrt.valid()) {error(xchg, ResponseCode.INVALID_PAYLOAD); return;}
 		hcrt.clean();
 		HouseholdCreationWrapper hcw = new HouseholdCreationWrapper(hcrt.name, hcrt.description, userID);
-		HouseholdCreationResult result = hcw.create();
-		if (result == HouseholdCreationResult.INTERNAL_ERROR) respond(xchg, 500);
-		else if (result == HouseholdCreationResult.CREATED) respond(xchg, 201, gson.toJson(hcw, HouseholdCreationWrapper.class));
-		else respond(xchg, 404);
+		ResponseCode result = hcw.create();
+		if (!result.success())
+			error(xchg, result);
+		else 
+			respond(xchg, result.getHttpCode(), gson.toJson(hcw));
 	}
 	
 	private static class HouseholdCreationJSON {

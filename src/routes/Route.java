@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import core.ResponseCode;
 import core.SessionToken;
 
 public class Route implements HttpHandler{
@@ -54,18 +55,17 @@ public class Route implements HttpHandler{
 	}
 	
 	/**
-	 * Responds to the HttpRequest with a templated JSON error message.
-	 * @param xchg The HttpExchange object for this request
-	 * @param code The Http status code for the response
-	 * @param error The "reason" string that will be inserted into the JSON body
+	 * Responds to the HttpExchange with a pre-formed, enumerated error code
+	 * @param xchg The HttpExchange being responded to
+	 * @param code The ErrorCode enumeration object used to create the response
 	 * @throws IOException
 	 */
-	protected void error(HttpExchange xchg, int code, String error) throws IOException{
+	protected void error(HttpExchange xchg, ResponseCode code) throws IOException{
 		xchg.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
 		xchg.getResponseHeaders().add("Content-Type", "application/json");
-		String jsonError = "{\n\t\"reason\" : \"" + error + "\"\n}";
+		String jsonError = code.toString();
 		byte [] json = jsonError.getBytes();
-		xchg.sendResponseHeaders(code, json.length);
+		xchg.sendResponseHeaders(code.getHttpCode(), json.length);
 		xchg.getResponseBody().write(json);
 		xchg.close();
 	}

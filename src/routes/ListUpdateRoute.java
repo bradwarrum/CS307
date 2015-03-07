@@ -4,39 +4,42 @@ import java.io.IOException;
 import java.util.List;
 
 import sql.wrappers.ListUpdateWrapper;
-import sql.wrappers.ListUpdateWrapper.ListUpdateResult;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.sun.net.httpserver.HttpExchange;
 
+import core.ResponseCode;
 import core.Server;
 
 public class ListUpdateRoute extends Route {
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		if (!"post".equalsIgnoreCase(xchg.getRequestMethod())) {respond(xchg, 404); return;}
-		int userID = -1;
+		
+		int userID = Server.sessionTable().authenticate(getToken(xchg));
+		if (userID == -2) {error(xchg, ResponseCode.TOKEN_EXPIRED); return;}
+		else if (userID == -1) {error(xchg, ResponseCode.INVALID_TOKEN); return;}
+		
 		int householdID = (int)xchg.getAttribute("householdID");
 		int listID = (int)xchg.getAttribute("listID");
-		if ((userID = Server.sessionTable().authenticate(getToken(xchg))) < 0) {respond(xchg, 403); return;}
 		String request = getRequest(xchg.getRequestBody());
 		ListUpdateJSON luj = null;
 		try {
 			luj = gson.fromJson(request, ListUpdateJSON.class);
 		} catch (JsonSyntaxException e) {
-			respond(xchg, 400); return;
+			error(xchg, ResponseCode.INVALID_PAYLOAD); return;
 		}
-		if (luj == null || !luj.valid()) { respond(xchg, 400); return;}
+		if (luj == null || !luj.valid()) { error(xchg, ResponseCode.INVALID_PAYLOAD); return;}
 		ListUpdateWrapper luw = new ListUpdateWrapper(userID, householdID, listID, luj.version, luj.items);
-		ListUpdateResult result = luw.update();
-		if (result == ListUpdateResult.INTERNAL_ERROR) {respond(xchg, 500);}
-		else if (result == ListUpdateResult.INSUFFICIENT_PERMISSIONS) {error(xchg, 403, "[2]Insufficient permissions to modify that list. Check that household ID is valid and user has modify permissions.");}
-		else if (result == ListUpdateResult.OUTDATED_INFORMATION) {error(xchg, 400, "[0]Outdated timestamp.");}
-		else if (result == ListUpdateResult.ITEM_NOT_FOUND) {error(xchg, 400, "[1]One or more invalid UPCs for this household. Ensure they are added to the inventory");}
-		else if (result == ListUpdateResult.LIST_NOT_FOUND) {error(xchg, 404, "[3]List not found under household.");}
-		else if (result == ListUpdateResult.OK) {xchg.getResponseHeaders().set("ETag", "\"" + luw.getTimestamp() + "\"");respond(xchg, 200, gson.toJson(luw, ListUpdateWrapper.class));}
-		
+		ResponseCode result = luw.update();
+		if (!result.success()) 
+			error(xchg, result);
+		else {
+			xchg.getResponseHeaders().set("ETag",
+					"\"" + luw.getTimestamp() + "\"");
+			respond(xchg, 200, gson.toJson(luw, ListUpdateWrapper.class));
+		}
 	}
 	public static class ListUpdateJSON {
 		@Expose(deserialize = true)

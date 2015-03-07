@@ -11,6 +11,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import core.Permissions;
+import core.ResponseCode;
 import routes.ListUpdateRoute.ListUpdateItemJSON;
 import sql.SQLExecutable;
 import sql.SQLParam;
@@ -22,15 +23,6 @@ public class ListUpdateWrapper extends SQLExecutable {
 	private long timestamp;
 	private List<ListUpdateItemJSON> items;
 
-	public static enum ListUpdateResult {
-		OK,
-		INTERNAL_ERROR,
-		INSUFFICIENT_PERMISSIONS,
-		OUTDATED_INFORMATION,
-		LIST_NOT_FOUND,
-		ITEM_NOT_FOUND
-	}
-
 	public ListUpdateWrapper(int userID, int householdID, int listID, long timestamp, List<ListUpdateItemJSON> items) {
 		this.userID = userID;
 		this.householdID = householdID;
@@ -39,27 +31,27 @@ public class ListUpdateWrapper extends SQLExecutable {
 		this.items = items;
 	}
 
-	public ListUpdateResult update() {
+	public ResponseCode update() {
 		// 1) Read permissions and ensure the user ID can modify lists
 		int permissionsraw = getPermissions();
-		if (permissionsraw == -1) {return ListUpdateResult.INTERNAL_ERROR;}
-		else if (permissionsraw == -2) {return ListUpdateResult.LIST_NOT_FOUND;}
+		if (permissionsraw == -1) {return ResponseCode.INTERNAL_ERROR;}
+		else if (permissionsraw == -2) {return ResponseCode.LIST_NOT_FOUND;}
 		Permissions permissions = new Permissions(permissionsraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ListUpdateResult.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		// 2) Read the household record and ensure the timestamp has not been updated
 		long DBtimestamp = readAndLockTimestamp();
-		if (DBtimestamp == -1) {release(); return ListUpdateResult.INTERNAL_ERROR;}
-		else if (DBtimestamp == -2) {release(); return ListUpdateResult.INSUFFICIENT_PERMISSIONS;}
-		if (timestamp != DBtimestamp ) {release(); return ListUpdateResult.OUTDATED_INFORMATION;}
+		if (DBtimestamp == -1) {release(); return ResponseCode.INTERNAL_ERROR;}
+		else if (DBtimestamp == -2) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		if (timestamp != DBtimestamp ) {release(); return ResponseCode.OUTDATED_TIMESTAMP;}
 		// 3) Update all the entries in the table
-		if (!updateRows()) {return ListUpdateResult.ITEM_NOT_FOUND;}
+		if (!updateRows()) {return ResponseCode.ITEM_NOT_FOUND;}
 
 		// 4) Write the timestamp to the household
 		long newstamp = writeTimestamp();
-		if (newstamp == -1) {return ListUpdateResult.INTERNAL_ERROR;}
+		if (newstamp == -1) {return ResponseCode.INTERNAL_ERROR;}
 		release();
 		timestamp = newstamp;
-		return ListUpdateResult.OK;
+		return ResponseCode.OK;
 
 	}
 
