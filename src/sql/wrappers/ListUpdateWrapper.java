@@ -66,10 +66,11 @@ public class ListUpdateWrapper extends BaseWrapper {
 			if (!results.next()) {release(results); release(); return -2;}
 			stamp = results.getLong(1);
 		} catch (SQLException e) {
-			release(results);
 			rollback();
 			release();
 			return -1;
+		} finally {
+			release(results);
 		}
 		return stamp;
 	}
@@ -89,8 +90,8 @@ public class ListUpdateWrapper extends BaseWrapper {
 				if (results == null || !results.next()) {release(results); rollback(); release(); return false;}
 				int itemID = results.getInt(1);
 				SQLParam itemidp = new SQLParam(itemID, SQLType.INT);
-				SQLParam quantityp = new SQLParam(item.quantity * 100 + item.fractional, SQLType.INT);
-				if (item.quantity == 0 && item.fractional == 0) {
+				SQLParam quantityp = new SQLParam(item.quantity, SQLType.INT);
+				if (item.quantity == 0) {
 					fail = update("DELETE FROM ShoppingListItem WHERE (ListId=? AND ItemId=?);",
 							listidp,
 							itemidp);

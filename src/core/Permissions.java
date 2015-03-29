@@ -56,7 +56,7 @@ public class Permissions {
 	 */
 	public boolean has(Flag...flagSet) {
 		for (Flag f : flagSet) {
-			if (permissions.contains(f)) return false;
+			if (!permissions.contains(f)) return false;
 		}
 		return true;
 	}

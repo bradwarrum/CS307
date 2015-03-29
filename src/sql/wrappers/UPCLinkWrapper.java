@@ -15,13 +15,17 @@ public class UPCLinkWrapper extends BaseWrapper {
 	private Barcode barcode;
 	private String description;
 	private String unitName;
+	private float size;
+	private String packageName;
 	
-	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, String unitName) {
+	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, String unitName, float size, String packageName) {
 		this.userID = userID;
 		this.householdID = householdID;
 		this.barcode = barcode;
 		this.description = description;
 		this.unitName = unitName;
+		this.size = size;
+		this.packageName = packageName;
 	}
 	
 	public ResponseCode link() {
@@ -32,13 +36,15 @@ public class UPCLinkWrapper extends BaseWrapper {
 		if (!permissions.has(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		try {
-			update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, UnitQuantity, UnitName, Hidden) VALUES (?, ?, ?, ?, ?, ?)"
-							+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), UnitName=VALUES(UnitName);",
+			update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, PackageQuantity, PackageUnits, PackageName, InventoryQuantity, Hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+							+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), PackageQuantity=VALUES(PackageQuantity), PackageName=VALUES(PackageName);",
 					new SQLParam(barcode.toString(), SQLType.VARCHAR),
 					new SQLParam(householdID, SQLType.INT),
 					new SQLParam(description, SQLType.VARCHAR),
-					new SQLParam(0f,SQLType.FLOAT),
+					new SQLParam(size, SQLType.FLOAT),
 					new SQLParam(unitName, SQLType.VARCHAR),
+					new SQLParam(packageName, SQLType.VARCHAR),
+					new SQLParam(0, SQLType.INT),
 					new SQLParam(0, SQLType.BYTE));
 		} catch (SQLException e) {
 			rollback();

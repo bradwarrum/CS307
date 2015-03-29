@@ -32,7 +32,7 @@ public class ServerTest {
 	
 	public static class DatabaseSetup extends sql.SQLExecutable {
 		public boolean setup() throws SQLException {
-			Path sqlfile = Paths.get("scripts/Sprint1Initialization.sql");
+			Path sqlfile = Paths.get("scripts/Sprint2Initialization.sql");
 			System.out.println("Running setup script from " + sqlfile.toAbsolutePath().toString());
 			List<String> contents;
 			try {
@@ -128,11 +128,11 @@ public class ServerTest {
 		createHousehold("Stash", "Private Inventory");
 		assertEquals("Household creation pass", 201, rcode);
 		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
-		link("029000071858", "Planters Cocktail Peanuts", "oz.");
+		link("029000071858", "Planters Cocktail Peanuts", "tins", "ounces", 12.0f);
 		assertEquals("Link 1 pass", 200, rcode);
-		link( "04963406", "Coca Cola, Can", "oz.");
+		link( "04963406", "Coca Cola", "cans", "ounces", 12.0f);
 		assertEquals("Link 2 pass", 200, rcode);
-		link("036632001085", "Dannon Fruit on Bottom Blueberry", "oz.");
+		link("040000231325", "Starburst FaveRed Jellybeans", "bags", "ounces", 14.0f);
 		assertEquals("Link 3 pass", 200, rcode);
 		createList("Weekly Shopping");
 		assertEquals("Create List pass", 201, rcode);
@@ -140,9 +140,9 @@ public class ServerTest {
 		listID = lcr.listID;
 		timestamp = lcr.version;
 		List<ListUpdateItem> items = new ArrayList<ListUpdateItem>();
-		items.add(new ListUpdateItem("029000071858", 3, 0));
-		items.add(new ListUpdateItem( "04963406", 12, 0));
-		items.add(new ListUpdateItem("036632001085", 6, 0));
+		items.add(new ListUpdateItem("029000071858", 3));
+		items.add(new ListUpdateItem( "04963406", 12));
+		items.add(new ListUpdateItem("040000231325", 6));
 		updateList(items);
 		assertEquals("Update list pass", 200, rcode);
 		timestamp = gson.fromJson(response, ListUpdateResJSON.class).timestamp;
@@ -156,13 +156,25 @@ public class ServerTest {
 		assertEquals("List removal pass", 200, rcode);
 		getHousehold();
 		assertEquals("Get household pass", 200, rcode);
+		getInventory();
+		assertEquals("Inventory fetch pass", 200, rcode);
+		timestamp = 1;
+		List<InventoryUpdateItem> invItems = new ArrayList<InventoryUpdateItem>();
+		invItems.add(new InventoryUpdateItem("029000071858", 1, 50));
+		invItems.add(new InventoryUpdateItem("04963406", 17, 0));
+		invItems.add(new InventoryUpdateItem("040000231325", 1, 25));
+		updateInventory(invItems);
+		assertEquals("Inventory update pass", 200, rcode);
+		getInventory();
+		assertEquals("Inventory fetch pass", 200, rcode);
 		createHousehold("Apartment", "John and Julia's Inventory");
 		assertEquals("Household creation pass", 201, rcode);
 		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
-		link("04963406", "Can of Coke", "oz.");
+		link( "04963406", "Coke", "cans", "milliliters", 355.0f);
 		assertEquals("Link 3 pass", 200, rcode);
 		getSuggestions("04963406");
 		assertEquals("Suggestion pass", 200, rcode);
+
 		
 		
 	}
@@ -277,10 +289,10 @@ public class ServerTest {
 		request.close();
 	}
 	
-	public void link(String UPC, String description, String unitName)throws IOException {
+	public void link(String UPC, String description, String packageName, String packageUnits, float packageSize)throws IOException {
 		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
 		request.setPostMethod();
-		String reqstr = gson.toJson(new LinkReqJSON(description, unitName));
+		String reqstr = gson.toJson(new LinkReqJSON(description, packageName, packageUnits, packageSize));
 		System.out.println(delimiter + "\nRequest: LINK UPC");
 		System.out.println(request.getRequestURL());
 		System.out.println(reqstr);
@@ -393,6 +405,39 @@ public class ServerTest {
 		request.setGetMethod();
 		System.out.println(delimiter + "\nRequest: GET ITEM SUGGESTIONS");
 		System.out.println(request.getRequestURL());
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
+	}
+	
+	public void getInventory() throws MalformedURLException, IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items?token=" + token);
+		request.setGetMethod();
+		System.out.println(delimiter + "\nRequest: GET HOUSEHOLD INVENTORY");
+		System.out.println(request.getRequestURL());
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
+	}
+	
+	public void updateInventory(List<InventoryUpdateItem> items) throws MalformedURLException, IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/update?token=" + token);
+		request.setPostMethod();
+		String reqstr = gson.toJson(new InventoryUpdateReqJSON(timestamp, items));
+		System.out.println(delimiter + "\nRequest: UPDATE INVENTORY");
+		System.out.println(request.getRequestURL());
+		System.out.println(reqstr);
+		request.send(reqstr);
 		System.out.println("Response:");
 		rcode = request.getResponseCode();
 		System.out.println("HTTP " + rcode);

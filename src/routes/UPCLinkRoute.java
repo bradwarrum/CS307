@@ -6,6 +6,7 @@ import sql.wrappers.UPCLinkWrapper;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.sun.net.httpserver.HttpExchange;
 
 import core.Barcode;
@@ -46,7 +47,7 @@ public class UPCLinkRoute extends Route {
 			error(xchg, ResponseCode.UPC_CHECKSUM_INVALID);
 			return;
 		}
-		UPCLinkWrapper upclw =  new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName);
+		UPCLinkWrapper upclw =  new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName);
 		ResponseCode result = upclw.link();
 		if (!result.success())
 			error(xchg, result);
@@ -57,11 +58,23 @@ public class UPCLinkRoute extends Route {
 	private static class UPCJson {
 		@Expose(deserialize = true) 
 		public String description;
+		
 		@Expose(deserialize = true)
+		@SerializedName("packageUnits")
 		public String unitName;
+		
+		@Expose(deserialize = true)
+		@SerializedName("packageSize")
+		public float size;
+		
+		@Expose(deserialize = true)
+		public String packageName;
+		
 		public boolean valid() {
 			if (description == null || description.length() > 40) return false;
-			if (unitName == null || unitName.length() > 5) return false;
+			if (unitName == null || unitName.length() > 20) return false;
+			if (packageName == null || packageName.length() > 20) return false;
+			if (size < 0) return false;
 			return true;
 		}
 	}

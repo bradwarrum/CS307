@@ -8,6 +8,7 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 ###Overview
  - :heavy_multiplication_x:  Not Implemented
  - :heavy_check_mark:  Implemented
+ - :heavy_exclamation_mark: Recently Modified
  
 <table>
 	<tr><th colspan="3">
@@ -87,7 +88,7 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 	</th></tr>
 
 	<tr>
-		<td>:heavy_check_mark:</td>
+		<td>:heavy_exclamation_mark:</td>
 		<td>Link a UPC to a Household</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/items/:UPC/link?token=SESSION_TOKEN</code></td>
 	</tr>
@@ -95,6 +96,16 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 		<td>:heavy_check_mark:</td>
 		<td>Get UPC Description Suggestions</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN</code></td>
+	</tr>
+	<tr>
+		<td>:heavy_check_mark:</td>
+		<td>Update Inventory Quantities</td>
+		<td><code>POST /households/:HOUSEHOLD_ID/items/update?token=SESSION_TOKEN</code></td>
+	</tr>
+	<tr>
+		<td>:heavy_check_mark:</td>
+		<td>Get Household Inventory</td>
+		<td><code>GET /households/:HOUSEHOLD_ID/items?token=SESSION_TOKEN</code></td>
 	</tr>
 	
 	<tr><th colspan="3">
@@ -106,12 +117,12 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 		<td><code>POST /households/:HOUSEHOLD_ID/lists/create?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_check_mark:</td>
+		<td>:heavy_exclamation_mark:</td>
 		<td>Update Shopping List</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/lists/:LIST_ID/update?token=SESSION_TOKEN</code></td>
 	</tr>	
 	<tr>
-		<td>:heavy_check_mark:</td>
+		<td>:heavy_exclamation_mark:</td>
 		<td>Get Shopping List</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/lists/:LIST_ID?token=SESSION_TOKEN</code></td>
 	</tr>

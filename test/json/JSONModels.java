@@ -2,6 +2,10 @@ package json;
 
 import java.util.List;
 
+import routes.InventoryUpdateRoute.InventoryUpdateItemJSON;
+
+import com.google.gson.annotations.Expose;
+
 public class JSONModels {
 	@SuppressWarnings("unused")
 	public static class RegisterReqJSON {
@@ -45,10 +49,14 @@ public class JSONModels {
 	@SuppressWarnings("unused")
 	public static class LinkReqJSON {
 		private final String description;
-		private final String unitName;
-		public LinkReqJSON(String description, String units) {
+		private final String packageName;
+		private final String packageUnits;
+		private final float packageSize;
+		public LinkReqJSON(String description, String packageName, String packageUnits, float packageSize) {
 			this.description = description;
-			this.unitName = units;
+			this.packageName = packageName;
+			this.packageUnits = packageUnits;
+			this.packageSize = packageSize;
 		}
 	}
 	@SuppressWarnings("unused")
@@ -75,15 +83,36 @@ public class JSONModels {
 	public static class ListUpdateItem {
 		public String UPC;
 		public int quantity;
-		public int fractional = 0;
 		
-		public ListUpdateItem(String UPC, int quantity, int fractional) {
+		public ListUpdateItem(String UPC, int quantity) {
 			this.UPC = UPC;
 			this.quantity = quantity;
-			this.fractional = fractional;
 		}
 	}
 	public static class ListUpdateResJSON {
 		public long timestamp;
+	}
+	
+	public static class InventoryUpdateReqJSON {
+		public long version;
+		public List<InventoryUpdateItem> items;
+		
+		public InventoryUpdateReqJSON(long version, List<InventoryUpdateItem> items) {
+			this.version = version;
+			this.items = items;
+		}
+		
+	}
+	public static class InventoryUpdateItem {
+		public String UPC;
+		public int quantity;
+		public int fractional = 0;
+		
+		public InventoryUpdateItem(String UPC, int quantity, int fractional) {
+			this.UPC = UPC;
+			this.quantity = quantity;
+			this.fractional = fractional;
+		}
+		
 	}
 }
