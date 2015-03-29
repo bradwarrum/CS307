@@ -14,11 +14,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
 
-import sql.SQLExecutable;
+
 import sql.SQLParam;
 import sql.SQLType;
 
-public class ItemSuggestionWrapper extends SQLExecutable{
+public class ItemSuggestionWrapper extends BaseWrapper{
 	private int userID;
 	@Expose(serialize = true)
 	private String UPC;

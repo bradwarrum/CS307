@@ -13,10 +13,9 @@ import com.google.gson.annotations.SerializedName;
 import core.Permissions;
 import core.ResponseCode;
 import routes.ListUpdateRoute.ListUpdateItemJSON;
-import sql.SQLExecutable;
 import sql.SQLParam;
 
-public class ListUpdateWrapper extends SQLExecutable {
+public class ListUpdateWrapper extends BaseWrapper {
 	private int userID, householdID, listID;
 	@Expose(serialize = true)
 	@SerializedName("version")
@@ -33,11 +32,12 @@ public class ListUpdateWrapper extends SQLExecutable {
 
 	public ResponseCode update() {
 		// 1) Read permissions and ensure the user ID can modify lists
-		int permissionsraw = getPermissions();
+		int permissionsraw = getPermissions(userID, householdID);
 		if (permissionsraw == -1) {return ResponseCode.INTERNAL_ERROR;}
-		else if (permissionsraw == -2) {return ResponseCode.LIST_NOT_FOUND;}
+		else if (permissionsraw == -2) {return ResponseCode.HOUSEHOLD_NOT_FOUND;}
 		Permissions permissions = new Permissions(permissionsraw);
 		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		
 		// 2) Read the household record and ensure the timestamp has not been updated
 		long DBtimestamp = readAndLockTimestamp();
 		if (DBtimestamp == -1) {release(); return ResponseCode.INTERNAL_ERROR;}
@@ -53,31 +53,6 @@ public class ListUpdateWrapper extends SQLExecutable {
 		timestamp = newstamp;
 		return ResponseCode.OK;
 
-	}
-
-	private int getPermissions() {
-		ResultSet results = null;
-		try{
-			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(householdID, SQLType.INT));
-
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}
-		int permissionRaw = 0;
-		try {
-			if (results == null) { release(); return -1;}
-			if	(!results.next()) { release(results); return -2;}
-			permissionRaw = results.getInt(1);
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}finally {
-			release(results);
-		}
-		return permissionRaw;
 	}
 
 	private long readAndLockTimestamp() {

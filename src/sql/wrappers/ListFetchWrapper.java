@@ -10,11 +10,10 @@ import com.google.gson.annotations.SerializedName;
 
 import core.Permissions;
 import core.ResponseCode;
-import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
 
-public class ListFetchWrapper extends SQLExecutable {
+public class ListFetchWrapper extends BaseWrapper {
 	
 	private int userID, householdID, listID;
 	@Expose(serialize = true)
@@ -56,11 +55,12 @@ public class ListFetchWrapper extends SQLExecutable {
 	}
 	
 	public ResponseCode fetch() {
-		int permissionsraw = getPermissions();
+		int permissionsraw = getPermissions(userID, householdID);
 		if (permissionsraw == -1) return ResponseCode.INTERNAL_ERROR;
-		else if (permissionsraw == -2) return ResponseCode.LIST_NOT_FOUND;
+		else if (permissionsraw == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
 		Permissions permissions = new Permissions(permissionsraw);
 		if (!permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) { release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		
 		int modresult = isModified(timestamp);
 		if (modresult == -1) return ResponseCode.INTERNAL_ERROR;
 		else if (modresult == -2) return ResponseCode.LIST_NOT_FOUND;
@@ -71,31 +71,6 @@ public class ListFetchWrapper extends SQLExecutable {
 			return ResponseCode.OK;
 		}
 		
-	}
-	
-	private int getPermissions() {
-		ResultSet results = null;
-		try{
-			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(householdID, SQLType.INT));
-
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}
-		int permissionRaw = 0;
-		try {
-			if (results == null) { release(); return -1;}
-			if	(!results.next()) { release(results); return -2;}
-			permissionRaw = results.getInt(1);
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}finally {
-			release(results);
-		}
-		return permissionRaw;
 	}
 	
 	private int isModified(long since) {

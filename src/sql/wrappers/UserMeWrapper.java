@@ -7,11 +7,11 @@ import java.util.List;
 
 import com.google.gson.annotations.Expose;
 
-import sql.SQLExecutable;
+
 import sql.SQLParam;
 import sql.SQLType;
 
-public class UserMeWrapper extends SQLExecutable {
+public class UserMeWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	private int userID;
 	@Expose(serialize = true)

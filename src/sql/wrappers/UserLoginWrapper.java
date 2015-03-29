@@ -7,7 +7,7 @@ import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-import sql.SQLExecutable;
+
 import sql.SQLParam;
 import sql.SQLType;
 
@@ -15,7 +15,7 @@ import com.google.gson.annotations.Expose;
 
 import core.ResponseCode;
 import core.Server;
-public class UserLoginWrapper extends SQLExecutable{
+public class UserLoginWrapper extends BaseWrapper{
 	@Expose(serialize = true)
 	private String firstName = null;
 	@Expose(serialize = true)

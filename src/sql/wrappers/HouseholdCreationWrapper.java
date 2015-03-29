@@ -5,13 +5,13 @@ import java.sql.SQLException;
 
 import com.google.gson.annotations.Expose;
 
-import sql.SQLExecutable;
+
 import sql.SQLParam;
 import sql.SQLType;
 import core.Permissions;
 import core.ResponseCode;
 
-public class HouseholdCreationWrapper extends SQLExecutable {
+public class HouseholdCreationWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	private int householdID = -1;
 	

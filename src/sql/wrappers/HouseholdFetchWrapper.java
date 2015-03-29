@@ -9,11 +9,10 @@ import com.google.gson.annotations.Expose;
 
 import core.Permissions;
 import core.ResponseCode;
-import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
 
-public class HouseholdFetchWrapper extends SQLExecutable {
+public class HouseholdFetchWrapper extends BaseWrapper {
 	
 	private int userID;
 	@Expose(serialize = true)	

@@ -1,17 +1,15 @@
 package sql.wrappers;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import core.Permissions;
 import core.Barcode;
 import core.ResponseCode;
-import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
 
 
-public class UPCLinkWrapper extends SQLExecutable {
+public class UPCLinkWrapper extends BaseWrapper {
 
 	private int userID, householdID;
 	private Barcode barcode;
@@ -27,26 +25,9 @@ public class UPCLinkWrapper extends SQLExecutable {
 	}
 	
 	public ResponseCode link() {
-		ResultSet results = null;
-		try {
-			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId = ? AND HouseholdId = ?;", 
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(householdID, SQLType.INT));
-		} catch (SQLException e) {
-			release();
-			return ResponseCode.INTERNAL_ERROR;
-		}
-		int permissionraw = 0;
-		if (results == null) {release(); return ResponseCode.INTERNAL_ERROR;}
-		try {
-			if (!results.next()) {release(results); release(); return ResponseCode.HOUSEHOLD_NOT_FOUND;}
-			permissionraw = results.getInt("PermissionLevel");
-		} catch (SQLException e) {
-			release();
-			return ResponseCode.INTERNAL_ERROR;
-		} finally {
-			release(results);
-		}
+		int permissionraw = getPermissions(userID, householdID);
+		if (permissionraw == -1) return ResponseCode.INTERNAL_ERROR;
+		else if (permissionraw == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
 		Permissions permissions = new Permissions(permissionraw);
 		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		

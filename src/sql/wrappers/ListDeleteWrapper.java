@@ -1,15 +1,13 @@
 package sql.wrappers;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import core.Permissions;
 import core.ResponseCode;
-import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
 
-public class ListDeleteWrapper extends SQLExecutable {
+public class ListDeleteWrapper extends BaseWrapper {
 	private int userID, listID, householdID;
 	
 	public ListDeleteWrapper(int userID, int listID, int householdID) {
@@ -21,9 +19,9 @@ public class ListDeleteWrapper extends SQLExecutable {
 	
 	public ResponseCode delete() {
 		//Check permissions
-		int permraw = getPermissions();
+		int permraw = getPermissions(userID, householdID);
 		if (permraw == -1) {return ResponseCode.INTERNAL_ERROR;}
-		else if (permraw == -2) {return ResponseCode.LIST_NOT_FOUND;}
+		else if (permraw == -2) {return ResponseCode.HOUSEHOLD_NOT_FOUND;}
 		Permissions perm = new Permissions(permraw);
 		if (!perm.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		//Remove the shopping list and check that the list belongs to the household
@@ -34,31 +32,6 @@ public class ListDeleteWrapper extends SQLExecutable {
 		
 		release();
 		return ResponseCode.OK;
-	}
-	
-	private int getPermissions() {
-		ResultSet results = null;
-		try{
-			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(householdID, SQLType.INT));
-
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}
-		int permissionRaw = 0;
-		try {
-			if (results == null) { release(); return -1;}
-			if	(!results.next()) { release(results); return -2;}
-			permissionRaw = results.getInt(1);
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}finally {
-			release(results);
-		}
-		return permissionRaw;
 	}
 	
 	private boolean deleteItems() {

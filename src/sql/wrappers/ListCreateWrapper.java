@@ -3,13 +3,15 @@ package sql.wrappers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import sql.SQLParam;
+import sql.SQLType;
+
 import com.google.gson.annotations.Expose;
 
 import core.Permissions;
 import core.ResponseCode;
-import sql.*;
 
-public class ListCreateWrapper extends SQLExecutable {
+public class ListCreateWrapper extends BaseWrapper {
 	private String listName;
 	@Expose(serialize = true)
 	private int listID = -1;
@@ -25,27 +27,11 @@ public class ListCreateWrapper extends SQLExecutable {
 	
 	
 	public ResponseCode create() {
-		ResultSet results = null;
-		try {
-			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(householdID, SQLType.INT));
-		} catch (SQLException e) {
-			release();
-			return ResponseCode.INTERNAL_ERROR;
-		}
-		
-		int permLevel = 0;
-		try {
-			if (results == null || !results.next()) {release(); return ResponseCode.HOUSEHOLD_NOT_FOUND;}
-			permLevel = results.getInt(1);
-		}catch (SQLException e) {
-			release();
-			return ResponseCode.INTERNAL_ERROR;
-		} finally {
-			release(results);
-		}
+		int permLevel = getPermissions(userID, householdID);
+		if (permLevel == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
+		else if (permLevel == -1) return ResponseCode.INTERNAL_ERROR;
 		Permissions permissions = new Permissions(permLevel);
+
 		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		int affected = 0;
@@ -62,6 +48,7 @@ public class ListCreateWrapper extends SQLExecutable {
 			return ResponseCode.INTERNAL_ERROR;
 		}
 		if (affected == 0) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
+		ResultSet results = null;
 		try {
 			results = query("SELECT LAST_INSERT_ID() AS lastID;");
 			if (results == null || !results.next()) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
