@@ -32,7 +32,7 @@ public class ListCreateWrapper extends BaseWrapper {
 		else if (permLevel == -1) return ResponseCode.INTERNAL_ERROR;
 		Permissions permissions = new Permissions(permLevel);
 
-		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.has(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		int affected = 0;
 		version = System.currentTimeMillis();

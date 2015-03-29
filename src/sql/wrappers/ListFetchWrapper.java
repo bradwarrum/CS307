@@ -59,7 +59,7 @@ public class ListFetchWrapper extends BaseWrapper {
 		if (permissionsraw == -1) return ResponseCode.INTERNAL_ERROR;
 		else if (permissionsraw == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
 		Permissions permissions = new Permissions(permissionsraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) { release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.has(Permissions.Flag.CAN_READ_LISTS)) { release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		int modresult = isModified(timestamp);
 		if (modresult == -1) return ResponseCode.INTERNAL_ERROR;

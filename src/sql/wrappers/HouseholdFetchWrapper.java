@@ -110,7 +110,7 @@ public class HouseholdFetchWrapper extends BaseWrapper {
 			return ResponseCode.INTERNAL_ERROR;
 		}
 		lists = new ArrayList<ListsJSON> ();
-		if (permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) {
+		if (permissions.has(Permissions.Flag.CAN_READ_LISTS)) {
 			try {
 				results = query("SELECT ListId, Name FROM HouseholdShoppingList WHERE (HouseholdId=?);",
 						hidp);

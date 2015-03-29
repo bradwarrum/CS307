@@ -29,7 +29,7 @@ public class UPCLinkWrapper extends BaseWrapper {
 		if (permissionraw == -1) return ResponseCode.INTERNAL_ERROR;
 		else if (permissionraw == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
 		Permissions permissions = new Permissions(permissionraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.has(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		try {
 			update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, UnitQuantity, UnitName, Hidden) VALUES (?, ?, ?, ?, ?, ?)"

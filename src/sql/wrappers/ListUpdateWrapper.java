@@ -36,7 +36,7 @@ public class ListUpdateWrapper extends BaseWrapper {
 		if (permissionsraw == -1) {return ResponseCode.INTERNAL_ERROR;}
 		else if (permissionsraw == -2) {return ResponseCode.HOUSEHOLD_NOT_FOUND;}
 		Permissions permissions = new Permissions(permissionsraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.has(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		// 2) Read the household record and ensure the timestamp has not been updated
 		long DBtimestamp = readAndLockTimestamp();
