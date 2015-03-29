@@ -68,9 +68,12 @@ HTTP 200
  - currentDescription is null if the household :HOUSEHOLD_ID provided in the URL does not have a linked description for :UPC.
  - internalSuggestions are all the descriptions for that :UPC from the user's other households. If they have no linked description for :UPC in another household, this field is an empty array.
  - externalSuggestions are all the descriptions for that :UPC from external APIs.  The source field designates which API produced the description.  If no APIs have a description for :UPC, this field is an empty array.
+
 ##Update Inventory Quantities<br>
-The version below must match the version on the server for the update to succeed.
 ####Request Format
+The version below must match the version on the server for the update to succeed.<p>
+The **fractional** field is used to represent fractional components of full packages.  If an inventory item is halfway consumed, for instance, the fractional component can be update with 50 and the quantity can be reduced by 1.<p>
+Omitting **fractional** will imply a fractional component of zero.
 ```
 POST /households/:HOUSEHOLD_ID/items/update?token=SESSION_TOKEN
 
@@ -112,9 +115,9 @@ ETag : "1427607227384"
 }
 ```
 ##Get Household Inventory<br>
+####Request Format
 The VERSION_ID below is the same version as described above in the update request specification.<p>
 Setting VERSION_ID to 0 or not including the "If-None-Match" header in the request will force the request to return information.
-####Request Format
 ```
 GET /households/:HOUSEHOLD_ID/items?token=SESSION_TOKEN
 
