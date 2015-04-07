@@ -83,8 +83,9 @@ public class InventoryFetchWrapper extends BaseWrapper {
 		items = new ArrayList<InventoryFetchResponseItemJSON> ();
 		try {
 			results = query("SELECT UPC, Description, PackageQuantity, PackageUnits, PackageName, InventoryQuantity FROM InventoryItem "
-					+ "WHERE HouseholdId=?;",
-					householdParam);
+					+ "WHERE HouseholdId=? AND Hidden=?;",
+					householdParam,
+					SQLParam.SQLFALSE);
 			if (results == null) { release(results); release(); return ResponseCode.INTERNAL_ERROR;}
 			while (results.next()) {
 				int temp = results.getInt("InventoryQuantity");

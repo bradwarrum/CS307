@@ -114,6 +114,7 @@ ETag : "1427607227384"
   "version": 1427607227384
 }
 ```
+
 ##Get Household Inventory<br>
 ####Request Format
 The VERSION_ID below is the same version as described above in the update request specification.<p>
@@ -173,4 +174,23 @@ HTTP 304 NOT MODIFIED
 
 HTTP Headers
 ETag : "1427607227384"
+```
+
+##Unlink UPC From a Household<br>
+####Request Format
+Unlinking a UPC from a household's inventory will do the following:
+
+	- Set the UPC in the household inventory to hidden.  It will not appear when querying household inventories.
+	- Set the household inventory quantity of the UPC to zero.
+	- Remove all shopping list references to the UPC.
+	- Update version numbers of all shopping lists that were modified during the removal.
+	- Update version number of the household inventory.
+	
+Note that internal UPC suggestions will still access the old linked descriptions for a UPC that has been removed.  This allows users to re-link the UPCs with the original descriptions and packaging descriptions as before without having to re-enter the information.  Furthermore, when a user tries to link a UPC in household 2 that has been linked and subsequently unlinked in household 1, the description from household 1 is visible when querying for suggestions for household 2.
+```
+POST /households/:HOUSEHOLD_ID/items/:UPC/remove?token=SESSION_TOKEN
+```
+####Response Format
+```
+HTTP 200 OK
 ```

@@ -107,6 +107,11 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 		<td>Get Household Inventory</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/items?token=SESSION_TOKEN</code></td>
 	</tr>
+	<tr>
+		<td>:heavy_check_mark:</td>
+		<td>Unlink UPC From a Household</td>
+		<td><code>POST /households/:HOUSEHOLD_ID/items/:UPC/unlink?token=SESSION_TOKEN</code></td>
+	</tr>
 	
 	<tr><th colspan="3">
 		<h5><a href="APIShoppingLists.md">Shopping Lists</a></h5>

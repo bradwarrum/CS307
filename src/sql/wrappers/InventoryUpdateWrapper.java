@@ -85,13 +85,14 @@ public class InventoryUpdateWrapper extends BaseWrapper {
 	 * Otherwise returns the number of rows updated.
 	 */
 	private int updateRows() {
-		SQLParam householdParam = new SQLParam(householdID);
+		SQLParam householdParam = new SQLParam(householdID, SQLType.INT);
 		for (InventoryUpdateItemJSON item : items) {
 			try {
-				int affected = update("UPDATE InventoryItem SET InventoryQuantity=? WHERE HouseholdId=? AND UPC=?;",
+				int affected = update("UPDATE InventoryItem SET InventoryQuantity=? WHERE HouseholdId=? AND UPC=? AND Hidden=?;",
 						new SQLParam(item.fractional + item.quantity * 100, SQLType.INT),
 						householdParam,
-						new SQLParam(item.UPC, SQLType.VARCHAR));
+						new SQLParam(item.UPC, SQLType.VARCHAR),
+						SQLParam.SQLFALSE);
 				if (affected == 0) {rollback(); release(); return -2;}
 				else if (affected < 0) {rollback(); release(); return -1;}
 			} catch (SQLException e) {

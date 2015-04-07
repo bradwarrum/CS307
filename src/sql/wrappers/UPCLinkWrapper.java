@@ -37,7 +37,7 @@ public class UPCLinkWrapper extends BaseWrapper {
 		
 		try {
 			update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, PackageQuantity, PackageUnits, PackageName, InventoryQuantity, Hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-							+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), PackageQuantity=VALUES(PackageQuantity), PackageName=VALUES(PackageName);",
+							+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), PackageQuantity=VALUES(PackageQuantity), PackageName=VALUES(PackageName), Hidden=VALUES(Hidden);",
 					new SQLParam(barcode.toString(), SQLType.VARCHAR),
 					new SQLParam(householdID, SQLType.INT),
 					new SQLParam(description, SQLType.VARCHAR),
@@ -45,7 +45,7 @@ public class UPCLinkWrapper extends BaseWrapper {
 					new SQLParam(unitName, SQLType.VARCHAR),
 					new SQLParam(packageName, SQLType.VARCHAR),
 					new SQLParam(0, SQLType.INT),
-					new SQLParam(0, SQLType.BYTE));
+					SQLParam.SQLFALSE);
 		} catch (SQLException e) {
 			rollback();
 			return ResponseCode.INTERNAL_ERROR;

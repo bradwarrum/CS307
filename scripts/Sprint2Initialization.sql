@@ -56,7 +56,7 @@ CREATE TABLE InventoryItem (
 	InventoryQuantity INT NOT NULL,
 	Expiration DATE,
 	DateAdded DATE,
-	Hidden BOOLEAN,
+	Hidden BOOLEAN NOT NULL,
 	PRIMARY KEY ( ItemId ),
 	UNIQUE ( UPC,HouseholdId ),
 	FOREIGN KEY ( HouseholdId )	REFERENCES Household ( HouseholdId )

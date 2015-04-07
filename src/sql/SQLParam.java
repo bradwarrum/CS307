@@ -46,4 +46,7 @@ public class SQLParam {
 	public Object getValue() {
 		return _value;
 	}
+	
+	public static final SQLParam SQLTRUE = new SQLParam(true, SQLType.BOOLEAN);
+	public static final SQLParam SQLFALSE = new SQLParam(false, SQLType.BOOLEAN);
 }

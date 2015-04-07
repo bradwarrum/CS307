@@ -152,10 +152,6 @@ public class ServerTest {
 		assertEquals("Get self pass", 200, rcode);
 		getHousehold();
 		assertEquals("Get household pass", 200, rcode);
-		removeList();
-		assertEquals("List removal pass", 200, rcode);
-		getHousehold();
-		assertEquals("Get household pass", 200, rcode);
 		getInventory();
 		assertEquals("Inventory fetch pass", 200, rcode);
 		timestamp = 1;
@@ -167,6 +163,16 @@ public class ServerTest {
 		assertEquals("Inventory update pass", 200, rcode);
 		getInventory();
 		assertEquals("Inventory fetch pass", 200, rcode);
+		deleteItem("04963406");
+		assertEquals("Deletion pass", 200, rcode);
+		getInventory();
+		getList();
+		link("04963406", "Coca cola", "cans", "milliliters", 355.0f);
+		getInventory();
+		removeList();
+		assertEquals("List removal pass", 200, rcode);
+		getHousehold();
+		assertEquals("Get household pass", 200, rcode);
 		createHousehold("Apartment", "John and Julia's Inventory");
 		assertEquals("Household creation pass", 201, rcode);
 		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
@@ -438,6 +444,21 @@ public class ServerTest {
 		System.out.println(request.getRequestURL());
 		System.out.println(reqstr);
 		request.send(reqstr);
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
+	}
+	
+	public void deleteItem(String UPC) throws MalformedURLException, IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/unlink?token=" + token);
+		request.setPostMethod();
+		System.out.println(delimiter + "\nRequest: REMOVE INVENTORY ITEM");
+		System.out.println(request.getRequestURL());
 		System.out.println("Response:");
 		rcode = request.getResponseCode();
 		System.out.println("HTTP " + rcode);

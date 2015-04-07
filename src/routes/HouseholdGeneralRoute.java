@@ -17,6 +17,7 @@ public class HouseholdGeneralRoute extends Route {
 	private static final Route ITEM_SUGGESTION_ROUTE = new ItemSuggestionRoute();
 	private static final Route INVENTORY_UPDATE_ROUTE = new InventoryUpdateRoute();
 	private static final Route INVENTORY_FETCH_ROUTE = new InventoryFetchRoute();
+	private static final Route INVENTORY_DELETE_ROUTE = new InventoryDeleteRoute();
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		String path = xchg.getRequestURI().getPath();
@@ -49,6 +50,9 @@ public class HouseholdGeneralRoute extends Route {
 					return;
 				}else if(itemCommand.equals("/suggestions")){
 					ITEM_SUGGESTION_ROUTE.handle(xchg);
+					return;
+				}else if (itemCommand.equals("/unlink")) {
+					INVENTORY_DELETE_ROUTE.handle(xchg);
 					return;
 				}
 			} else if (separated.equals("/lists/create")) {

@@ -84,9 +84,10 @@ public class ListUpdateWrapper extends BaseWrapper {
 		ResultSet results= null;
 		try {
 			for (ListUpdateItemJSON item : items) {
-				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=?);",
+				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=? AND Hidden=?);",
 						new SQLParam(item.UPC, SQLType.VARCHAR),
-						houseidp);
+						houseidp,
+						SQLParam.SQLFALSE);
 				if (results == null || !results.next()) {release(results); rollback(); release(); return false;}
 				int itemID = results.getInt(1);
 				SQLParam itemidp = new SQLParam(itemID, SQLType.INT);
