@@ -65,10 +65,10 @@ If the server version matches
 ```
 HTTP 200 OK
 Content-Type : application/json
-ETag : "190248237928"
+ETag : "190203493792"
 
 {
-	"version" : 190248237928
+	"version" : 190203493792
 }
 ```
 ##Get Recipe
