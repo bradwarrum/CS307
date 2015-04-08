@@ -13,10 +13,9 @@ import com.google.gson.annotations.SerializedName;
 import core.Permissions;
 import core.ResponseCode;
 import routes.ListUpdateRoute.ListUpdateItemJSON;
-import sql.SQLExecutable;
 import sql.SQLParam;
 
-public class ListUpdateWrapper extends SQLExecutable {
+public class ListUpdateWrapper extends BaseWrapper {
 	private int userID, householdID, listID;
 	@Expose(serialize = true)
 	@SerializedName("version")
@@ -33,11 +32,12 @@ public class ListUpdateWrapper extends SQLExecutable {
 
 	public ResponseCode update() {
 		// 1) Read permissions and ensure the user ID can modify lists
-		int permissionsraw = getPermissions();
+		int permissionsraw = getPermissions(userID, householdID);
 		if (permissionsraw == -1) {return ResponseCode.INTERNAL_ERROR;}
-		else if (permissionsraw == -2) {return ResponseCode.LIST_NOT_FOUND;}
+		else if (permissionsraw == -2) {return ResponseCode.HOUSEHOLD_NOT_FOUND;}
 		Permissions permissions = new Permissions(permissionsraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.has(Permissions.Flag.CAN_MODIFY_LISTS)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		
 		// 2) Read the household record and ensure the timestamp has not been updated
 		long DBtimestamp = readAndLockTimestamp();
 		if (DBtimestamp == -1) {release(); return ResponseCode.INTERNAL_ERROR;}
@@ -55,31 +55,6 @@ public class ListUpdateWrapper extends SQLExecutable {
 
 	}
 
-	private int getPermissions() {
-		ResultSet results = null;
-		try{
-			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(householdID, SQLType.INT));
-
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}
-		int permissionRaw = 0;
-		try {
-			if (results == null) { release(); return -1;}
-			if	(!results.next()) { release(results); return -2;}
-			permissionRaw = results.getInt(1);
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}finally {
-			release(results);
-		}
-		return permissionRaw;
-	}
-
 	private long readAndLockTimestamp() {
 		long stamp = -1;
 		ResultSet results = null;
@@ -91,10 +66,11 @@ public class ListUpdateWrapper extends SQLExecutable {
 			if (!results.next()) {release(results); release(); return -2;}
 			stamp = results.getLong(1);
 		} catch (SQLException e) {
-			release(results);
 			rollback();
 			release();
 			return -1;
+		} finally {
+			release(results);
 		}
 		return stamp;
 	}
@@ -108,14 +84,15 @@ public class ListUpdateWrapper extends SQLExecutable {
 		ResultSet results= null;
 		try {
 			for (ListUpdateItemJSON item : items) {
-				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=?);",
+				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=? AND Hidden=?);",
 						new SQLParam(item.UPC, SQLType.VARCHAR),
-						houseidp);
+						houseidp,
+						SQLParam.SQLFALSE);
 				if (results == null || !results.next()) {release(results); rollback(); release(); return false;}
 				int itemID = results.getInt(1);
 				SQLParam itemidp = new SQLParam(itemID, SQLType.INT);
-				SQLParam quantityp = new SQLParam(item.quantity * 100 + item.fractional, SQLType.INT);
-				if (item.quantity == 0 && item.fractional == 0) {
+				SQLParam quantityp = new SQLParam(item.quantity, SQLType.INT);
+				if (item.quantity == 0) {
 					fail = update("DELETE FROM ShoppingListItem WHERE (ListId=? AND ItemId=?);",
 							listidp,
 							itemidp);

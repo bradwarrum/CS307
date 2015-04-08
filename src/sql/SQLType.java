@@ -14,6 +14,7 @@ public enum SQLType {
 	BINARY(java.sql.Types.BINARY),
 	TIME(java.sql.Types.TIME),
 	TIMESTAMP(java.sql.Types.TIMESTAMP),
+	BOOLEAN(java.sql.Types.BOOLEAN),
 	AUTO(0);
 	
 	private int value;

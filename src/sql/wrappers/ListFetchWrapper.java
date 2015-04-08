@@ -10,11 +10,10 @@ import com.google.gson.annotations.SerializedName;
 
 import core.Permissions;
 import core.ResponseCode;
-import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
 
-public class ListFetchWrapper extends SQLExecutable {
+public class ListFetchWrapper extends BaseWrapper {
 	
 	private int userID, householdID, listID;
 	@Expose(serialize = true)
@@ -42,25 +41,24 @@ public class ListFetchWrapper extends SQLExecutable {
 		public final String description;
 		@Expose(serialize = true)		
 		public final int quantity;
-		@Expose(serialize = true)		
-		public final int fractional;
 		@Expose(serialize = true)
-		public final String unitName;		
-		public ListFetchItemsJSON (String unitName, String UPC, String description, int quantity, int fractional) {
-			this.unitName = unitName;
+		public final String packageName;
+		
+		public ListFetchItemsJSON (String packageName, String UPC, String description, int quantity) {
+			this.packageName = packageName;
 			this.UPC = UPC;
 			this.description = description;
 			this.quantity = quantity;
-			this.fractional = fractional;
 		}
 	}
 	
 	public ResponseCode fetch() {
-		int permissionsraw = getPermissions();
+		int permissionsraw = getPermissions(userID, householdID);
 		if (permissionsraw == -1) return ResponseCode.INTERNAL_ERROR;
-		else if (permissionsraw == -2) return ResponseCode.LIST_NOT_FOUND;
+		else if (permissionsraw == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
 		Permissions permissions = new Permissions(permissionsraw);
-		if (!permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) { release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		if (!permissions.has(Permissions.Flag.CAN_READ_LISTS)) { release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		
 		int modresult = isModified(timestamp);
 		if (modresult == -1) return ResponseCode.INTERNAL_ERROR;
 		else if (modresult == -2) return ResponseCode.LIST_NOT_FOUND;
@@ -71,31 +69,6 @@ public class ListFetchWrapper extends SQLExecutable {
 			return ResponseCode.OK;
 		}
 		
-	}
-	
-	private int getPermissions() {
-		ResultSet results = null;
-		try{
-			results = query("SELECT PermissionLevel FROM HouseholdPermissions WHERE UserId=? AND HouseholdId=?;",
-					new SQLParam(userID, SQLType.INT),
-					new SQLParam(householdID, SQLType.INT));
-
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}
-		int permissionRaw = 0;
-		try {
-			if (results == null) { release(); return -1;}
-			if	(!results.next()) { release(results); return -2;}
-			permissionRaw = results.getInt(1);
-		} catch (SQLException e) {
-			release();
-			return -1;
-		}finally {
-			release(results);
-		}
-		return permissionRaw;
 	}
 	
 	private int isModified(long since) {
@@ -122,23 +95,21 @@ public class ListFetchWrapper extends SQLExecutable {
 	private boolean selectAll() {
 		ResultSet results = null;
 		try {
-			results = query("SELECT InventoryItem.UPC, InventoryItem.Description, InventoryItem.UnitName, ShoppingListItem.Quantity "
+			results = query("SELECT InventoryItem.UPC, InventoryItem.Description, InventoryItem.PackageName, ShoppingListItem.Quantity "
 					+ "FROM ShoppingListItem INNER JOIN InventoryItem ON (ShoppingListItem.ItemId=InventoryItem.ItemId) "
 					+ "WHERE (ShoppingListItem.ListId=?);",
 					new SQLParam(listID, SQLType.INT));
 			if (results == null) {release(); return false;}
 			
 			items = new ArrayList<ListFetchItemsJSON>();
-			String UPC, description, unitName;
-			int quantity, fractional, temp;
+			String UPC, description, packageName;
+			int quantity;
 			while (results.next()) {
 				UPC = results.getString(1);
 				description = results.getString(2);
-				unitName=  results.getString(3);
-				temp = results.getInt(4);
-				quantity = (temp / 100);
-				fractional = temp - quantity * 100;
-				items.add(new ListFetchItemsJSON(unitName, UPC, description, quantity, fractional));
+				packageName=  results.getString(3);
+				quantity = results.getInt(4);
+				items.add(new ListFetchItemsJSON(packageName, UPC, description, quantity));
 			}
 		} catch (SQLException e) {
 			release();

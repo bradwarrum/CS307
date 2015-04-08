@@ -5,13 +5,13 @@ import java.sql.SQLException;
 
 import com.google.gson.annotations.Expose;
 
-import sql.SQLExecutable;
+
 import sql.SQLParam;
 import sql.SQLType;
 import core.Permissions;
 import core.ResponseCode;
 
-public class HouseholdCreationWrapper extends SQLExecutable {
+public class HouseholdCreationWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	private int householdID = -1;
 	
@@ -27,10 +27,11 @@ public class HouseholdCreationWrapper extends SQLExecutable {
 	public ResponseCode create() {
 		int affected = 0;
 		try {
-			affected = update("INSERT INTO Household (Name, Description, HeadOfHousehold) VALUES (?, ?, ?);",
+			affected = update("INSERT INTO Household (Name, Description, HeadOfHousehold, Version) VALUES (?, ?, ?, ?);",
 					new SQLParam(householdName, SQLType.VARCHAR),
 					new SQLParam(householdDescription, SQLType.VARCHAR),
-					new SQLParam(userID, SQLType.INT));
+					new SQLParam(userID, SQLType.INT),
+					new SQLParam(1, SQLType.LONG));
 		} catch (SQLException e) {
 			rollback();
 			release();

@@ -9,11 +9,10 @@ import com.google.gson.annotations.Expose;
 
 import core.Permissions;
 import core.ResponseCode;
-import sql.SQLExecutable;
 import sql.SQLParam;
 import sql.SQLType;
 
-public class HouseholdFetchWrapper extends SQLExecutable {
+public class HouseholdFetchWrapper extends BaseWrapper {
 	
 	private int userID;
 	@Expose(serialize = true)	
@@ -111,7 +110,7 @@ public class HouseholdFetchWrapper extends SQLExecutable {
 			return ResponseCode.INTERNAL_ERROR;
 		}
 		lists = new ArrayList<ListsJSON> ();
-		if (permissions.set().contains(Permissions.Flag.CAN_READ_LISTS)) {
+		if (permissions.has(Permissions.Flag.CAN_READ_LISTS)) {
 			try {
 				results = query("SELECT ListId, Name FROM HouseholdShoppingList WHERE (HouseholdId=?);",
 						hidp);

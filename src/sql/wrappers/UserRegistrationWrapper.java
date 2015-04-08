@@ -8,11 +8,11 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import core.ResponseCode;
-import sql.SQLExecutable;
+
 import sql.SQLParam;
 import sql.SQLType;
 
-public class UserRegistrationWrapper extends SQLExecutable {
+public class UserRegistrationWrapper extends BaseWrapper {
 	private String emailAddress, firstName, lastName, sha256pwd;
 	
 	

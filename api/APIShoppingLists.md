@@ -26,9 +26,8 @@ Content-Type : application/json
 ##Update Shopping List<br>
 ####Request Format
 The version below must match the version on the server for the update to succeed.<p>
-The quantity is the whole number of units, and fractional is a number between 0 and 99 representing fractional units, if necessary.<p>
-Quantity and/or fractional can be left out of any of the item declarations. It is assumed the value is 0 if it is missing. <p>
-Setting a quantity and fraction to 0 will result in the item being removed from the shopping list.
+The quantity is the whole number of packages, defined by packageName when linking the item.<p>
+Setting a quantity to 0 will result in the item being removed from the shopping list.
 ```
 POST /households/:HOUSEHOLD_ID/lists/:LIST_ID/update?token=SESSION_TOKEN
 
@@ -40,18 +39,15 @@ Content-Type : application/json
   "items": [
     {
       "UPC": "029000071858",
-      "quantity": 3,
-      "fractional": 0
+      "quantity": 3
     },
     {
       "UPC": "04963406",
-      "quantity": 12,
-      "fractional": 0
+      "quantity": 12
     },
     {
       "UPC": "036632001085",
-      "quantity": 6,
-      "fractional": 0
+      "quantity": 6
     }
   ]
 }
@@ -90,29 +86,26 @@ Content-Type : application/json
 ETag : "1425107935796"
 
 {
-  "version": 1425107935796,
+  "version": 1427601583081,
   "name": "Weekly Shopping",
   "items": [
     {
       "UPC": "029000071858",
       "description": "Planters Cocktail Peanuts",
       "quantity": 3,
-      "fractional": 0,
-      "unitName": "oz."
+      "packageName": "tins"
     },
     {
       "UPC": "04963406",
-      "description": "Coca Cola, Can",
+      "description": "Coca Cola",
       "quantity": 12,
-      "fractional": 0,
-      "unitName": "oz."
+      "packageName": "cans"
     },
     {
-      "UPC": "036632001085",
-      "description": "Dannon Fruit on Bottom Blueberry",
+      "UPC": "040000231325",
+      "description": "Starburst FaveRed Jellybeans",
       "quantity": 6,
-      "fractional": 0,
-      "unitName": "oz."
+      "packageName": "bags"
     }
   ]
 }

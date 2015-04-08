@@ -49,8 +49,16 @@ public class Permissions {
 		return intflags;
 	}
 	
-	public EnumSet<Flag> set() {
-		return permissions;
+	/**
+	 * Check that a user has specific permissions.
+	 * @param flagSet The permission flags to check for.
+	 * @return Returns true if the Permissions object has all the flags in the flagSet.
+	 */
+	public boolean has(Flag...flagSet) {
+		for (Flag f : flagSet) {
+			if (!permissions.contains(f)) return false;
+		}
+		return true;
 	}
 	
 }
