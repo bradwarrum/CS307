@@ -143,12 +143,12 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 	<tr>
 		<td>:heavy_multiplication_x:</td>
 		<td>Create Recipe</td>
-		<td><code>POST /households/:HOUSEHOLD_ID/recipes?token=SESSION_TOKEN</code></td>
+		<td><code>POST /households/:HOUSEHOLD_ID/recipes/create?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
 		<td>:heavy_multiplication_x:</td>
 		<td>Update Recipe</td>
-		<td><code>POST /households/:HOUSEHOLD_ID/recipes/:RECIPE_ID?token=SESSION_TOKEN</code></td>
+		<td><code>POST /households/:HOUSEHOLD_ID/recipes/:RECIPE_ID/update?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
 		<td>:heavy_multiplication_x:</td>
