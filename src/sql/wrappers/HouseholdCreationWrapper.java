@@ -27,11 +27,12 @@ public class HouseholdCreationWrapper extends BaseWrapper {
 	public ResponseCode create() {
 		int affected = 0;
 		try {
-			affected = update("INSERT INTO Household (Name, Description, HeadOfHousehold, Version) VALUES (?, ?, ?, ?);",
+			affected = update("INSERT INTO Household (Name, Description, HeadOfHousehold, Version, AvailableProduceID) VALUES (?, ?, ?, ?, ?);",
 					new SQLParam(householdName, SQLType.VARCHAR),
 					new SQLParam(householdDescription, SQLType.VARCHAR),
 					new SQLParam(userID, SQLType.INT),
-					new SQLParam(1, SQLType.LONG));
+					new SQLParam(1, SQLType.LONG),
+					new SQLParam(1, SQLType.INT));
 		} catch (SQLException e) {
 			rollback();
 			release();

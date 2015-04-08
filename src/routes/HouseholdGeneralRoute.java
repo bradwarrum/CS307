@@ -45,8 +45,13 @@ public class HouseholdGeneralRoute extends Route {
 			}else if (separated.equals("/items/update")) {
 				INVENTORY_UPDATE_ROUTE.handle(xchg);
 				return;
+			}else if (separated.equals("/items/generate")) {
+				xchg.setAttribute("UPC", null);
+				LINK_ROUTE.handle(xchg);
+				return;
 			}else if (separated.startsWith("/items/")) {
 				String UPC = separated.substring(7, separated.indexOf('/', 7));
+				if (UPC == null) UPC = "";
 				xchg.setAttribute("UPC", UPC);
 				String itemCommand = separated.substring(7+ UPC.length());
 				if (itemCommand.equals("/link")) {

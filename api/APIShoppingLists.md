@@ -66,6 +66,7 @@ Content-Type : application/json
 ```
 ##Get Shopping List<br>
 ####Request Format
+NOTE that this request now supports internally generated UPCs<p>
 The version number in the header shown below is the same format as the version shown in the update request/response. <p>
 If the version matches the one on the server, no content is returned.<p>
 If there is not a match, the normal response is returned. <p>
@@ -91,21 +92,31 @@ ETag : "1425107935796"
   "items": [
     {
       "UPC": "029000071858",
+      "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
       "quantity": 3,
       "packageName": "tins"
     },
     {
       "UPC": "04963406",
+      "isInternalUPC": false,      
       "description": "Coca Cola",
       "quantity": 12,
       "packageName": "cans"
     },
     {
       "UPC": "040000231325",
+      "isInternalUPC": false,      
       "description": "Starburst FaveRed Jellybeans",
       "quantity": 6,
       "packageName": "bags"
+    },
+    {
+      "UPC": "00001",
+      "isInternalUPC": true,
+      "description": "Apple",
+      "quantity": 5,
+      "packageName": "each"
     }
   ]
 }

@@ -34,28 +34,37 @@ public class UPCLinkRoute extends Route {
 		} catch (JsonSyntaxException e) {
 			error(xchg, ResponseCode.INVALID_PAYLOAD); return;
 		}
-		if (upcjson == null || !upcjson.valid() || householdID < 0 || UPC == null ) {
+		if (upcjson == null || !upcjson.valid() || householdID < 0 ) {
 			error(xchg, ResponseCode.INVALID_PAYLOAD);
 			return;
 		}
-		Barcode barcode = new Barcode(UPC);
-		if (barcode.getFormat() == Barcode.Format.INVALID_FORMAT || barcode.getFormat() == Barcode.Format.PRODUCE_5) {
-			error(xchg, ResponseCode.UPC_FORMAT_NOT_SUPPORTED); 
-			return;
+		UPCLinkWrapper upclw;
+		if (UPC == null) {
+			upclw = new UPCLinkWrapper(userID, householdID, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName);
+		}else {
+			Barcode barcode = new Barcode(UPC);
+			if (barcode.getFormat() == Barcode.Format.INVALID_FORMAT) {
+				error(xchg, ResponseCode.UPC_FORMAT_NOT_SUPPORTED); 
+				return;
+			}
+			else if (barcode.getFormat() == Barcode.Format.INVALID_CHECKSUM) {
+				error(xchg, ResponseCode.UPC_CHECKSUM_INVALID);
+				return;
+			}
+			upclw = new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName);
 		}
-		else if (barcode.getFormat() == Barcode.Format.INVALID_CHECKSUM) {
-			error(xchg, ResponseCode.UPC_CHECKSUM_INVALID);
-			return;
-		}
-		UPCLinkWrapper upclw =  new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName);
 		ResponseCode result = upclw.link();
 		if (!result.success())
 			error(xchg, result);
 		else
-			respond(xchg, result.getHttpCode());
+			if (UPC == null) {
+				respond(xchg, result.getHttpCode(), gson.toJson(upclw, UPCLinkWrapper.class));
+			} else {
+				respond(xchg, result.getHttpCode());
+			}
 	}
 
-	private static class UPCJson {
+	public static class UPCJson {
 		@Expose(deserialize = true) 
 		public String description;
 		
