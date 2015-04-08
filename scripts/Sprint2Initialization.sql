@@ -41,6 +41,31 @@ CREATE TABLE MeasurementUnit (
 	UnitName VARCHAR(20) NOT NULL UNIQUE,
 	PRIMARY KEY (UnitId)
 );
+INSERT INTO MeasurementUnit ( UnitName ) VALUES
+	( 'lb' ),
+	( 'pound' ),
+	( 'oz' ),
+	( 'ounce' ),
+	( 'g' ),
+	( 'mg' ),
+	( 'L' ),
+	( 'liter' ),
+	( 'mL' ),
+	( 'gal' ),
+	( 'gallon' ),
+	( 'qt' ),
+	( 'quart' ),
+	( 'pt' ),
+	( 'pint' ),
+	( 'cup' ),
+	( 'tsp' ),
+	( 'teaspoon' ),
+	( 'Tbsp' ),
+	( 'tablespoon' ),
+	( 'fl oz' ),
+	( 'box' ),
+	( 'package' ),
+	( 'unit' );
 CREATE TABLE InventoryItem (
 	ItemId Int NOT NULL AUTO_INCREMENT,
 	UPC VARCHAR(13) NOT NULL,
@@ -49,9 +74,9 @@ CREATE TABLE InventoryItem (
 	/*The number of PackageUnits in a package (the 14.5 in 14.5 oz./box)*/
 	PackageQuantity FLOAT NOT NULL,
 	/*Units of packaging for the package (the oz. in 14.5 oz./box)*/
-	PackageUnits VARCHAR(20) NOT NULL,
+	PackageUnits INT NOT NULL,
 	/*Units describing the packaging itself (the box in 14.5 oz./box)*/
-	PackageName VARCHAR(20) NOT NULL,
+	PackageName INT NOT NULL,
 	/*The number of packages of this item in the inventory*/
 	InventoryQuantity INT NOT NULL,
 	Expiration DATE,
@@ -59,7 +84,9 @@ CREATE TABLE InventoryItem (
 	Hidden BOOLEAN NOT NULL,
 	PRIMARY KEY ( ItemId ),
 	UNIQUE ( UPC,HouseholdId ),
-	FOREIGN KEY ( HouseholdId )	REFERENCES Household ( HouseholdId )
+	FOREIGN KEY ( HouseholdId )	REFERENCES Household ( HouseholdId ),
+	FOREIGN KEY ( PackageUnits ) REFERENCES MeasurementUnit ( UnitId ),
+	FOREIGN KEY ( PackageName ) REFERENCES MeasurementUnit ( UnitId )
 );
 CREATE TABLE HouseholdShoppingList(
 	ListId INT NOT NULL AUTO_INCREMENT,
@@ -80,7 +107,35 @@ CREATE TABLE ShoppingListItem (
 	Quantity INT NOT NULL,
 	UnitId INT,
 	PRIMARY KEY ( ListItemId ),
+	FOREIGN KEY (ListId) REFERENCES HouseholdShoppingList(ListId),
 	FOREIGN KEY (ItemId) REFERENCES InventoryItem(ItemId),
 	FOREIGN KEY ( UnitId ) REFERENCES MeasurementUnit ( UnitId ),
 	UNIQUE (ItemId, ListId)
+);
+CREATE TABLE HouseholdRecipe (
+	RecipeId INT NOT NULL AUTO_INCREMENT,
+	HouseholdId INT NOT NULL,
+	Name VARCHAR(40) NOT NULL,
+	Description VARCHAR(40),
+	PRIMARY KEY ( RecipeId ),
+	FOREIGN KEY ( HouseholdId ) REFERENCES Household ( HouseholdId )
+);
+CREATE TABLE RecipeItem (
+	RecipeItemId INT NOT NULL AUTO_INCREMENT,
+	RecipeId INT NOT NULL,
+	ItemId INT NOT NULL,
+	Quantity INT NOT NULL,
+	UnitId INT NOT NULL,
+	PRIMARY KEY ( RecipeItemId ),
+	FOREIGN KEY ( RecipeId ) REFERENCES HouseholdRecipe ( RecipeId ),
+	FOREIGN KEY ( ItemId )   REFERENCES InventoryItem( ItemId ),
+	FOREIGN KEY ( UnitId ) REFERENCES MeasurementUnit ( UnitId )
+);
+CREATE TABLE RecipeInstruction(
+	RecipeInstructionId INT NOT NULL AUTO_INCREMENT,
+	RecipeId INT NOT NULL,
+	SortOrder INT,
+	Instruction VARCHAR(100),
+	PRIMARY KEY ( RecipeInstructionId ),
+	FOREIGN KEY ( RecipeId ) REFERENCES HouseholdRecipe ( RecipeId )
 );
