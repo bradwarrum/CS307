@@ -15,6 +15,7 @@ public enum ResponseCode {
 	HOUSEHOLD_NOT_FOUND(400, "User is not associated with that household."),
 	LIST_NOT_FOUND(400, "One or more shopping lists in the request cannot be found for that household."),
 	ITEM_NOT_FOUND(400, "One or more UPC strings are not associated with the household, ensure that all UPCs are linked to the household."),
+	RECIPE_NOT_FOUND(400, "One or more of the recipies cannot be found for that household."),
 	UPC_FORMAT_NOT_SUPPORTED(400, "Support does not exist for barcodes of that format."),
 	UPC_CHECKSUM_INVALID(400, "UPC-A or EAN-13 barcode has an invalid checksum, try again."),
 	INSUFFICIENT_PERMISSIONS(403, "The user has insufficient household permissions to perform this action."),

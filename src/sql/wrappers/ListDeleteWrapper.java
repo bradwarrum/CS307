@@ -29,7 +29,7 @@ public class ListDeleteWrapper extends BaseWrapper {
 		if (res != ResponseCode.OK) return res;
 		//Remove the individual items belonging to the shopping list
 		if (!deleteItems()) return ResponseCode.INTERNAL_ERROR;
-		
+
 		release();
 		return ResponseCode.OK;
 	}
