@@ -11,14 +11,12 @@ import sql.SQLType;
 
 public class UPCLinkWrapper extends BaseWrapper {
 
-	private int userID, householdID;
+	private int userID, householdID,unitName,packageName;
 	private Barcode barcode;
 	private String description;
-	private String unitName;
 	private float size;
-	private String packageName;
 	
-	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, String unitName, float size, String packageName) {
+	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, int unitName, float size, int packageName) {
 		this.userID = userID;
 		this.householdID = householdID;
 		this.barcode = barcode;
@@ -42,8 +40,8 @@ public class UPCLinkWrapper extends BaseWrapper {
 					new SQLParam(householdID, SQLType.INT),
 					new SQLParam(description, SQLType.VARCHAR),
 					new SQLParam(size, SQLType.FLOAT),
-					new SQLParam(unitName, SQLType.VARCHAR),
-					new SQLParam(packageName, SQLType.VARCHAR),
+					new SQLParam(unitName, SQLType.INT),
+					new SQLParam(packageName, SQLType.INT),
 					new SQLParam(0, SQLType.INT),
 					SQLParam.SQLFALSE);
 		} catch (SQLException e) {

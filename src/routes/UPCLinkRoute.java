@@ -61,19 +61,19 @@ public class UPCLinkRoute extends Route {
 		
 		@Expose(deserialize = true)
 		@SerializedName("packageUnits")
-		public String unitName;
+		public int unitName;
 		
 		@Expose(deserialize = true)
 		@SerializedName("packageSize")
 		public float size;
 		
 		@Expose(deserialize = true)
-		public String packageName;
+		public int packageName;
 		
 		public boolean valid() {
 			if (description == null || description.length() > 40) return false;
-			if (unitName == null || unitName.length() > 20) return false;
-			if (packageName == null || packageName.length() > 20) return false;
+			if (unitName < 0 || unitName > 25) return false;
+			if (packageName < 0 || packageName > 25) return false;
 			if (size < 0) return false;
 			return true;
 		}

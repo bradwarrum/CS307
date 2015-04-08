@@ -13,8 +13,8 @@ Content-Type : application/json
 
 {
 	"description" : "Planter's Cocktail Peanuts",
-	"packageName" : "tin",
-	"packageUnits" : "oz.",
+	"packageName" : 23,
+	"packageUnits" : 3,
 	"packageSize" : 12.0
 }
 ```
