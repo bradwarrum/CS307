@@ -13,6 +13,7 @@ CREATE TABLE Household (
 	Description VARCHAR(40),
 	HeadOfHousehold INT NOT NULL,
 	Version LONG NOT NULL,
+	AvailableProduceID INT NOT NULL,
 	PRIMARY KEY ( HouseholdId ),
 	FOREIGN KEY (HeadOfHousehold) REFERENCES User(UserId)
 );

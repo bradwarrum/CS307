@@ -31,6 +31,8 @@ public class InventoryFetchWrapper extends BaseWrapper {
 		@Expose(serialize = true)
 		private String UPC;
 		@Expose(serialize = true)
+		private boolean isInternalUPC;
+		@Expose(serialize = true)
 		private String description;
 		@Expose(serialize = true)
 		private float packageSize;
@@ -43,8 +45,9 @@ public class InventoryFetchWrapper extends BaseWrapper {
 		@Expose(serialize = true)
 		private int fractional;
 		
-		public InventoryFetchResponseItemJSON (String UPC, String description, float packageSize, String packageUnits, String packageName, int quantity, int fractional) {
+		public InventoryFetchResponseItemJSON (String UPC, boolean isInternalUPC, String description, float packageSize, String packageUnits, String packageName, int quantity, int fractional) {
 			this.UPC = UPC;
+			this.isInternalUPC = isInternalUPC;
 			this.description = description;
 			this.packageSize = packageSize;
 			this.packageUnits = packageUnits;
@@ -91,7 +94,8 @@ public class InventoryFetchWrapper extends BaseWrapper {
 				int temp = results.getInt("InventoryQuantity");
 				int quantity = temp / 100;
 				int fractional = temp - quantity * 100;
-				items.add(new InventoryFetchResponseItemJSON(results.getString(1), results.getString(2), results.getFloat(3), results.getString(4),
+				String UPC = results.getString(1);
+				items.add(new InventoryFetchResponseItemJSON(UPC, UPC.length() == 5, results.getString(2), results.getFloat(3), results.getString(4),
 						results.getString(5), quantity, fractional));
 			}
 			release(results);

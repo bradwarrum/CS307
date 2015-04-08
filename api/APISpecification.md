@@ -94,6 +94,10 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 	</tr>
 	<tr>
 		<td>:heavy_check_mark:</td>
+		<td>Generate an Internal UPC</td>
+		<td><code>POST /households/:HOUSEHOLD_ID/items/generate?token=SESSION_TOKEN</code></td>
+	<tr>
+		<td>:heavy_check_mark:</td>
 		<td>Get UPC Description Suggestions</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN</code></td>
 	</tr>
@@ -103,7 +107,7 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 		<td><code>POST /households/:HOUSEHOLD_ID/items/update?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_check_mark:</td>
+		<td>:heavy_exclamation_mark:</td>
 		<td>Get Household Inventory</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/items?token=SESSION_TOKEN</code></td>
 	</tr>

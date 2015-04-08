@@ -134,6 +134,8 @@ public class ServerTest {
 		assertEquals("Link 2 pass", 200, rcode);
 		link("040000231325", "Starburst FaveRed Jellybeans", "bags", "ounces", 14.0f);
 		assertEquals("Link 3 pass", 200, rcode);
+		link(null, "Apple", "each", "unit", 1.0f);
+		assertEquals("Generate pass", 200, rcode);
 		createList("Weekly Shopping");
 		assertEquals("Create List pass", 201, rcode);
 		ListCreateResJSON lcr = gson.fromJson(response, ListCreateResJSON.class);
@@ -143,6 +145,7 @@ public class ServerTest {
 		items.add(new ListUpdateItem("029000071858", 3));
 		items.add(new ListUpdateItem( "04963406", 12));
 		items.add(new ListUpdateItem("040000231325", 6));
+		items.add(new ListUpdateItem("00001", 5)); // 1 is the first value for the generated UPC
 		updateList(items);
 		assertEquals("Update list pass", 200, rcode);
 		timestamp = gson.fromJson(response, ListUpdateResJSON.class).timestamp;
@@ -165,6 +168,8 @@ public class ServerTest {
 		assertEquals("Inventory fetch pass", 200, rcode);
 		deleteItem("04963406");
 		assertEquals("Deletion pass", 200, rcode);
+		deleteItem("00001");
+		assertEquals("Deletion of generated UPC", 200, rcode);
 		getInventory();
 		getList();
 		link("04963406", "Coca cola", "cans", "milliliters", 355.0f);
@@ -296,10 +301,19 @@ public class ServerTest {
 	}
 	
 	public void link(String UPC, String description, String packageName, String packageUnits, float packageSize)throws IOException {
-		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
+		Transaction request;
+		if (UPC != null) {
+			request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
+		} else {
+			request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/generate?token=" + token);
+		}
 		request.setPostMethod();
 		String reqstr = gson.toJson(new LinkReqJSON(description, packageName, packageUnits, packageSize));
-		System.out.println(delimiter + "\nRequest: LINK UPC");
+		if (UPC == null) {
+			System.out.println(delimiter + "\nRequest: GENERATE UPC");
+		} else {
+			System.out.println(delimiter + "\nRequest: LINK UPC");
+		}
 		System.out.println(request.getRequestURL());
 		System.out.println(reqstr);
 		request.send(reqstr);
