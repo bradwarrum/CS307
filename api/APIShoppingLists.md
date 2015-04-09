@@ -13,7 +13,7 @@ Content-Type : application/json
 ```
 ####Response Format
 ```
-HTTP 200 OK
+HTTP 201 CREATED
 
 HTTP Headers
 Content-Type : application/json
