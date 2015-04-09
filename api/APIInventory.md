@@ -4,6 +4,8 @@ Linking a UPC to a household will set up the description and unit type for that 
 If the UPC is not linked to the household a new record will be created.
 If the UPC is already linked, the description and unit name will be updated in the database.<p>
 Note that the packageName, packageUnits, and packageSize fields describe only the packaging units for the item.  For example, the following link call will describe the UPC as "12.0 oz. tin of Planter's Cocktail Peanuts".  Conversely, all inventory updates are in terms of package counts, not packaging units.
+#####PackageUnits is now an enumerated integer instead of a string.
+<a href="APIMeasurementUnits.md">Find the enumeration values here.</a>
 ####Request Format
 ```
 POST /households/:HOUSEHOLD_ID/items/:UPC/link?token=SESSION_TOKEN
