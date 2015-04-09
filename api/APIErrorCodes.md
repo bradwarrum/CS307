@@ -94,6 +94,12 @@ All API requests that fail for any reason now return a normalized, enumerated fo
 	    <td>409</td>
 	    <td>The server version of this resource is different than the client's version.  Update the resource on the client and retry.</td>
     </tr>
+    	<tr>
+	    <td>17</td>
+	    <td>RECIPE_NOT_FOUND</td>
+	    <td>400</td>
+	    <td>One or more of the recipes cannot be found for that household.</td>
+    </tr>
 </table>
 
 ###JSON Response Format Example
