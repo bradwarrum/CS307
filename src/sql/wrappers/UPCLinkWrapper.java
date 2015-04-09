@@ -15,20 +15,14 @@ import sql.SQLType;
 
 public class UPCLinkWrapper extends BaseWrapper {
 
-	private int userID, householdID,unitName,packageName;
+	private int userID, householdID,unitName;
+	private String packageName;
 	private Barcode barcode;
 	private String description;
 	private float size;
-<<<<<<< HEAD
-	
-	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, int unitName, float size, int packageName) {
-=======
-	private String packageName;
 	@Expose(serialize = true)
 	private String UPC;
-
-	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, String unitName, float size, String packageName) {
->>>>>>> origin/master
+	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, int unitName, float size, String packageName) {
 		this.userID = userID;
 		this.householdID = householdID;
 		this.barcode = barcode;
@@ -37,8 +31,7 @@ public class UPCLinkWrapper extends BaseWrapper {
 		this.size = size;
 		this.packageName = packageName;
 	}
-
-	public UPCLinkWrapper(int userID, int householdID, String description, String unitName, float size, String packageName) {
+	public UPCLinkWrapper(int userID, int householdID, String description, int unitName, float size, String packageName) {
 		this(userID, householdID, null, description, unitName, size, packageName);
 	}
 
@@ -81,7 +74,7 @@ public class UPCLinkWrapper extends BaseWrapper {
 					new SQLParam(description, SQLType.VARCHAR),
 					new SQLParam(size, SQLType.FLOAT),
 					new SQLParam(unitName, SQLType.INT),
-					new SQLParam(packageName, SQLType.INT),
+					new SQLParam(packageName, SQLType.VARCHAR),
 					new SQLParam(0, SQLType.INT),
 					SQLParam.SQLFALSE);
 		} catch (SQLException e) {

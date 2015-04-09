@@ -1,5 +1,10 @@
 package sql.wrappers;
 
+import java.sql.SQLException;
+
+import sql.SQLParam;
+import sql.SQLType;
+import core.Permissions;
 import core.ResponseCode;
 
 
@@ -63,7 +68,7 @@ public class RecipeDeleteWrapper extends BaseWrapper {
 	private ResponseCode deleteRecipe(){
 		int affected = -1;
 		try {
-			affected = update("DELETE FROM HouseholdRecipe  WHERE HouseholdId=? AND RecipeId=?;",
+			affected = update("DELETE FROM HouseholdRecipe WHERE HouseholdId=? AND RecipeId=?;",
 					new SQLParam(householdID, SQLType.INT),
 					new SQLParam(recipeID, SQLType.INT));
 		} catch (SQLException e) {
@@ -72,8 +77,7 @@ public class RecipeDeleteWrapper extends BaseWrapper {
 			return ResponseCode.INTERNAL_ERROR;
 		}
 		if (affected < 0) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
-		else if (affected == 0) {rollback(); release(); return ResponseCode.LIST_NOT_FOUND;}
+		else if (affected == 0) {rollback(); release(); return ResponseCode.RECIPE_NOT_FOUND;}
 		return ResponseCode.OK;
-	}
 	}
 }

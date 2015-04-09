@@ -27,11 +27,13 @@ import java.util.List;
 
 import json.JSONModels.*;
 
+import core.MeasurementUnits;
+
 
 public class ServerTest {
 	
 	public static class DatabaseSetup extends sql.SQLExecutable {
-		public boolean setup() throws SQLException {
+		public boolean setup() {
 			Path sqlfile = Paths.get("scripts/Sprint2Initialization.sql");
 			System.out.println("Running setup script from " + sqlfile.toAbsolutePath().toString());
 			List<String> contents;
@@ -40,14 +42,26 @@ public class ServerTest {
 			} catch (IOException e) {
 				return false;
 			}
+			try {
 			update("DROP DATABASE testdb;");
 			update("CREATE DATABASE testdb;");
 			update("USE testdb;");
+			} catch (SQLException e ) {
+				System.out.println("Database setup failed");
+				e.printStackTrace(System.out);
+				System.exit(1);
+			}
 			String query = "";
 			for (String s : contents) {
 				query += s + "\n";
 				if (s.endsWith(");")) {
-					update(query);
+					try {
+						update(query);
+					}catch (SQLException e) {
+						System.out.println("Database setup failed on query " + query);
+						e.printStackTrace(System.out);
+						System.exit(1);
+					}
 					query = "";
 				}
 			}
@@ -89,7 +103,8 @@ public class ServerTest {
 	public static String token = null;
 	public static int householdID;
 	public static int listID;
-	public static long timestamp;
+	public static int recipeID;
+	public static long inventoryVersion, listVersion, recipeVersion;
 	
 	public static int rcode;
 	public static String response;
@@ -114,6 +129,7 @@ public class ServerTest {
 	@Test
 	public void test() throws MalformedURLException, IOException {
 		System.out.println("Starting server test");
+		//Registration and Login
 		register("email1@gmail.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", "John", "Doe");
 		assertEquals("Registration 1 pass", 201, rcode);
 		register("email1@gmail.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", "John", "Doe");
@@ -125,22 +141,48 @@ public class ServerTest {
 		login("email1@gmail.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
 		assertEquals("Login pass", 200, rcode);
 		token = gson.fromJson(response, LoginResJSON.class).token;
+		getSelfInfo();
+		assertEquals("Get self pass", 200, rcode);
+		
+		//Household Creation
 		createHousehold("Stash", "Private Inventory");
 		assertEquals("Household creation pass", 201, rcode);
 		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
-		link("029000071858", "Planters Cocktail Peanuts", "tins", "ounces", 12.0f);
+		
+		//Linking
+		link("029000071858", "Planters Cocktail Peanuts", "tins", MeasurementUnits.OZ, 12.0f);
 		assertEquals("Link 1 pass", 200, rcode);
-		link( "04963406", "Coca Cola", "cans", "ounces", 12.0f);
+		link( "04963406", "Coca Cola", "cans", MeasurementUnits.OZ, 12.0f);
 		assertEquals("Link 2 pass", 200, rcode);
-		link("040000231325", "Starburst FaveRed Jellybeans", "bags", "ounces", 14.0f);
+		link("040000231325", "Starburst FaveRed Jellybeans", "bags", MeasurementUnits.OZ, 14.0f);
 		assertEquals("Link 3 pass", 200, rcode);
-		link(null, "Apple", "each", "unit", 1.0f);
+		link(null, "Apple", "each", MeasurementUnits.UNITS, 1.0f);
 		assertEquals("Generate pass", 200, rcode);
+		
+		//Recipe creation
+		createRecipe("Spaghetti", "Grandma's Special Spaghetti Recipe");
+		assertEquals("Create recipe pass", 201, rcode);
+		RecipeCreateResJSON rcr = gson.fromJson(response, RecipeCreateResJSON.class);
+		recipeID = rcr.recipeID;
+		recipeVersion = rcr.version;
+		
+		//Update recipe
+		List<String> rinstructions = new ArrayList<String>();
+		List<RecipeUpdateIngredJSON> ringredients = new ArrayList<RecipeUpdateIngredJSON>();
+		rinstructions.add("First put the thing in a pot");
+		rinstructions.add("Then put the thing on the stove");
+		rinstructions.add("Stir and then drop the spaghetti on the floor");
+		ringredients.add(new RecipeUpdateIngredJSON("029000071858", 2, 50));
+		ringredients.add(new RecipeUpdateIngredJSON("00001", 1, 99));
+		updateRecipe("New Spaghetti", "This Spaghetti Is Actually Grandpas", rinstructions, ringredients);
+		assertEquals("Update recipe pass", 200, rcode);
+		
+		//List operations
 		createList("Weekly Shopping");
 		assertEquals("Create List pass", 201, rcode);
 		ListCreateResJSON lcr = gson.fromJson(response, ListCreateResJSON.class);
 		listID = lcr.listID;
-		timestamp = lcr.version;
+		listVersion = lcr.version;
 		List<ListUpdateItem> items = new ArrayList<ListUpdateItem>();
 		items.add(new ListUpdateItem("029000071858", 3));
 		items.add(new ListUpdateItem( "04963406", 12));
@@ -148,16 +190,18 @@ public class ServerTest {
 		items.add(new ListUpdateItem("00001", 5)); // 1 is the first value for the generated UPC
 		updateList(items);
 		assertEquals("Update list pass", 200, rcode);
-		timestamp = gson.fromJson(response, ListUpdateResJSON.class).timestamp;
+		listVersion = gson.fromJson(response, ListUpdateResJSON.class).timestamp;
 		getList();
 		assertEquals("Get list pass", 200, rcode);
-		getSelfInfo();
-		assertEquals("Get self pass", 200, rcode);
+		
+		//General fetching
 		getHousehold();
 		assertEquals("Get household pass", 200, rcode);
 		getInventory();
 		assertEquals("Inventory fetch pass", 200, rcode);
-		timestamp = 1;
+		
+		//Inventory updates
+		inventoryVersion = 1;
 		List<InventoryUpdateItem> invItems = new ArrayList<InventoryUpdateItem>();
 		invItems.add(new InventoryUpdateItem("029000071858", 1, 50));
 		invItems.add(new InventoryUpdateItem("04963406", 17, 0));
@@ -166,22 +210,27 @@ public class ServerTest {
 		assertEquals("Inventory update pass", 200, rcode);
 		getInventory();
 		assertEquals("Inventory fetch pass", 200, rcode);
+		
+		//Deletions
 		deleteItem("04963406");
 		assertEquals("Deletion pass", 200, rcode);
 		deleteItem("00001");
 		assertEquals("Deletion of generated UPC", 200, rcode);
 		getInventory();
 		getList();
-		link("04963406", "Coca cola", "cans", "milliliters", 355.0f);
+		link("04963406", "Coca cola", "cans", MeasurementUnits.ML, 355.0f);
 		getInventory();
 		removeList();
 		assertEquals("List removal pass", 200, rcode);
 		getHousehold();
 		assertEquals("Get household pass", 200, rcode);
+		
+		
+		//Suggestions
 		createHousehold("Apartment", "John and Julia's Inventory");
 		assertEquals("Household creation pass", 201, rcode);
 		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
-		link( "04963406", "Coke", "cans", "milliliters", 355.0f);
+		link( "04963406", "Coke", "cans", MeasurementUnits.ML, 355.0f);
 		assertEquals("Link 3 pass", 200, rcode);
 		getSuggestions("04963406");
 		assertEquals("Suggestion pass", 200, rcode);
@@ -300,7 +349,7 @@ public class ServerTest {
 		request.close();
 	}
 	
-	public void link(String UPC, String description, String packageName, String packageUnits, float packageSize)throws IOException {
+	public void link(String UPC, String description, String packageName, MeasurementUnits packageUnits, float packageSize)throws IOException {
 		Transaction request;
 		if (UPC != null) {
 			request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
@@ -308,7 +357,7 @@ public class ServerTest {
 			request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/generate?token=" + token);
 		}
 		request.setPostMethod();
-		String reqstr = gson.toJson(new LinkReqJSON(description, packageName, packageUnits, packageSize));
+		String reqstr = gson.toJson(new LinkReqJSON(description, packageName, packageUnits.getID(), packageSize));
 		if (UPC == null) {
 			System.out.println(delimiter + "\nRequest: GENERATE UPC");
 		} else {
@@ -348,7 +397,7 @@ public class ServerTest {
 	public void updateList(List<ListUpdateItem> items) throws IOException {
 		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/lists/" + listID + "/update?token=" + token);
 		request.setPostMethod();
-		String reqstr = gson.toJson(new ListUpdateReqJSON(timestamp, items));
+		String reqstr = gson.toJson(new ListUpdateReqJSON(listVersion, items));
 		System.out.println(delimiter + "\nRequest: UPDATE LIST");
 		System.out.println(request.getRequestURL());
 		System.out.println(reqstr);
@@ -453,7 +502,7 @@ public class ServerTest {
 	public void updateInventory(List<InventoryUpdateItem> items) throws MalformedURLException, IOException {
 		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/update?token=" + token);
 		request.setPostMethod();
-		String reqstr = gson.toJson(new InventoryUpdateReqJSON(timestamp, items));
+		String reqstr = gson.toJson(new InventoryUpdateReqJSON(inventoryVersion, items));
 		System.out.println(delimiter + "\nRequest: UPDATE INVENTORY");
 		System.out.println(request.getRequestURL());
 		System.out.println(reqstr);
@@ -481,6 +530,50 @@ public class ServerTest {
 			System.out.println(response);
 		}catch (IOException e) {}
 		request.close();
+	}
+	
+	public void createRecipe(String name, String description) throws MalformedURLException, IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/recipes/create?token=" + token);
+		request.setPostMethod();
+		String reqstr = gson.toJson(new RecipeCreateReqJSON(name, description));
+		System.out.println(delimiter + "\nRequest: CREATE RECIPE");
+		System.out.println(request.getRequestURL());
+		System.out.println(reqstr);
+		request.send(reqstr);
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
+	}
+	
+	public void updateRecipe(String name, String description, List<String> instructions, List<RecipeUpdateIngredJSON> ingredients) throws MalformedURLException, IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/recipes/" + recipeID + "/update?token=" + token);
+		request.setPostMethod();
+		String reqstr = gson.toJson(new RecipeUpdateReqJSON(recipeVersion, name, description, instructions, ingredients));
+		System.out.println(delimiter + "\nRequest: UPDATE RECIPE");
+		System.out.println(request.getRequestURL());
+		System.out.println(reqstr);
+		request.send(reqstr);
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
+	}
+	
+	public void fetchRecipe() {
+		
+	}
+	
+	public void deleteRecipe() {
+		
 	}
 
 }

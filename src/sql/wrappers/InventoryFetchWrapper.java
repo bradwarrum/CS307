@@ -35,25 +35,41 @@ public class InventoryFetchWrapper extends BaseWrapper {
 		@Expose(serialize = true)
 		private String description;
 		@Expose(serialize = true)
-		private float packageSize;
-		@Expose(serialize = true)
-		private String packageUnits;
-		@Expose(serialize = true)
-		private String packageName;
-		@Expose(serialize = true)
 		private int quantity;
 		@Expose(serialize = true)
 		private int fractional;
+		@Expose(serialize = true)
+		private PackagingJSON packaging;
 		
-		public InventoryFetchResponseItemJSON (String UPC, boolean isInternalUPC, String description, float packageSize, String packageUnits, String packageName, int quantity, int fractional) {
+		public InventoryFetchResponseItemJSON (String UPC, boolean isInternalUPC, String description, int quantity, int fractional, PackagingJSON packaging) {
 			this.UPC = UPC;
 			this.isInternalUPC = isInternalUPC;
 			this.description = description;
-			this.packageSize = packageSize;
-			this.packageUnits = packageUnits;
-			this.packageName = packageName;
 			this.quantity = quantity;
 			this.fractional = fractional;
+			this.packaging = packaging;
+		}
+	}
+	
+	private static class PackagingJSON {
+		@Expose(serialize = true)
+		@SerializedName("packageSize")
+		private float unitQuantity;
+		@Expose(serialize = true)
+		private int unitID;
+		@Expose(serialize = true)
+		private String unitName;
+		@Expose(serialize = true)
+		private String unitAbbreviation;
+		@Expose(serialize = true)
+		private String packageName;
+		
+		public PackagingJSON (float unitQuantity, int unitID, String unitName, String unitAbbreviation, String packageName) {
+			this.unitQuantity = unitQuantity;
+			this.unitID = unitID;
+			this.unitName = unitName;
+			this.unitAbbreviation = unitAbbreviation;
+			this.packageName = packageName;
 		}
 	}
 	
@@ -85,18 +101,25 @@ public class InventoryFetchWrapper extends BaseWrapper {
 		}
 		items = new ArrayList<InventoryFetchResponseItemJSON> ();
 		try {
-			results = query("SELECT UPC, Description, PackageQuantity, PackageUnits, PackageName, InventoryQuantity FROM InventoryItem "
-					+ "WHERE HouseholdId=? AND Hidden=?;",
+			results = query("SELECT I.UPC, I.Description, I.PackageQuantity, I.PackageUnits, M.UnitName, M.UnitAbbreviation, I.PackageName, I.InventoryQuantity FROM InventoryItem I "
+					+ "INNER JOIN MeasurementUnit M ON M.UnitId=I.PackageUnits "
+					+ "WHERE I.HouseholdId=? AND I.Hidden=?;",
 					householdParam,
 					SQLParam.SQLFALSE);
 			if (results == null) { release(results); release(); return ResponseCode.INTERNAL_ERROR;}
 			while (results.next()) {
-				int temp = results.getInt("InventoryQuantity");
+				String UPC = results.getString(1);
+				String description = results.getString(2);
+				float pkgQuantity = results.getFloat(3);
+				int pkgUnitID = results.getInt(4);
+				String pkgUnitName = results.getString(5);
+				String pkgUnitAbbrev = results.getString(6);
+				String pkgName = results.getString(7);
+				int temp = results.getInt(8);
 				int quantity = temp / 100;
 				int fractional = temp - quantity * 100;
-				String UPC = results.getString(1);
-				items.add(new InventoryFetchResponseItemJSON(UPC, UPC.length() == 5, results.getString(2), results.getFloat(3), results.getString(4),
-						results.getString(5), quantity, fractional));
+				PackagingJSON packaging = new PackagingJSON(pkgQuantity, pkgUnitID, pkgUnitName, pkgUnitAbbrev, pkgName);
+				items.add(new InventoryFetchResponseItemJSON(UPC, UPC.length() == 5, description, quantity, fractional, packaging));
 			}
 			release(results);
 			release();

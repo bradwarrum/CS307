@@ -1,7 +1,14 @@
 package sql.wrappers;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import sql.SQLParam;
+import sql.SQLType;
+
 import com.google.gson.annotations.Expose;
 
+import core.Permissions;
 import core.ResponseCode;
 
 public class RecipeCreateWrapper extends BaseWrapper {
@@ -9,7 +16,10 @@ public class RecipeCreateWrapper extends BaseWrapper {
 	private int userID, householdID;
 	private String recipeName, recipeDescription;
 	@Expose(serialize = true)
+	private int recipeID;
+	@Expose(serialize = true)
 	private long version;
+
 
 	public RecipeCreateWrapper(int userID, int householdID, String recipeName, String recipeDescription) {
 		this.userID = userID;
@@ -49,7 +59,7 @@ public class RecipeCreateWrapper extends BaseWrapper {
 		try {
 			results = query("SELECT LAST_INSERT_ID() AS lastID;");
 			if (results == null || !results.next()) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
-			listID = results.getInt(1);
+			recipeID = results.getInt(1);
 		}catch (SQLException e) {
 			rollback(); release();
 			return ResponseCode.INTERNAL_ERROR;

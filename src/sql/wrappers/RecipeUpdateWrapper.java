@@ -1,11 +1,16 @@
 package sql.wrappers;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 
+import core.Permissions;
 import core.ResponseCode;
 import routes.RecipeUpdateRoute.*;
+import sql.SQLParam;
+import sql.SQLType;
 
 public class RecipeUpdateWrapper extends BaseWrapper {
 	private int userID, householdID, recipeID;
@@ -38,17 +43,18 @@ public class RecipeUpdateWrapper extends BaseWrapper {
 		// 2) Check that the version number matches the database version (look at ListUpdateWrapper. You will want to SELECT ... FOR UPDATE to lock the version number in the database)
 		long DBtimestamp = readAndLockTimestamp();
 		if (DBtimestamp == -1) {release(); return ResponseCode.INTERNAL_ERROR;}
-		else if (DBtimestamp == -2) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
-		if (timestamp != DBtimestamp ) {release(); return ResponseCode.OUTDATED_TIMESTAMP;}
+		else if (DBtimestamp == -2) {release(); return ResponseCode.RECIPE_NOT_FOUND;}
+		if (version != DBtimestamp ) {release(); return ResponseCode.OUTDATED_TIMESTAMP;}
 		// 3) If the version matches, update the values in the database
-		if (!updateRows()) {return ResponseCode.ITEM_NOT_FOUND;}
+		ResponseCode res = updateRows();
+		if (res != ResponseCode.OK) {return res;}
 
 		// 4) Update the version in the recipe table. (Use System.currentTimeMillis() for the version value)
 		long newstamp = writeTimestamp();
 		if (newstamp == -1) {return ResponseCode.INTERNAL_ERROR;}
 		release();
 		// 5) Set the version variable above to the same version you inserted into the table.  It will automatically sent back to the client.
-		timestamp = newstamp;
+		version = newstamp;
 		return ResponseCode.OK;
 	}
 	private long readAndLockTimestamp() {
@@ -70,43 +76,67 @@ public class RecipeUpdateWrapper extends BaseWrapper {
 		}
 		return stamp;
 	}
-	private boolean updateRows() {
-		int updated = 0;
-		int fail;
+	private ResponseCode updateRows() {
 		SQLParam recipeidp = new SQLParam(recipeID, SQLType.INT);
 		SQLParam houseidp = new SQLParam(householdID, SQLType.INT);
+		
 
-		ResultSet results= null;
+		int affected = -1;
+		ResultSet results = null;
 		try {
-			//this will consume inventory according to the recipe
-			for (ListUpdateItemJSON item : items) {
+			//Delete all relevant items first
+			affected = update("DELETE FROM RecipeItem WHERE RecipeId=?;",
+					recipeidp);
+			if (affected < 0) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
+			affected = update("DELETE FROM RecipeInstruction WHERE RecipeId=?;",
+					recipeidp);
+			if (affected < 0) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
+			//Insert instructions
+			for(int i = 0; i < instructions.size(); i++) {
+				affected = update("INSERT INTO RecipeInstruction (RecipeId, SortOrder, Instruction)"
+						+ "VALUES (?, ?, ?);",
+						recipeidp,
+						new SQLParam(i, SQLType.INT),
+						new SQLParam(instructions.get(i), SQLType.VARCHAR));
+				if (affected !=1 ) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
+			}
+			//Insert Ingredients
+
+			for (int i = 0; i < ingredients.size(); i++) {
+				RecipeUpdateIngredJSON ingred = ingredients.get(i);
 				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=? AND Hidden=?);",
-						new SQLParam(item.UPC, SQLType.VARCHAR),
+						new SQLParam(ingred.UPC, SQLType.VARCHAR),
 						houseidp,
 						SQLParam.SQLFALSE);
-				if (results == null || !results.next()) {release(results); rollback(); release(); return false;}
+				if (results == null || !results.next()) {rollback(); release(results); release(); return ResponseCode.ITEM_NOT_FOUND;}
 				int itemID = results.getInt(1);
-				SQLParam itemidp = new SQLParam(itemID, SQLType.INT);
-				SQLParam quantityp = new SQLParam(item.quantity, SQLType.INT);
-				updated += 1;
 				release(results);
+				
+				affected = update("INSERT INTO RecipeItem (RecipeId, ItemId, Quantity) "
+						+ "VALUES (?, ?, ?);"
+						+ "",
+						recipeidp,
+						new SQLParam(itemID, SQLType.INT),
+						new SQLParam(ingred.quantity * 100 + ingred.fractional, SQLType.INT));
+				if (affected != 1) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
 			}
 		} catch (SQLException e) {
-			release(results);
 			rollback();
+			release(results);
 			release();
-			return false;
+			return ResponseCode.INTERNAL_ERROR;
 		}
-		release(results);
-		if (updated != items.size()) {rollback(); release(); return false;}
-		return true;
+		return ResponseCode.OK;
+
 	}
 	private long writeTimestamp() {
 		long stamp = System.currentTimeMillis();
 		int affected = -1;
 		try {
-			affected = update("UPDATE HouseholdRecipe SET Timestamp=? WHERE RecipeId=?;",
+			affected = update("UPDATE HouseholdRecipe SET Timestamp=?, Name=?, Description=? WHERE RecipeId=?;",
 					new SQLParam(stamp, SQLType.LONG),
+					new SQLParam(recipeName, SQLType.VARCHAR),
+					new SQLParam(recipeDescription, SQLType.VARCHAR),
 					new SQLParam(recipeID, SQLType.INT));
 		} catch (SQLException e) {
 			rollback();
