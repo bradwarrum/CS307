@@ -8,6 +8,9 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 <h5>Format dump files have been added.</h5>
 These dump files are raw outputs of test scripts and give an idea of what the format is of each API request.  In case there is a disparity between this documentation and the server request/response formats, the most updated formats are likely in the format dump file.<p>
 <a href="../test/dumps">Find the dumps here.</a>
+<h5>Measurement Unit enumerations have been added.</h5>
+These enumerations will affect UPC linking and household inventory fetching. <p>
+<a href="APIMeasurementUnits.md">Find the enumerations here.</a>
 ###Overview
  - :heavy_multiplication_x:  Not Implemented
  - :heavy_check_mark:  Implemented
