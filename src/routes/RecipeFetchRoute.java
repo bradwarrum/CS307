@@ -2,7 +2,6 @@ package routes;
 
 import java.io.IOException;
 
-import sql.wrappers.ListFetchWrapper;
 import sql.wrappers.RecipeFetchWrapper;
 
 import com.sun.net.httpserver.HttpExchange;

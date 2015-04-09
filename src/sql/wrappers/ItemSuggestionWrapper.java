@@ -8,24 +8,24 @@ import java.util.List;
 import com.google.gson.*;
 import com.google.gson.annotations.Expose;
 
+import core.Permissions;
 import core.ResponseCode;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
 
-
 import sql.SQLParam;
 import sql.SQLType;
+import sql.wrappers.InventoryFetchWrapper.PackagingJSON;
 
 public class ItemSuggestionWrapper extends BaseWrapper{
 	private int userID;
 	@Expose(serialize = true)
 	private String UPC;
-	@Expose(serialize = true)
 	private int householdId;
 	@Expose(serialize = true)
-	private String currentDescription = null;
+	private InternalSuggestJSON currentLink = null;
 	@Expose(serialize = true)
 	private List<InternalSuggestJSON> internalSuggestions = new ArrayList<InternalSuggestJSON>();
 	@Expose(serialize = true)
@@ -36,9 +36,12 @@ public class ItemSuggestionWrapper extends BaseWrapper{
 		private final int householdID;
 		@Expose(serialize = true)
 		private final String description;
-		public InternalSuggestJSON(int householdID, String description) {
+		@Expose(serialize = true)
+		private PackagingJSON packaging;
+		public InternalSuggestJSON(int householdID, String description, PackagingJSON packaging) {
 			this.householdID = householdID;
 			this.description = description;
+			this.packaging = packaging;
 		}
 	}
 
@@ -71,21 +74,41 @@ public class ItemSuggestionWrapper extends BaseWrapper{
 			if (results == null) {release(); return  ResponseCode.INTERNAL_ERROR;}
 			if (!results.next()) {release(results); release(); return  ResponseCode.HOUSEHOLD_NOT_FOUND;}
 			release(results);
-			results = query ("SELECT InventoryItem.Description, HouseholdPermissions.HouseholdId FROM HouseholdPermissions "
-					+ "INNER JOIN InventoryItem ON (InventoryItem.HouseholdId = HouseholdPermissions.HouseholdId) "
-					+ "WHERE (HouseholdPermissions.UserId=? AND InventoryItem.UPC=?);",
+			results = query ("SELECT I.Description, I.PackageQuantity, I.PackageUnits, M.UnitName, M.UnitAbbreviation, I.PackageName, H.HouseholdId, H.PermissionLevel FROM HouseholdPermissions H "
+					+ "INNER JOIN InventoryItem I ON (I.HouseholdId = H.HouseholdId) "
+					+ "INNER JOIN MeasurementUnit M ON (I.PackageUnits = M.UnitId)"
+					+ "WHERE (H.UserId=? AND I.UPC=?);",
 					usersql,
 					upcsql);
 			if (results == null) {release(); return  ResponseCode.INTERNAL_ERROR;}
 			int houseTEMP = -1;
-			String descriptionTEMP;
+			String description;
+			float packageQuantity;
+			int packageUnits;
+			String unitName, unitAbbrev;
+			String packageName;
+			int permRaw;
+			Permissions permissions;
 			while (results.next()) {
-				descriptionTEMP = results.getString(1);
-				houseTEMP = results.getInt(2);
+				permRaw = results.getInt(8);
+				permissions = new Permissions(permRaw);
+				
+				if (!permissions.has(Permissions.Flag.CAN_READ_INVENTORY)) continue;
+				
+				description = results.getString(1);
+				packageQuantity = results.getFloat(2);
+				packageUnits = results.getInt(3);
+				unitName = results.getString(4);
+				unitAbbrev = results.getString(5);
+				packageName = results.getString(6);
+				houseTEMP = results.getInt(7);
+
+				PackagingJSON p = new PackagingJSON(packageQuantity, packageUnits, unitName, unitAbbrev, packageName);
+				InternalSuggestJSON s = new InternalSuggestJSON(houseTEMP, description, p);
 				if (houseTEMP == householdId) {
-					currentDescription = descriptionTEMP;
+					currentLink = s;
 				} else {
-					internalSuggestions.add(new InternalSuggestJSON(houseTEMP, descriptionTEMP));
+					internalSuggestions.add(s);
 				}
 			}
 			//hit API for default description

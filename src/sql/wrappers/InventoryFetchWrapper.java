@@ -51,7 +51,7 @@ public class InventoryFetchWrapper extends BaseWrapper {
 		}
 	}
 	
-	private static class PackagingJSON {
+	public static class PackagingJSON {
 		@Expose(serialize = true)
 		@SerializedName("packageSize")
 		private float unitQuantity;

@@ -3,7 +3,6 @@ package routes;
 import java.io.IOException;
 import java.util.List;
 
-import sql.wrappers.ListUpdateWrapper;
 import sql.wrappers.RecipeUpdateWrapper;
 
 import com.google.gson.JsonSyntaxException;

@@ -103,7 +103,7 @@ These enumerations will affect UPC linking and household inventory fetching. <p>
 		<td>Generate an Internal UPC</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/items/generate?token=SESSION_TOKEN</code></td>
 	<tr>
-		<td>:heavy_check_mark:</td>
+		<td>:heavy_exclamation_mark:</td>
 		<td>Get UPC Description Suggestions</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN</code></td>
 	</tr>

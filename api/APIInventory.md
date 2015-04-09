@@ -72,6 +72,7 @@ Content-Type : application/json
 ```
 
 ##Get UPC Description Suggestions<br>
+###This request has been modified to return packaging information along with the description.
 ####Request Format
 ```
 GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN
@@ -81,12 +82,28 @@ GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN
 HTTP 200
 {
   "UPC": "04963406",
-  "householdId": 24839,
-  "currentDescription": "Can of Coke",
+  "currentLink": {
+    "householdID": 2,
+    "description": "Coke",
+    "packaging": {
+      "packageSize": 355.0,
+      "unitID": 6,
+      "unitName": "milliliters",
+      "unitAbbreviation": "mL",
+      "packageName": "cans"
+    }
+  },
   "internalSuggestions": [
     {
-      "householdID": 19283,
-      "description": "Coca Cola, Can"
+      "householdID": 1,
+      "description": "Coca cola",
+      "packaging": {
+        "packageSize": 355.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
     }
   ],
   "externalSuggestions": [
@@ -96,6 +113,8 @@ HTTP 200
     }
   ]
 }
+
+
 ```
  - currentDescription is the description linked to the household :HOUSEHOLD_ID provided in the URL.
  - currentDescription is null if the household :HOUSEHOLD_ID provided in the URL does not have a linked description for :UPC.
