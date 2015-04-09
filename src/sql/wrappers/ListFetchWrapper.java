@@ -12,6 +12,7 @@ import core.Permissions;
 import core.ResponseCode;
 import sql.SQLParam;
 import sql.SQLType;
+import sql.wrappers.InventoryFetchWrapper.PackagingJSON;
 
 public class ListFetchWrapper extends BaseWrapper {
 	
@@ -44,10 +45,10 @@ public class ListFetchWrapper extends BaseWrapper {
 		@Expose(serialize = true)		
 		public final int quantity;
 		@Expose(serialize = true)
-		public final String packageName;
+		public final PackagingJSON packaging;
 
-		public ListFetchItemsJSON (String packageName, String UPC, String description, int quantity, boolean isInternalUPC) {
-			this.packageName = packageName;
+		public ListFetchItemsJSON (String UPC, String description, int quantity, boolean isInternalUPC, PackagingJSON packaging) {
+			this.packaging = packaging;
 			this.UPC = UPC;
 			this.description = description;
 			this.quantity = quantity;
@@ -98,25 +99,34 @@ public class ListFetchWrapper extends BaseWrapper {
 	private boolean selectAll() {
 		ResultSet results = null;
 		try {
-			results = query("SELECT InventoryItem.UPC, InventoryItem.Description, InventoryItem.PackageName, ShoppingListItem.Quantity "
-					+ "FROM ShoppingListItem INNER JOIN InventoryItem ON (ShoppingListItem.ItemId=InventoryItem.ItemId) "
-					+ "WHERE (ShoppingListItem.ListId=?);",
+			results = query("SELECT I.UPC, I.Description, I.PackageQuantity, I.PackageUnits, M.UnitName, M.UnitAbbreviation, I.PackageName, S.Quantity "
+					+ "FROM ShoppingListItem S INNER JOIN InventoryItem I ON (S.ItemId=I.ItemId) "
+					+ "INNER JOIN MeasurementUnit M ON (M.UnitId=I.PackageUnits) "
+					+ "WHERE (S.ListId=?);",
 					new SQLParam(listID, SQLType.INT));
 			if (results == null) {release(); return false;}
 			
 			items = new ArrayList<ListFetchItemsJSON>();
-			String UPC, description, packageName;
-			int quantity;
+			String UPC, description, packageName, unitName, unitAbbrev;
+			float unitQuantity;
+			int quantity, unitID;
 			while (results.next()) {
 				UPC = results.getString(1);
 				description = results.getString(2);
-				packageName=  results.getString(3);
-				quantity = results.getInt(4);
-				items.add(new ListFetchItemsJSON(packageName, UPC, description, quantity, UPC.length() == 5));
+				unitQuantity = results.getInt(3);
+				unitID = results.getInt(4);
+				unitName = results.getString(5);
+				unitAbbrev = results.getString(6);
+				packageName = results.getString(7);
+				quantity = results.getInt(8);
+				PackagingJSON p = new PackagingJSON(unitQuantity, unitID, unitName, unitAbbrev, packageName);
+				items.add(new ListFetchItemsJSON(UPC, description, quantity, UPC.length() == 5, p));
 			}
 		} catch (SQLException e) {
 			release();
 			return false;
+		} finally {
+			release(results);
 		}
 		return true;
 	}

@@ -76,12 +76,12 @@ HTTP 200
   "firstName": "John",
   "lastName": "Doe",
   "userID": 1,
-  "token": "6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j"
+  "token": "Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X"
 }
 
 ==========================================================================
 Request: GET USER INFORMATION
-http://127.0.0.1:8000/users/me?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/users/me?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
@@ -94,7 +94,7 @@ HTTP 200
 
 ==========================================================================
 Request: CREATE HOUSEHOLD
-http://127.0.0.1:8000/households/create?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/create?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "householdName": "Stash",
   "householdDescription": "Private Inventory"
@@ -107,7 +107,7 @@ HTTP 201
 
 ==========================================================================
 Request: LINK UPC
-http://127.0.0.1:8000/households/1/items/029000071858/link?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/029000071858/link?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "description": "Planters Cocktail Peanuts",
   "packageName": "tins",
@@ -119,7 +119,7 @@ HTTP 200
 
 ==========================================================================
 Request: LINK UPC
-http://127.0.0.1:8000/households/1/items/04963406/link?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/04963406/link?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "description": "Coca Cola",
   "packageName": "cans",
@@ -131,7 +131,7 @@ HTTP 200
 
 ==========================================================================
 Request: LINK UPC
-http://127.0.0.1:8000/households/1/items/040000231325/link?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/040000231325/link?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "description": "Starburst FaveRed Jellybeans",
   "packageName": "bags",
@@ -143,7 +143,7 @@ HTTP 200
 
 ==========================================================================
 Request: GENERATE UPC
-http://127.0.0.1:8000/households/1/items/generate?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/generate?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "description": "Apple",
   "packageName": "each",
@@ -158,7 +158,7 @@ HTTP 200
 
 ==========================================================================
 Request: CREATE RECIPE
-http://127.0.0.1:8000/households/1/recipes/create?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/recipes/create?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "recipeName": "Spaghetti",
   "recipeDescription": "Grandma\u0027s Special Spaghetti Recipe"
@@ -167,14 +167,14 @@ Response:
 HTTP 201
 {
   "recipeID": 1,
-  "version": 1428569545089
+  "version": 1428613574567
 }
 
 ==========================================================================
 Request: UPDATE RECIPE
-http://127.0.0.1:8000/households/1/recipes/1/update?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/recipes/1/update?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
-  "version": 1428569545089,
+  "version": 1428613574567,
   "recipeName": "New Spaghetti",
   "recipeDescription": "This Spaghetti Is Actually Grandpas",
   "instructions": [
@@ -199,16 +199,16 @@ http://127.0.0.1:8000/households/1/recipes/1/update?token=6cR5nOO-UvswJRxhUIiLSM
 Response:
 HTTP 200
 {
-  "version": 1428569545174
+  "version": 1428613574645
 }
 
 ==========================================================================
 Request: GET RECIPE
-http://127.0.0.1:8000/households/1/recipes/1?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/recipes/1?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545174,
+  "version": 1428613574645,
   "recipeName": "New Spaghetti",
   "recipeDescription": "This Spaghetti Is Actually Grandpas",
   "ingredients": [
@@ -237,7 +237,7 @@ HTTP 200
 
 ==========================================================================
 Request: CREATE LIST
-http://127.0.0.1:8000/households/1/lists/create?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/lists/create?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "listName": "Weekly Shopping"
 }
@@ -245,14 +245,14 @@ Response:
 HTTP 201
 {
   "listID": 1,
-  "version": 1428569545299
+  "version": 1428613574776
 }
 
 ==========================================================================
 Request: UPDATE LIST
-http://127.0.0.1:8000/households/1/lists/1/update?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/lists/1/update?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
-  "version": 1428569545299,
+  "version": 1428613574776,
   "items": [
     {
       "UPC": "029000071858",
@@ -275,16 +275,16 @@ http://127.0.0.1:8000/households/1/lists/1/update?token=6cR5nOO-UvswJRxhUIiLSMvb
 Response:
 HTTP 200
 {
-  "version": 1428569545502
+  "version": 1428613574901
 }
 
 ==========================================================================
 Request: GET LIST
-http://127.0.0.1:8000/households/1/lists/1?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/lists/1?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545502,
+  "version": 1428613574901,
   "name": "Weekly Shopping",
   "items": [
     {
@@ -292,35 +292,59 @@ HTTP 200
       "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
       "quantity": 3,
-      "packageName": "tins"
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
     },
     {
       "UPC": "04963406",
       "isInternalUPC": false,
       "description": "Coca Cola",
       "quantity": 12,
-      "packageName": "cans"
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
     },
     {
       "UPC": "040000231325",
       "isInternalUPC": false,
       "description": "Starburst FaveRed Jellybeans",
       "quantity": 6,
-      "packageName": "bags"
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
     },
     {
       "UPC": "00001",
       "isInternalUPC": true,
       "description": "Apple",
       "quantity": 5,
-      "packageName": "each"
+      "packaging": {
+        "packageSize": 1.0,
+        "unitID": 14,
+        "unitName": "units",
+        "unitAbbreviation": "units",
+        "packageName": "each"
+      }
     }
   ]
 }
 
 ==========================================================================
 Request: GET HOUSEHOLD
-http://127.0.0.1:8000/households/1?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
@@ -353,7 +377,7 @@ HTTP 200
 
 ==========================================================================
 Request: GET HOUSEHOLD INVENTORY
-http://127.0.0.1:8000/households/1/items?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
@@ -420,7 +444,7 @@ HTTP 200
 
 ==========================================================================
 Request: UPDATE INVENTORY
-http://127.0.0.1:8000/households/1/items/update?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/update?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "version": 1,
   "items": [
@@ -444,16 +468,16 @@ http://127.0.0.1:8000/households/1/items/update?token=6cR5nOO-UvswJRxhUIiLSMvbW2
 Response:
 HTTP 200
 {
-  "version": 1428569545574
+  "version": 1428613577742
 }
 
 ==========================================================================
 Request: GET HOUSEHOLD INVENTORY
-http://127.0.0.1:8000/households/1/items?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545574,
+  "version": 1428613577742,
   "items": [
     {
       "UPC": "029000071858",
@@ -516,29 +540,29 @@ HTTP 200
 
 ==========================================================================
 Request: REMOVE INVENTORY ITEM
-http://127.0.0.1:8000/households/1/items/04963406/unlink?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/04963406/unlink?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545605
+  "version": 1428613577820
 }
 
 ==========================================================================
 Request: REMOVE INVENTORY ITEM
-http://127.0.0.1:8000/households/1/items/00001/unlink?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/00001/unlink?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545652
+  "version": 1428613577867
 }
 
 ==========================================================================
 Request: GET HOUSEHOLD INVENTORY
-http://127.0.0.1:8000/households/1/items?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545652,
+  "version": 1428613577867,
   "items": [
     {
       "UPC": "029000071858",
@@ -573,11 +597,11 @@ HTTP 200
 
 ==========================================================================
 Request: GET LIST
-http://127.0.0.1:8000/households/1/lists/1?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/lists/1?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545652,
+  "version": 1428613577867,
   "name": "Weekly Shopping",
   "items": [
     {
@@ -585,25 +609,37 @@ HTTP 200
       "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
       "quantity": 3,
-      "packageName": "tins"
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
     },
     {
       "UPC": "040000231325",
       "isInternalUPC": false,
       "description": "Starburst FaveRed Jellybeans",
       "quantity": 6,
-      "packageName": "bags"
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
     }
   ]
 }
 
 ==========================================================================
 Request: GET RECIPE
-http://127.0.0.1:8000/households/1/recipes/1?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/recipes/1?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545652,
+  "version": 1428613577867,
   "recipeName": "New Spaghetti",
   "recipeDescription": "This Spaghetti Is Actually Grandpas",
   "ingredients": [
@@ -625,7 +661,7 @@ HTTP 200
 
 ==========================================================================
 Request: LINK UPC
-http://127.0.0.1:8000/households/1/items/04963406/link?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items/04963406/link?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "description": "Coca cola",
   "packageName": "cans",
@@ -637,11 +673,11 @@ HTTP 200
 
 ==========================================================================
 Request: GET HOUSEHOLD INVENTORY
-http://127.0.0.1:8000/households/1/items?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/items?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
-  "version": 1428569545652,
+  "version": 1428613577867,
   "items": [
     {
       "UPC": "029000071858",
@@ -665,9 +701,9 @@ HTTP 200
       "fractional": 0,
       "packaging": {
         "packageSize": 355.0,
-        "unitID": 2,
-        "unitName": "ounces",
-        "unitAbbreviation": "oz",
+        "unitID": 6,
+        "unitName": "milliliters",
+        "unitAbbreviation": "mL",
         "packageName": "cans"
       }
     },
@@ -690,13 +726,13 @@ HTTP 200
 
 ==========================================================================
 Request: REMOVE LIST
-http://127.0.0.1:8000/households/1/lists/1/remove?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/lists/1/remove?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 
 ==========================================================================
 Request: GET HOUSEHOLD
-http://127.0.0.1:8000/households/1?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
@@ -724,13 +760,13 @@ HTTP 200
 
 ==========================================================================
 Request: REMOVE RECIPE
-http://127.0.0.1:8000/households/1/recipes/1/remove?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1/recipes/1/remove?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 
 ==========================================================================
 Request: GET HOUSEHOLD
-http://127.0.0.1:8000/households/1?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/1?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
@@ -752,7 +788,7 @@ HTTP 200
 
 ==========================================================================
 Request: CREATE HOUSEHOLD
-http://127.0.0.1:8000/households/create?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/create?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "householdName": "Apartment",
   "householdDescription": "John and Julia\u0027s Inventory"
@@ -765,7 +801,7 @@ HTTP 201
 
 ==========================================================================
 Request: LINK UPC
-http://127.0.0.1:8000/households/2/items/04963406/link?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/2/items/04963406/link?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 {
   "description": "Coke",
   "packageName": "cans",
@@ -777,17 +813,33 @@ HTTP 200
 
 ==========================================================================
 Request: GET ITEM SUGGESTIONS
-http://127.0.0.1:8000/households/2/items/04963406/suggestions?token=6cR5nOO-UvswJRxhUIiLSMvbW2l5x79j
+http://127.0.0.1:8000/households/2/items/04963406/suggestions?token=Jkz4E46doTbCs7WU1zCDvrsNWFQj6r2X
 Response:
 HTTP 200
 {
   "UPC": "04963406",
-  "householdId": 2,
-  "currentDescription": "Coke",
+  "currentLink": {
+    "householdID": 2,
+    "description": "Coke",
+    "packaging": {
+      "packageSize": 355.0,
+      "unitID": 6,
+      "unitName": "milliliters",
+      "unitAbbreviation": "mL",
+      "packageName": "cans"
+    }
+  },
   "internalSuggestions": [
     {
       "householdID": 1,
-      "description": "Coca cola"
+      "description": "Coca cola",
+      "packaging": {
+        "packageSize": 355.0,
+        "unitID": 6,
+        "unitName": "milliliters",
+        "unitAbbreviation": "mL",
+        "packageName": "cans"
+      }
     }
   ],
   "externalSuggestions": [

@@ -66,7 +66,8 @@ Content-Type : application/json
 ```
 ##Get Shopping List<br>
 ####Request Format
-NOTE that this request now supports internally generated UPCs<p>
+#####NOTE that this request now supports internally generated UPCs.
+#####NOTE that this request now returns packaging information as well.
 The version number in the header shown below is the same format as the version shown in the update request/response. <p>
 If the version matches the one on the server, no content is returned.<p>
 If there is not a match, the normal response is returned. <p>
@@ -87,7 +88,7 @@ Content-Type : application/json
 ETag : "1425107935796"
 
 {
-  "version": 1427601583081,
+  "version": 1428613574901,
   "name": "Weekly Shopping",
   "items": [
     {
@@ -95,28 +96,52 @@ ETag : "1425107935796"
       "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
       "quantity": 3,
-      "packageName": "tins"
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
     },
     {
       "UPC": "04963406",
-      "isInternalUPC": false,      
+      "isInternalUPC": false,
       "description": "Coca Cola",
       "quantity": 12,
-      "packageName": "cans"
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
     },
     {
       "UPC": "040000231325",
-      "isInternalUPC": false,      
+      "isInternalUPC": false,
       "description": "Starburst FaveRed Jellybeans",
       "quantity": 6,
-      "packageName": "bags"
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
     },
     {
       "UPC": "00001",
       "isInternalUPC": true,
       "description": "Apple",
       "quantity": 5,
-      "packageName": "each"
+      "packaging": {
+        "packageSize": 1.0,
+        "unitID": 14,
+        "unitName": "units",
+        "unitAbbreviation": "units",
+        "packageName": "each"
+      }
     }
   ]
 }
