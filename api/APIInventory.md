@@ -72,7 +72,7 @@ Content-Type : application/json
 ```
 
 ##Get UPC Description Suggestions<br>
-###This request has been modified to return packaging information along with the description.
+#####This request has been modified to return packaging information along with the description.
 ####Request Format
 ```
 GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN
