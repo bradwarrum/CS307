@@ -1,2 +1,2 @@
 #!/bin/bash
-mysql -u root -p < /root/server/scripts/Sprint1Reset.sql
+mysql -u root -p < /root/server/scripts/Sprint2Reset.sql
