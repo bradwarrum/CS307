@@ -68,7 +68,7 @@ public class UPCLinkWrapper extends BaseWrapper {
 
 		try {
 			update("INSERT INTO InventoryItem (UPC, HouseholdId, Description, PackageQuantity, PackageUnits, PackageName, InventoryQuantity, Hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-					+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), PackageQuantity=VALUES(PackageQuantity), PackageName=VALUES(PackageName), Hidden=VALUES(Hidden);",
+					+ "ON DUPLICATE KEY UPDATE Description=VALUES(Description), PackageQuantity=VALUES(PackageQuantity), PackageName=VALUES(PackageName), PackageUnits=VALUES(PackageUnits), Hidden=VALUES(Hidden);",
 					new SQLParam(barcode.toString(), SQLType.VARCHAR),
 					householdParam,
 					new SQLParam(description, SQLType.VARCHAR),
