@@ -5,6 +5,9 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 <br>
 <h5>Error codes have been normalized.</h5>
 <a href="APIErrorCodes.md">Find the documentation here.</a>
+<h5>Format dump files have been added.</h5>
+These dump files are raw outputs of test scripts and give an idea of what the format is of each API request.  In case there is a disparity between this documentation and the server request/response formats, the most updated formats are likely in the format dump file.<p>
+<a href="../test/dumps">Find the dumps here.</a>
 ###Overview
  - :heavy_multiplication_x:  Not Implemented
  - :heavy_check_mark:  Implemented
@@ -145,22 +148,22 @@ URLs are assumed to be appended to <code>http://SERVER_HOST/api</code>
 		<h5><a href="APIRecipes.md">Recipes</a></h5>
 	</th></tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Create Recipe</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/recipes/create?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Update Recipe</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/recipes/:RECIPE_ID/update?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Get Recipe</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/recipes/:RECIPE_ID?token=SESSION_TOKEN</code></td>
 	</tr>	
 	<tr>
-		<td>:heavy_multiplication_x:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Remove Recipe</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/recipes/:RECIPE_ID/remove?token=SESSION_TOKEN</code></td>
 	</tr>

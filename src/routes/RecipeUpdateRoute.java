@@ -32,14 +32,13 @@ public class RecipeUpdateRoute extends Route {
 		}
 		if (ruj == null || !ruj.valid()) { error(xchg, ResponseCode.INVALID_PAYLOAD); return;}
 		RecipeUpdateWrapper ruw = new RecipeUpdateWrapper(userID, householdID, recipeID, ruj);
-		System.out.println("HERE");
 		ResponseCode result = ruw.update();
 		if (!result.success()) 
 			error(xchg, result);
 		else {
 			xchg.getResponseHeaders().set("ETag",
 					"\"" + ruw.getVersion() + "\"");
-			respond(xchg, 200, gson.toJson(ruw, ListUpdateWrapper.class));
+			respond(xchg, 200, gson.toJson(ruw, RecipeUpdateWrapper.class));
 		}
 	}
 

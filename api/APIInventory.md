@@ -168,50 +168,67 @@ Content-Type : application/json
 ETag : "1427607227384"
 
 {
-  "version": 1427607227384,
+  "version": 1,
   "items": [
     {
       "UPC": "029000071858",
       "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
-      "packageSize": 12.0,
-      "packageUnits": "ounces",
-      "packageName": "tins",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
     },
     {
       "UPC": "04963406",
       "isInternalUPC": false,
       "description": "Coca Cola",
-      "packageSize": 12.0,
-      "packageUnits": "ounces",
-      "packageName": "cans",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
     },
     {
       "UPC": "040000231325",
       "isInternalUPC": false,
       "description": "Starburst FaveRed Jellybeans",
-      "packageSize": 14.0,
-      "packageUnits": "ounces",
-      "packageName": "bags",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
     },
     {
       "UPC": "00001",
       "isInternalUPC": true,
       "description": "Apple",
-      "packageSize": 1.0,
-      "packageUnits": "unit",
-      "packageName": "each",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 1.0,
+        "unitID": 14,
+        "unitName": "units",
+        "unitAbbreviation": "units",
+        "packageName": "each"
+      }
     }
   ]
 }
+
 ```
 If version matches
 ```

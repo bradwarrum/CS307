@@ -20,13 +20,14 @@ public class RecipeFetchWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	private long version;
 	@Expose(serialize = true)
-	public List<RecipeFetchItemsJSON> ingredients;
-	@Expose(serialize = true)
-	public List<String> instructions;
-	@Expose(serialize = true)
 	public String recipeName;
 	@Expose(serialize = true)
 	public String recipeDescription;
+	@Expose(serialize = true)
+	public List<RecipeFetchItemsJSON> ingredients;
+	@Expose(serialize = true)
+	public List<String> instructions;
+
 
 	public RecipeFetchWrapper(int userID, int householdID, int recipeID, long etag) {
 		this.userID = userID;
@@ -44,12 +45,15 @@ public class RecipeFetchWrapper extends BaseWrapper {
 		public final int quantity;
 		@Expose(serialize = true)
 		public final int fractional;
+		@Expose(serialize = true)
+		public final String packageName;
 		
-		public RecipeFetchItemsJSON (String UPC, int quantity, int fractional, boolean isInternalUPC) {
+		public RecipeFetchItemsJSON (String UPC, int quantity, int fractional, boolean isInternalUPC, String packageName) {
 			this.UPC = UPC;
 			this.quantity = quantity;
 			this.fractional = fractional;
 			this.isInternalUPC = isInternalUPC;
+			this.packageName = packageName;
 		}
 	}
 	public ResponseCode fetch() {
@@ -100,7 +104,7 @@ public class RecipeFetchWrapper extends BaseWrapper {
 	private boolean selectAll() {
 		ResultSet results = null;
 		try {
-			results = query("SELECT I.UPC, R.Quantity "
+			results = query("SELECT I.UPC, R.Quantity, I.PackageName "
 					+ "FROM RecipeItem R  INNER JOIN InventoryItem I ON (R.ItemId=I.ItemId) "
 					+ "WHERE (R.RecipeId=?);",
 					new SQLParam(recipeID, SQLType.INT));
@@ -114,12 +118,16 @@ public class RecipeFetchWrapper extends BaseWrapper {
 				int temp = results.getInt(2);
 				quantity = temp / 100;
 				fractional = temp - quantity * 100;
-				ingredients.add(new RecipeFetchItemsJSON(UPC, quantity, fractional, UPC.length() == 5));
+				ingredients.add(new RecipeFetchItemsJSON(UPC, quantity, fractional, UPC.length() == 5, results.getString(3)));
 			}
 			release(results);
-			results = query("SELECT Instruction FROM RecipeInstruction ORDER BY SortOrder WHERE (RecipeId=?);",
+			instructions = new ArrayList<String>();
+			results = query("SELECT Instruction, SortOrder FROM RecipeInstruction WHERE (RecipeId=?) ORDER BY SortOrder;",
 					new SQLParam(recipeID, SQLType.INT));
 			if (results == null) {release(); return false;}
+			while (results.next()) {
+				instructions.add(results.getString(1));
+			}
 			
 		} catch (SQLException e) {
 			release(results);

@@ -26,7 +26,7 @@ public class Route implements HttpHandler{
 		int read = 0;
 		try {
 		do {
-			read = stream.read(chunk, ofs, 512);
+			read = stream.read(chunk, 0, 512);
 			if (read > 0) {
 				request.append(new String(chunk, 0, read));
 				ofs += read;
@@ -34,11 +34,12 @@ public class Route implements HttpHandler{
 				if (ofs > 20000) return "";
 			}
 		}while (read == 512);
-		
-		return request.toString();
-		} catch (Exception e) {
+		}catch (IOException e) {
+			System.out.println("WARNING: REQUEST BUFFER FAILURE");
 			return "";
 		}
+		
+		return request.toString();
 	}
 	
 	/**

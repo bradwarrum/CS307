@@ -171,11 +171,16 @@ public class ServerTest {
 		List<RecipeUpdateIngredJSON> ringredients = new ArrayList<RecipeUpdateIngredJSON>();
 		rinstructions.add("First put the thing in a pot");
 		rinstructions.add("Then put the thing on the stove");
-		rinstructions.add("Stir and then drop the spaghetti on the floor");
+		rinstructions.add("Stir and then drop the spaghetti");
+		rinstructions.add("Get on the floor and walk the dinosaur");
 		ringredients.add(new RecipeUpdateIngredJSON("029000071858", 2, 50));
 		ringredients.add(new RecipeUpdateIngredJSON("00001", 1, 99));
 		updateRecipe("New Spaghetti", "This Spaghetti Is Actually Grandpas", rinstructions, ringredients);
 		assertEquals("Update recipe pass", 200, rcode);
+		
+		//Fetch the recipe
+		fetchRecipe();
+		assertEquals("Fetch recipe pass", 200, rcode);
 		
 		//List operations
 		createList("Weekly Shopping");
@@ -218,12 +223,16 @@ public class ServerTest {
 		assertEquals("Deletion of generated UPC", 200, rcode);
 		getInventory();
 		getList();
+		fetchRecipe();
 		link("04963406", "Coca cola", "cans", MeasurementUnits.ML, 355.0f);
 		getInventory();
 		removeList();
 		assertEquals("List removal pass", 200, rcode);
 		getHousehold();
 		assertEquals("Get household pass", 200, rcode);
+		deleteRecipe();
+		assertEquals("Recipe removal pass", 200, rcode);
+		getHousehold();
 		
 		
 		//Suggestions
@@ -568,12 +577,34 @@ public class ServerTest {
 		request.close();
 	}
 	
-	public void fetchRecipe() {
-		
+	public void fetchRecipe() throws MalformedURLException, IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/recipes/" + recipeID + "?token=" + token);
+		request.setGetMethod();
+		System.out.println(delimiter + "\nRequest: GET RECIPE");
+		System.out.println(request.getRequestURL());
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
 	}
 	
-	public void deleteRecipe() {
-		
+	public void deleteRecipe() throws IOException {
+		Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/recipes/" + recipeID + "/remove?token=" + token);
+		request.setPostMethod();
+		System.out.println(delimiter + "\nRequest: REMOVE RECIPE");
+		System.out.println(request.getRequestURL());
+		System.out.println("Response:");
+		rcode = request.getResponseCode();
+		System.out.println("HTTP " + rcode);
+		try {
+			response = request.getResponse();
+			System.out.println(response);
+		}catch (IOException e) {}
+		request.close();
 	}
 
 }

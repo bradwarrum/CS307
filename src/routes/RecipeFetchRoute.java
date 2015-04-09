@@ -37,7 +37,7 @@ public class RecipeFetchRoute extends Route {
 		else {
 			xchg.getResponseHeaders().set("ETag", "\"" + rfw.getVersion() + "\"");
 			if (result == ResponseCode.OK)
-				respond(xchg, 200, gson.toJson(rfw, ListFetchWrapper.class));
+				respond(xchg, 200, gson.toJson(rfw, RecipeFetchWrapper.class));
 			else
 				respond(xchg, 304);
 				
