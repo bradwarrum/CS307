@@ -13,7 +13,7 @@ import com.sun.net.httpserver.HttpServer;
 
 public class Server {
 
-	private static SessionTable sessions = new SessionTable(10 * 60, 20);
+	private static SessionTable sessions = new SessionTable(12 * 60 * 60, 24 * 60 * 60);
 	public static SessionTable sessionTable() {
 		return sessions;
 	}

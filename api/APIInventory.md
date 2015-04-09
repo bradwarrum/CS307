@@ -15,7 +15,7 @@ Content-Type : application/json
 
 {
 	"description" : "Planter's Cocktail Peanuts",
-	"packageName" : 23,
+	"packageName" : "tin",
 	"packageUnits" : 3,
 	"packageSize" : 12.0
 }
@@ -54,7 +54,7 @@ Content-Type : application/json
 {
 	"description" : "Orange",
 	"packageName" : "each",
-	"packageUnits" : "unit",
+	"packageUnits" : 14,
 	"packageSize" : 1.0
 }
 ```
