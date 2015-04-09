@@ -38,17 +38,20 @@ public class ListFetchWrapper extends BaseWrapper {
 		@Expose(serialize = true)		
 		public final String UPC;
 		@Expose(serialize = true)
+		public final boolean isInternalUPC;
+		@Expose(serialize = true)
 		public final String description;
 		@Expose(serialize = true)		
 		public final int quantity;
 		@Expose(serialize = true)
 		public final String packageName;
-		
-		public ListFetchItemsJSON (String packageName, String UPC, String description, int quantity) {
+
+		public ListFetchItemsJSON (String packageName, String UPC, String description, int quantity, boolean isInternalUPC) {
 			this.packageName = packageName;
 			this.UPC = UPC;
 			this.description = description;
 			this.quantity = quantity;
+			this.isInternalUPC = isInternalUPC;
 		}
 	}
 	
@@ -109,7 +112,7 @@ public class ListFetchWrapper extends BaseWrapper {
 				description = results.getString(2);
 				packageName=  results.getString(3);
 				quantity = results.getInt(4);
-				items.add(new ListFetchItemsJSON(packageName, UPC, description, quantity));
+				items.add(new ListFetchItemsJSON(packageName, UPC, description, quantity, UPC.length() == 5));
 			}
 		} catch (SQLException e) {
 			release();

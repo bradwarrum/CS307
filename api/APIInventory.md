@@ -38,6 +38,37 @@ HTTP 400 BAD REQUEST
 ```
 Note: Barcodes currently accepted are UPC-A, EAN-13 and UPC-E/EAN-8.  UPC-A and EAN-13 have a checksum method that is carried out on the server.  A HTTP 400 BAD REQUEST response will occur if the checksum bit is invalid.<p>
 EAN-8 and UPC-E checksums are not calculated because it is not possible to tell if the barcode is UPC-E or EAN-8 (same number of digits)
+
+##Generate an Internal UPC
+Use this API call to generate a 5-digit internal UPC when an item (such as produce) does not have an associated UPC code.  Once the UPC is generated, it can be treated as a normal UPC in every request that accepts a UPC parameter.<p>
+Note that an internal UPC is ALWAYS 5-digits in size.  This can be used to identify internally generated UPCs; however, most if not all associated API calls now have an "isInternalUPC" boolean field that denotes this identification.
+####Request Format
+```
+POST /households/:HOUSEHOLD_ID/items/generate?token=SESSION_TOKEN
+
+HTTP Headers
+Content-Type : application/json
+
+{
+	"description" : "Orange",
+	"packageName" : "each",
+	"packageUnits" : "unit",
+	"packageSize" : 1.0
+}
+```
+
+####Response Format
+```
+HTTP 200 OK
+
+HTTP Headers
+Content-Type : application/json
+
+{
+	"UPC" : "12345"
+}
+```
+
 ##Get UPC Description Suggestions<br>
 ####Request Format
 ```
@@ -117,6 +148,7 @@ ETag : "1427607227384"
 
 ##Get Household Inventory<br>
 ####Request Format
+NOTE that this request now supports internally generated UPCs.<p>
 The VERSION_ID below is the same version as described above in the update request specification.<p>
 Setting VERSION_ID to 0 or not including the "If-None-Match" header in the request will force the request to return information.
 ```
@@ -140,30 +172,43 @@ ETag : "1427607227384"
   "items": [
     {
       "UPC": "029000071858",
+      "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
       "packageSize": 12.0,
       "packageUnits": "ounces",
       "packageName": "tins",
-      "quantity": 2,
-      "fractional": 50
+      "quantity": 0,
+      "fractional": 0
     },
     {
       "UPC": "04963406",
+      "isInternalUPC": false,
       "description": "Coca Cola",
       "packageSize": 12.0,
       "packageUnits": "ounces",
       "packageName": "cans",
-      "quantity": 15,
+      "quantity": 0,
       "fractional": 0
     },
     {
       "UPC": "040000231325",
+      "isInternalUPC": false,
       "description": "Starburst FaveRed Jellybeans",
       "packageSize": 14.0,
       "packageUnits": "ounces",
       "packageName": "bags",
-      "quantity": 1,
-      "fractional": 75
+      "quantity": 0,
+      "fractional": 0
+    },
+    {
+      "UPC": "00001",
+      "isInternalUPC": true,
+      "description": "Apple",
+      "packageSize": 1.0,
+      "packageUnits": "unit",
+      "packageName": "each",
+      "quantity": 0,
+      "fractional": 0
     }
   ]
 }
@@ -183,7 +228,9 @@ Unlinking a UPC from a household's inventory will do the following:
 	- Set the UPC in the household inventory to hidden.  It will not appear when querying household inventories.
 	- Set the household inventory quantity of the UPC to zero.
 	- Remove all shopping list references to the UPC.
+	- Remove all recipe references to the UPC.
 	- Update version numbers of all shopping lists that were modified during the removal.
+	- Update version numbers of all recipes that were modified during the removal
 	- Update version number of the household inventory.
 	
 Note that internal UPC suggestions will still access the old linked descriptions for a UPC that has been removed.  This allows users to re-link the UPCs with the original descriptions and packaging descriptions as before without having to re-enter the information.  Furthermore, when a user tries to link a UPC in household 2 that has been linked and subsequently unlinked in household 1, the description from household 1 is visible when querying for suggestions for household 2.
