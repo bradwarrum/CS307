@@ -56,53 +56,54 @@ public class InventoryDeleteWrapper extends BaseWrapper {
 		}
 
 		int affected = -1;
-		
+
 		version = System.currentTimeMillis();
 		SQLParam verParam = new SQLParam(version, SQLType.LONG);
 		SQLParam itemIDParam = new SQLParam(itemID, SQLType.INT);
-		
-		// 2) Update each shopping list that has been modified as a result of the deletion with a new version number
+
+
 		try {
+			// 2) Update each shopping list that has been modified as a result of the deletion with a new version number
 			affected = update("UPDATE HouseholdShoppingList SET Timestamp=? WHERE ListId IN (SELECT ListId FROM ShoppingListItem WHERE ItemId=?);",
 					verParam,
 					itemIDParam);
 			if (affected < 0) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
-		
-		} catch (SQLException e) {
-			rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;
-		}
-		
-		// 3) Delete the shopping list items referencing the hidden inventory item
-		try {
-			affected = update("DELETE FROM ShoppingListItem WHERE ItemId=?;",
+
+			// 3) Update each recipe that has been modified as a result of the deletion with a new version number
+			affected = update("UPDATE HouseholdRecipe SET Timestamp=? WHERE RecipeId IN (SELECT RecipeId FROM RecipeItem WHERE ItemId=?);",
+					verParam,
 					itemIDParam);
 			if (affected < 0) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
-		} catch (SQLException e) {
-			rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;
-		}
-		
-		// 4) Hide the inventory item
-		try {
+
+			// 4) Delete the shopping list items referencing the hidden inventory item
+			affected = update("DELETE FROM ShoppingListItem WHERE ItemId=?;",
+					itemIDParam);
+
+			
+			// 5) Delete the recipe items referencing the hidden inventory item
+			affected = update("DELETE FROM RecipeItem Where ItemId=?;",
+					itemIDParam);
+			if (affected < 0) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
+			
+			// 6) Hide the inventory item
 			affected = update("UPDATE InventoryItem SET Hidden=?, InventoryQuantity=0 WHERE ItemId=?;",
 					SQLParam.SQLTRUE,
-					
+
 					itemIDParam);
 			if (affected <= 0) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
-		} catch (SQLException e) {
-			rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;
-		}
-		
-		// 5) Update the version for the inventory and return it
-		try {
+
+			// 7) Update the version for the inventory and return it
 			affected = update("UPDATE Household SET Version=? WHERE HouseholdId=?;",
 					verParam,
 					householdParam);
 			if (affected <= 0) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
+
 		} catch (SQLException e) {
 			rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;
 		}
-		
-			
+
+
+
 		release(results);
 		release();
 		return ResponseCode.OK;

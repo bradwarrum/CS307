@@ -10,6 +10,7 @@ import com.google.gson.annotations.SerializedName;
 import com.sun.net.httpserver.HttpExchange;
 
 import core.Barcode;
+import core.MeasurementUnits;
 import core.ResponseCode;
 import core.Server;
 
@@ -70,7 +71,7 @@ public class UPCLinkRoute extends Route {
 		
 		@Expose(deserialize = true)
 		@SerializedName("packageUnits")
-		public String unitName;
+		public int unitName;
 		
 		@Expose(deserialize = true)
 		@SerializedName("packageSize")
@@ -81,7 +82,7 @@ public class UPCLinkRoute extends Route {
 		
 		public boolean valid() {
 			if (description == null || description.length() > 40) return false;
-			if (unitName == null || unitName.length() > 20) return false;
+			if (unitName < 0 || unitName > MeasurementUnits.NUM_UNITS) return false;
 			if (packageName == null || packageName.length() > 20) return false;
 			if (size < 0) return false;
 			return true;

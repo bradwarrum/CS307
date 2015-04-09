@@ -38,7 +38,7 @@ public class RecipeUpdateRoute extends Route {
 		else {
 			xchg.getResponseHeaders().set("ETag",
 					"\"" + ruw.getVersion() + "\"");
-			respond(xchg, 200, gson.toJson(ruw, ListUpdateWrapper.class));
+			respond(xchg, 200, gson.toJson(ruw, RecipeUpdateWrapper.class));
 		}
 	}
 

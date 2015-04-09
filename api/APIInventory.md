@@ -4,6 +4,8 @@ Linking a UPC to a household will set up the description and unit type for that 
 If the UPC is not linked to the household a new record will be created.
 If the UPC is already linked, the description and unit name will be updated in the database.<p>
 Note that the packageName, packageUnits, and packageSize fields describe only the packaging units for the item.  For example, the following link call will describe the UPC as "12.0 oz. tin of Planter's Cocktail Peanuts".  Conversely, all inventory updates are in terms of package counts, not packaging units.
+#####PackageUnits is now an enumerated integer instead of a string.
+<a href="APIMeasurementUnits.md">Find the enumeration values here.</a>
 ####Request Format
 ```
 POST /households/:HOUSEHOLD_ID/items/:UPC/link?token=SESSION_TOKEN
@@ -13,8 +15,8 @@ Content-Type : application/json
 
 {
 	"description" : "Planter's Cocktail Peanuts",
-	"packageName" : "tin",
-	"packageUnits" : "oz.",
+	"packageName" : 23,
+	"packageUnits" : 3,
 	"packageSize" : 12.0
 }
 ```
@@ -168,50 +170,67 @@ Content-Type : application/json
 ETag : "1427607227384"
 
 {
-  "version": 1427607227384,
+  "version": 1,
   "items": [
     {
       "UPC": "029000071858",
       "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
-      "packageSize": 12.0,
-      "packageUnits": "ounces",
-      "packageName": "tins",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
     },
     {
       "UPC": "04963406",
       "isInternalUPC": false,
       "description": "Coca Cola",
-      "packageSize": 12.0,
-      "packageUnits": "ounces",
-      "packageName": "cans",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
     },
     {
       "UPC": "040000231325",
       "isInternalUPC": false,
       "description": "Starburst FaveRed Jellybeans",
-      "packageSize": 14.0,
-      "packageUnits": "ounces",
-      "packageName": "bags",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
     },
     {
       "UPC": "00001",
       "isInternalUPC": true,
       "description": "Apple",
-      "packageSize": 1.0,
-      "packageUnits": "unit",
-      "packageName": "each",
       "quantity": 0,
-      "fractional": 0
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 1.0,
+        "unitID": 14,
+        "unitName": "units",
+        "unitAbbreviation": "units",
+        "packageName": "each"
+      }
     }
   ]
 }
+
 ```
 If version matches
 ```

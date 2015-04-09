@@ -92,27 +92,31 @@ HTTP Headers
 ETag : "190248237928"
 Content-Type : application/json
 {
-	"version" : 190248237928,
-	"recipeName" : "Pot O Stuff",
-	"recipeDescription" : "Strange pot of stuff made of two things",
-	"ingredients" : [
-		{
-			"UPC" : "029000071858",
-			"quantity" : 1,
-			"fractional" : 50
-		},
-		{
-			"UPC" : "076183643570",
-			"quantity" : 2,
-			"fractional" : 0
-		}
-	],
-	"instructions" : [
-		"Put the first item in a jar.",
-		"Put the second item in the same jar.",
-		"Shake the jar.",
-		"Serve."
-	]
+  "version": 1428569545174,
+  "recipeName": "New Spaghetti",
+  "recipeDescription": "This Spaghetti Is Actually Grandpa's",
+  "ingredients": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "quantity": 2,
+      "fractional": 50,
+      "packageName": "tins"
+    },
+    {
+      "UPC": "00001",
+      "isInternalUPC": true,
+      "quantity": 1,
+      "fractional": 99,
+      "packageName": "each"
+    }
+  ],
+  "instructions": [
+    "First put the thing in a pot",
+    "Then put the thing on the stove",
+    "Stir and then drop the spaghetti",
+    "Get on the floor and walk the dinosaur"
+  ]
 }
 ```
 If the version matches

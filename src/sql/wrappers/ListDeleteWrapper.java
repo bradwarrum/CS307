@@ -24,12 +24,12 @@ public class ListDeleteWrapper extends BaseWrapper {
 		else if (permraw == -2) {return ResponseCode.HOUSEHOLD_NOT_FOUND;}
 		Permissions perm = new Permissions(permraw);
 		if (!perm.has(Permissions.Flag.CAN_MODIFY_LISTS)) {return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		//Remove the individual items belonging to the shopping list
+		if (!deleteItems()) return ResponseCode.INTERNAL_ERROR;
 		//Remove the shopping list and check that the list belongs to the household
 		ResponseCode res = deleteList();
 		if (res != ResponseCode.OK) return res;
-		//Remove the individual items belonging to the shopping list
-		if (!deleteItems()) return ResponseCode.INTERNAL_ERROR;
-		
+
 		release();
 		return ResponseCode.OK;
 	}

@@ -27,6 +27,8 @@ public class HouseholdFetchWrapper extends BaseWrapper {
 	private List<MembersJSON> members;
 	@Expose(serialize = true)
 	private List<ListsJSON> lists;
+	@Expose(serialize = true)
+	private List<RecipesJSON> recipes;
 	
 	
 	private static class MembersJSON {
@@ -58,6 +60,22 @@ public class HouseholdFetchWrapper extends BaseWrapper {
 			this.listName = listName;
 		}
 	}
+	
+	private static class RecipesJSON {
+		@Expose(serialize = true)
+		private final int recipeID;
+		@Expose(serialize = true)
+		private final String recipeName;
+		@Expose(serialize = true)
+		private final String recipeDescription;
+		
+		public RecipesJSON(int recipeID, String recipeName, String recipeDescription) {
+			this.recipeID = recipeID;
+			this.recipeName = recipeName;
+			this.recipeDescription = recipeDescription;
+		}
+	}
+	
 	public HouseholdFetchWrapper(int userID, int householdID) {
 		this.userID = userID;
 		this.householdID = householdID;
@@ -121,6 +139,22 @@ public class HouseholdFetchWrapper extends BaseWrapper {
 					listidTEMP = results.getInt(1);
 					nameTEMP = results.getString(2);
 					lists.add(new ListsJSON(listidTEMP, nameTEMP));
+				}
+			} catch (SQLException e ){
+				release(results);
+				release();
+				return ResponseCode.INTERNAL_ERROR;
+			}
+		}
+		
+		if (permissions.has(Permissions.Flag.CAN_READ_RECIPES)) {
+			try {
+				results = query("SELECT RecipeId, Name, Description Name FROM HouseholdRecipe WHERE (HouseholdId=?);",
+						hidp);
+				if (results == null) {release(); return ResponseCode.INTERNAL_ERROR;}
+				recipes = new ArrayList<RecipesJSON>();
+				while (results.next()) {
+					recipes.add(new RecipesJSON(results.getInt(1), results.getString(2), results.getString(3)));
 				}
 			} catch (SQLException e ){
 				release(results);

@@ -50,9 +50,9 @@ public class JSONModels {
 	public static class LinkReqJSON {
 		private final String description;
 		private final String packageName;
-		private final String packageUnits;
+		private final int packageUnits;
 		private final float packageSize;
-		public LinkReqJSON(String description, String packageName, String packageUnits, float packageSize) {
+		public LinkReqJSON(String description, String packageName, int packageUnits, float packageSize) {
 			this.description = description;
 			this.packageName = packageName;
 			this.packageUnits = packageUnits;
@@ -114,5 +114,48 @@ public class JSONModels {
 			this.fractional = fractional;
 		}
 		
+	}
+	
+	public static class RecipeCreateReqJSON {
+		public String recipeName;
+		public String recipeDescription;
+		
+		public RecipeCreateReqJSON (String recipeName, String recipeDescription) {
+			this.recipeName = recipeName;
+			this.recipeDescription = recipeDescription;
+		}
+	}
+	
+	public static class RecipeCreateResJSON {
+		public int recipeID;
+		public long version;
+	}
+	
+	public static class RecipeUpdateReqJSON {
+		public long version;
+		public String recipeName;
+		public String recipeDescription;
+		public List<String> instructions;
+		public List<RecipeUpdateIngredJSON> ingredients;
+		
+		public RecipeUpdateReqJSON(long version, String recipeName, String recipeDescription, List<String> instructions, List<RecipeUpdateIngredJSON> ingredients) {
+			this.version = version;
+			this.recipeName = recipeName;
+			this.recipeDescription = recipeDescription;
+			this.instructions = instructions;
+			this.ingredients = ingredients;
+		}
+	}
+	
+	public static class RecipeUpdateIngredJSON {
+		public String UPC;
+		public int quantity;
+		public int fractional;
+		
+		public RecipeUpdateIngredJSON(String UPC, int quantity, int fractional) {
+			this.UPC = UPC;
+			this.quantity = quantity;
+			this.fractional = fractional;
+		}
 	}
 }

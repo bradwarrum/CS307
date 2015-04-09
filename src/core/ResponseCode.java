@@ -18,7 +18,8 @@ public enum ResponseCode {
 	UPC_FORMAT_NOT_SUPPORTED(400, "Support does not exist for barcodes of that format."),
 	UPC_CHECKSUM_INVALID(400, "UPC-A or EAN-13 barcode has an invalid checksum, try again."),
 	INSUFFICIENT_PERMISSIONS(403, "The user has insufficient household permissions to perform this action."),
-	OUTDATED_TIMESTAMP(409, "The server version of this resource is different than the client's version.  Update the resource on the client and retry.");
+	OUTDATED_TIMESTAMP(409, "The server version of this resource is different than the client's version.  Update the resource on the client and retry."),
+	RECIPE_NOT_FOUND(400, "One or more of the recipies cannot be found for that household.");
 	
 	private final int errorcode;
 	private final int httpcode;
