@@ -27,12 +27,7 @@ public class Server {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 8000), 0);
         //Setup routing
-        server.createContext("/users/login", new UserLoginRoute());
-        server.createContext("/users/register", new UserRegistrationRoute());
-        server.createContext("/users/me", new UserMeRoute());
-        server.createContext("/households/create", new HouseholdCreateRoute());
-        server.createContext("/households/", new HouseholdGeneralRoute());
-       // server.createContext("/inventory/description", new InventoryDescriptionRoute());
+        server.createContext("/", new GeneralRoute());
         System.out.println("Server running.");
         server.start();
         
