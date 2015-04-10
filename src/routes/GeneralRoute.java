@@ -65,63 +65,11 @@ public class GeneralRoute extends Route {
 				if (op == null) {
 					HOUSEHOLD_FETCH_ROUTE.handle(xchg); return;
 				} else if (op.equals("items")) {
-					op = params.poll();
-					if (op == null) {
-						INVENTORY_FETCH_ROUTE.handle(xchg); return;
-					} else if (op.equals("update") && params.isEmpty()) {
-						INVENTORY_UPDATE_ROUTE.handle(xchg); return;
-					} else if (op.equals("generate") && params.isEmpty()) {
-						xchg.setAttribute("UPC", null);
-						INVENTORY_LINK_ROUTE.handle(xchg); return;
-					} else {
-						xchg.setAttribute("UPC", op);
-						op = params.poll();
-						if (op == null) {
-							respond(xchg, 404); return;
-						} else if (op.equals("link") && params.isEmpty()) {
-							INVENTORY_LINK_ROUTE.handle(xchg); return;
-						} else if (op.equals("unlink") && params.isEmpty()) {
-							INVENTORY_DELETE_ROUTE.handle(xchg); return;
-						} else if (op.equals("suggestions") && params.isEmpty()) {
-							ITEM_SUGGESTION_ROUTE.handle(xchg); return;
-						}
-					}
+					handleInventory(xchg, params);
 				} else if (op.equals("lists")) {
-					op = params.poll();
-					if (op == null) {
-						respond(xchg, 404); return;
-					} else if (op.equals("create") && params.isEmpty()) {
-						LIST_CREATE_ROUTE.handle(xchg); return;
-					} else {
-						int listID = Integer.parseUnsignedInt(op);
-						xchg.setAttribute("listID", listID);
-						op = params.poll();
-						if (op == null) {
-							LIST_FETCH_ROUTE.handle(xchg); return;
-						} else if (op.equals("update") && params.isEmpty()) {
-							LIST_UPDATE_ROUTE.handle(xchg); return;
-						} else if (op.equals("remove") && params.isEmpty()) {
-							LIST_REMOVE_ROUTE.handle(xchg); return;
-						}
-					}
+					handleLists(xchg, params);
 				} else if (op.equals("recipes")) {
-					op = params.poll();
-					if (op == null) {
-						respond(xchg, 404); return;
-					} else if (op.equals("create") && params.isEmpty()) {
-						RECIPE_CREATE_ROUTE.handle(xchg); return;
-					} else {
-						int recipeID = Integer.parseUnsignedInt(op);
-						xchg.setAttribute("recipeID", recipeID);
-						op = params.poll();
-						if (op == null) {
-							RECIPE_FETCH_ROUTE.handle(xchg); return;
-						} else if (op.equals("update") && params.isEmpty()) {
-							RECIPE_UPDATE_ROUTE.handle(xchg); return;
-						} else if (op.equals("remove") && params.isEmpty()) {
-							RECIPE_DELETE_ROUTE.handle(xchg); return;
-						}
-					}
+					handleRecipes(xchg, params);
 				}
 			}
 		}
@@ -130,6 +78,70 @@ public class GeneralRoute extends Route {
 			respond(xchg, 404);
 		}
 		respond(xchg, 404);
+	}
+	
+	private void handleInventory(HttpExchange xchg, LinkedList<String> params) throws IOException {
+		String op = params.poll();
+		if (op == null) {
+			INVENTORY_FETCH_ROUTE.handle(xchg); return;
+		} else if (op.equals("update") && params.isEmpty()) {
+			INVENTORY_UPDATE_ROUTE.handle(xchg); return;
+		} else if (op.equals("generate") && params.isEmpty()) {
+			xchg.setAttribute("UPC", null);
+			INVENTORY_LINK_ROUTE.handle(xchg); return;
+		} else {
+			xchg.setAttribute("UPC", op);
+			op = params.poll();
+			if (op == null) {
+				respond(xchg, 404); return;
+			} else if (op.equals("link") && params.isEmpty()) {
+				INVENTORY_LINK_ROUTE.handle(xchg); return;
+			} else if (op.equals("unlink") && params.isEmpty()) {
+				INVENTORY_DELETE_ROUTE.handle(xchg); return;
+			} else if (op.equals("suggestions") && params.isEmpty()) {
+				ITEM_SUGGESTION_ROUTE.handle(xchg); return;
+			}
+		}
+	}
+	
+	private void handleLists(HttpExchange xchg, LinkedList<String> params) throws IOException {
+		String op = params.poll();
+		if (op == null) {
+			respond(xchg, 404); return;
+		} else if (op.equals("create") && params.isEmpty()) {
+			LIST_CREATE_ROUTE.handle(xchg); return;
+		} else {
+			int listID = Integer.parseUnsignedInt(op);
+			xchg.setAttribute("listID", listID);
+			op = params.poll();
+			if (op == null) {
+				LIST_FETCH_ROUTE.handle(xchg); return;
+			} else if (op.equals("update") && params.isEmpty()) {
+				LIST_UPDATE_ROUTE.handle(xchg); return;
+			} else if (op.equals("remove") && params.isEmpty()) {
+				LIST_REMOVE_ROUTE.handle(xchg); return;
+			}
+		}
+	}
+	
+	private void handleRecipes(HttpExchange xchg, LinkedList<String> params) throws IOException {
+		String op = params.poll();
+		if (op == null) {
+			respond(xchg, 404); return;
+		} else if (op.equals("create") && params.isEmpty()) {
+			RECIPE_CREATE_ROUTE.handle(xchg); return;
+		} else {
+			int recipeID = Integer.parseUnsignedInt(op);
+			xchg.setAttribute("recipeID", recipeID);
+			op = params.poll();
+			if (op == null) {
+				RECIPE_FETCH_ROUTE.handle(xchg); return;
+			} else if (op.equals("update") && params.isEmpty()) {
+				RECIPE_UPDATE_ROUTE.handle(xchg); return;
+			} else if (op.equals("remove") && params.isEmpty()) {
+				RECIPE_DELETE_ROUTE.handle(xchg); return;
+			}
+		}
 	}
 
 }

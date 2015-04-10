@@ -2,10 +2,6 @@ package json;
 
 import java.util.List;
 
-import routes.InventoryUpdateRoute.InventoryUpdateItemJSON;
-
-import com.google.gson.annotations.Expose;
-
 public class JSONModels {
 	@SuppressWarnings("unused")
 	public static class RegisterReqJSON {
@@ -83,10 +79,12 @@ public class JSONModels {
 	public static class ListUpdateItem {
 		public String UPC;
 		public int quantity;
+		public int fractional = 0;
 		
-		public ListUpdateItem(String UPC, int quantity) {
+		public ListUpdateItem(String UPC, int quantity, int fractional) {
 			this.UPC = UPC;
 			this.quantity = quantity;
+			this.fractional = fractional;
 		}
 	}
 	public static class ListUpdateResJSON {

@@ -12,7 +12,8 @@ import com.google.gson.annotations.SerializedName;
 
 import core.Permissions;
 import core.ResponseCode;
-import routes.ListUpdateRoute.ListUpdateItemJSON;
+import core.json.UpdateItemJSON;
+import core.json.VersionedUpdateListJSON;
 import sql.SQLParam;
 
 public class ListUpdateWrapper extends BaseWrapper {
@@ -20,14 +21,14 @@ public class ListUpdateWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	@SerializedName("version")
 	private long timestamp;
-	private List<ListUpdateItemJSON> items;
+	private List<UpdateItemJSON> items;
 
-	public ListUpdateWrapper(int userID, int householdID, int listID, long timestamp, List<ListUpdateItemJSON> items) {
+	public ListUpdateWrapper(int userID, int householdID, int listID, VersionedUpdateListJSON items) {
 		this.userID = userID;
 		this.householdID = householdID;
 		this.listID = listID;
-		this.timestamp = timestamp;
-		this.items = items;
+		this.timestamp = items.version;;
+		this.items = items.items;;
 	}
 
 	public ResponseCode update() {
@@ -83,7 +84,7 @@ public class ListUpdateWrapper extends BaseWrapper {
 
 		ResultSet results= null;
 		try {
-			for (ListUpdateItemJSON item : items) {
+			for (UpdateItemJSON item : items) {
 				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=? AND Hidden=?);",
 						new SQLParam(item.UPC, SQLType.VARCHAR),
 						houseidp,
@@ -91,12 +92,12 @@ public class ListUpdateWrapper extends BaseWrapper {
 				if (results == null || !results.next()) {release(results); rollback(); release(); return false;}
 				int itemID = results.getInt(1);
 				SQLParam itemidp = new SQLParam(itemID, SQLType.INT);
-				SQLParam quantityp = new SQLParam(item.quantity, SQLType.INT);
-				if (item.quantity == 0) {
+				if (item.quantity == 0 && item.fractional == 0) {
 					fail = update("DELETE FROM ShoppingListItem WHERE (ListId=? AND ItemId=?);",
 							listidp,
 							itemidp);
 				} else {
+					SQLParam quantityp = new SQLParam(item.quantity * 100 + item.fractional, SQLType.INT);
 					fail = update("INSERT INTO ShoppingListItem (ListId, ItemId, Quantity) VALUES (?, ?, ?)"
 							+ " ON DUPLICATE KEY UPDATE Quantity=?;",
 							listidp,

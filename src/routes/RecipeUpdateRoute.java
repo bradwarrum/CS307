@@ -11,6 +11,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import core.ResponseCode;
 import core.Server;
+import core.json.UpdateItemJSON;
 
 public class RecipeUpdateRoute extends Route {
 	@Override
@@ -45,7 +46,7 @@ public class RecipeUpdateRoute extends Route {
 		@Expose(deserialize = true)
 		public long version;
 		@Expose(deserialize = true)
-		public List<RecipeUpdateIngredJSON> ingredients;
+		public List<UpdateItemJSON> ingredients;
 		@Expose(deserialize = true)
 		public List<String> instructions;
 		@Expose( deserialize = true)
@@ -57,7 +58,7 @@ public class RecipeUpdateRoute extends Route {
 			if (version < 0) return false;
 			if (recipeName == null || recipeName.length() > 40) return false;
 			if (recipeDescription == null || recipeDescription.length() > 128) return false;
-			for (RecipeUpdateIngredJSON i : ingredients) {
+			for (UpdateItemJSON i : ingredients) {
 				if (!i.valid()) return false;
 			}
 			for (String s : instructions) {
@@ -67,18 +68,4 @@ public class RecipeUpdateRoute extends Route {
 		}
 	}
 
-	public static class RecipeUpdateIngredJSON {
-
-		@Expose(deserialize = true)
-		public String UPC;
-		@Expose(deserialize = true)
-		public int quantity;
-		@Expose(deserialize = true)
-		public int fractional;
-		public boolean valid() {
-			if (UPC == null || UPC.length() > 13) return false;
-			if (quantity < 0 || fractional < 0 || fractional >= 100) return false;
-			return true;
-		}
-	}
 }

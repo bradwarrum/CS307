@@ -8,6 +8,7 @@ import com.google.gson.annotations.Expose;
 
 import core.Permissions;
 import core.ResponseCode;
+import core.json.UpdateItemJSON;
 import routes.RecipeUpdateRoute.*;
 import sql.SQLParam;
 import sql.SQLType;
@@ -17,7 +18,7 @@ public class RecipeUpdateWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	private long version;
 	private String recipeDescription, recipeName;
-	private List<RecipeUpdateIngredJSON> ingredients;
+	private List<UpdateItemJSON> ingredients;
 	private List<String> instructions;
 	public RecipeUpdateWrapper(int userID, int householdID, int recipeID, RecipeUpdateJSON ruj) {
 		this.userID = userID;
@@ -103,7 +104,7 @@ public class RecipeUpdateWrapper extends BaseWrapper {
 			//Insert Ingredients
 
 			for (int i = 0; i < ingredients.size(); i++) {
-				RecipeUpdateIngredJSON ingred = ingredients.get(i);
+				UpdateItemJSON ingred = ingredients.get(i);
 				results = query("SELECT ItemId FROM InventoryItem WHERE (UPC=? AND HouseholdId=? AND Hidden=?);",
 						new SQLParam(ingred.UPC, SQLType.VARCHAR),
 						houseidp,

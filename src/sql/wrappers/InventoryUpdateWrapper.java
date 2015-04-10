@@ -8,7 +8,8 @@ import com.google.gson.annotations.Expose;
 
 import core.Permissions;
 import core.ResponseCode;
-import routes.InventoryUpdateRoute.InventoryUpdateItemJSON;
+import core.json.UpdateItemJSON;
+import core.json.VersionedUpdateListJSON;
 import sql.SQLParam;
 import sql.SQLType;
 
@@ -17,13 +18,13 @@ public class InventoryUpdateWrapper extends BaseWrapper {
 	private int userID, householdID;
 	@Expose(serialize = true)	
 	private long version;
-	private List<InventoryUpdateItemJSON> items;
+	private List<UpdateItemJSON> items;
 
-	public InventoryUpdateWrapper(int userID, int householdID, long version, List<InventoryUpdateItemJSON> items) {
+	public InventoryUpdateWrapper(int userID, int householdID, VersionedUpdateListJSON items) {
 		this.userID = userID;
 		this.householdID = householdID;
-		this.version = version;
-		this.items = items;
+		this.version = items.version;
+		this.items = items.items;
 	}
 
 	public ResponseCode update() {
@@ -86,7 +87,7 @@ public class InventoryUpdateWrapper extends BaseWrapper {
 	 */
 	private int updateRows() {
 		SQLParam householdParam = new SQLParam(householdID, SQLType.INT);
-		for (InventoryUpdateItemJSON item : items) {
+		for (UpdateItemJSON item : items) {
 			try {
 				int affected = update("UPDATE InventoryItem SET InventoryQuantity=? WHERE HouseholdId=? AND UPC=? AND Hidden=?;",
 						new SQLParam(item.fractional + item.quantity * 100, SQLType.INT),

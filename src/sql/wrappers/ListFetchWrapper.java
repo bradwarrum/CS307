@@ -12,7 +12,8 @@ import core.Permissions;
 import core.ResponseCode;
 import sql.SQLParam;
 import sql.SQLType;
-import sql.wrappers.InventoryFetchWrapper.PackagingJSON;
+import core.json.FetchItemJSON;
+import core.json.PackagingJSON;
 
 public class ListFetchWrapper extends BaseWrapper {
 	
@@ -23,7 +24,7 @@ public class ListFetchWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	private String name;
 	@Expose(serialize = true)
-	private List<ListFetchItemsJSON> items = null;
+	private List<FetchItemJSON> items = null;
 
 	//private ListFetchItemsJSON[] items;
 	
@@ -32,28 +33,6 @@ public class ListFetchWrapper extends BaseWrapper {
 		this.householdID = householdID;
 		this.listID = listID;
 		this.timestamp = timestamp;
-	}
-	
-	
-	public static class ListFetchItemsJSON {
-		@Expose(serialize = true)		
-		public final String UPC;
-		@Expose(serialize = true)
-		public final boolean isInternalUPC;
-		@Expose(serialize = true)
-		public final String description;
-		@Expose(serialize = true)		
-		public final int quantity;
-		@Expose(serialize = true)
-		public final PackagingJSON packaging;
-
-		public ListFetchItemsJSON (String UPC, String description, int quantity, boolean isInternalUPC, PackagingJSON packaging) {
-			this.packaging = packaging;
-			this.UPC = UPC;
-			this.description = description;
-			this.quantity = quantity;
-			this.isInternalUPC = isInternalUPC;
-		}
 	}
 	
 	public ResponseCode fetch() {
@@ -106,10 +85,10 @@ public class ListFetchWrapper extends BaseWrapper {
 					new SQLParam(listID, SQLType.INT));
 			if (results == null) {release(); return false;}
 			
-			items = new ArrayList<ListFetchItemsJSON>();
+			items = new ArrayList<FetchItemJSON>();
 			String UPC, description, packageName, unitName, unitAbbrev;
 			float unitQuantity;
-			int quantity, unitID;
+			int quantity, fractional, unitID;
 			while (results.next()) {
 				UPC = results.getString(1);
 				description = results.getString(2);
@@ -118,9 +97,11 @@ public class ListFetchWrapper extends BaseWrapper {
 				unitName = results.getString(5);
 				unitAbbrev = results.getString(6);
 				packageName = results.getString(7);
-				quantity = results.getInt(8);
+				int temp = results.getInt(8);
+				quantity = temp / 100;
+				fractional = temp - quantity * 100;
 				PackagingJSON p = new PackagingJSON(unitQuantity, unitID, unitName, unitAbbrev, packageName);
-				items.add(new ListFetchItemsJSON(UPC, description, quantity, UPC.length() == 5, p));
+				items.add(new FetchItemJSON(UPC, description, quantity, fractional,  UPC.length() == 5, p));
 			}
 		} catch (SQLException e) {
 			release();

@@ -1,16 +1,15 @@
 package routes;
 
 import java.io.IOException;
-import java.util.List;
 
 import sql.wrappers.ListUpdateWrapper;
 
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.annotations.Expose;
 import com.sun.net.httpserver.HttpExchange;
 
 import core.ResponseCode;
 import core.Server;
+import core.json.VersionedUpdateListJSON;
 
 public class ListUpdateRoute extends Route {
 	@Override
@@ -24,14 +23,14 @@ public class ListUpdateRoute extends Route {
 		int householdID = (int)xchg.getAttribute("householdID");
 		int listID = (int)xchg.getAttribute("listID");
 		String request = getRequest(xchg.getRequestBody());
-		ListUpdateJSON luj = null;
+		VersionedUpdateListJSON luj = null;
 		try {
-			luj = gson.fromJson(request, ListUpdateJSON.class);
+			luj = gson.fromJson(request, VersionedUpdateListJSON.class);
 		} catch (JsonSyntaxException e) {
 			error(xchg, ResponseCode.INVALID_PAYLOAD); return;
 		}
 		if (luj == null || !luj.valid()) { error(xchg, ResponseCode.INVALID_PAYLOAD); return;}
-		ListUpdateWrapper luw = new ListUpdateWrapper(userID, householdID, listID, luj.version, luj.items);
+		ListUpdateWrapper luw = new ListUpdateWrapper(userID, householdID, listID, luj);
 		ResponseCode result = luw.update();
 		if (!result.success()) 
 			error(xchg, result);
@@ -39,33 +38,6 @@ public class ListUpdateRoute extends Route {
 			xchg.getResponseHeaders().set("ETag",
 					"\"" + luw.getTimestamp() + "\"");
 			respond(xchg, 200, gson.toJson(luw, ListUpdateWrapper.class));
-		}
-	}
-	public static class ListUpdateJSON {
-		@Expose(deserialize = true)
-		public long version;
-		@Expose(deserialize = true)
-		public List<ListUpdateItemJSON> items;
-		
-		public boolean valid() {
-			if (version < 0) return false;
-			if (items == null) return false;
-			for (ListUpdateItemJSON l : items) {
-				if (!l.valid()) return false;
-			}
-			return true;
-		}
-	}
-	public static class ListUpdateItemJSON {
-		@Expose(deserialize = true)
-		public String UPC;
-		@Expose(deserialize = true)
-		public int quantity;
-		
-		public boolean valid() {
-			if (UPC == null || UPC.length() > 13 ) return false;
-			if (quantity < 0) return false;
-			return true;
 		}
 	}
 }

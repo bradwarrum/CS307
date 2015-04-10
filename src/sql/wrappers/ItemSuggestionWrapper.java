@@ -17,7 +17,7 @@ import java.net.*;
 
 import sql.SQLParam;
 import sql.SQLType;
-import sql.wrappers.InventoryFetchWrapper.PackagingJSON;
+import core.json.PackagingJSON;
 
 public class ItemSuggestionWrapper extends BaseWrapper{
 	private int userID;

@@ -25,6 +25,7 @@ Content-Type : application/json
 ```
 ##Update Shopping List<br>
 ####Request Format
+#####NOTE: Fractional components have been added. They are NOT required. Omitting fractional will simply default the value to zero.
 The version below must match the version on the server for the update to succeed.<p>
 The quantity is the whole number of packages, defined by packageName when linking the item.<p>
 Setting a quantity to 0 will result in the item being removed from the shopping list.
@@ -35,19 +36,27 @@ HTTP Headers
 Content-Type : application/json
 
 {
-  "version": 1425107935671,
+  "version": 1428626887626,
   "items": [
     {
       "UPC": "029000071858",
-      "quantity": 3
+      "quantity": 3,
+      "fractional": 0
     },
     {
       "UPC": "04963406",
-      "quantity": 12
+      "quantity": 12,
+      "fractional": 50
     },
     {
-      "UPC": "036632001085",
-      "quantity": 6
+      "UPC": "040000231325",
+      "quantity": 0,
+      "fractional": 50
+    },
+    {
+      "UPC": "00001",
+      "quantity": 0,
+      "fractional": 99
     }
   ]
 }
@@ -68,6 +77,7 @@ Content-Type : application/json
 ####Request Format
 #####NOTE that this request now supports internally generated UPCs.
 #####NOTE that this request now returns packaging information as well.
+#####NOTE that this request now supports fractional quantities.
 The version number in the header shown below is the same format as the version shown in the update request/response. <p>
 If the version matches the one on the server, no content is returned.<p>
 If there is not a match, the normal response is returned. <p>
@@ -88,7 +98,7 @@ Content-Type : application/json
 ETag : "1425107935796"
 
 {
-  "version": 1428613574901,
+  "version": 1428626887762,
   "name": "Weekly Shopping",
   "items": [
     {
@@ -96,6 +106,7 @@ ETag : "1425107935796"
       "isInternalUPC": false,
       "description": "Planters Cocktail Peanuts",
       "quantity": 3,
+      "fractional": 0,
       "packaging": {
         "packageSize": 12.0,
         "unitID": 2,
@@ -109,6 +120,7 @@ ETag : "1425107935796"
       "isInternalUPC": false,
       "description": "Coca Cola",
       "quantity": 12,
+      "fractional": 50,
       "packaging": {
         "packageSize": 12.0,
         "unitID": 2,
@@ -121,7 +133,8 @@ ETag : "1425107935796"
       "UPC": "040000231325",
       "isInternalUPC": false,
       "description": "Starburst FaveRed Jellybeans",
-      "quantity": 6,
+      "quantity": 0,
+      "fractional": 50,
       "packaging": {
         "packageSize": 14.0,
         "unitID": 2,
@@ -134,7 +147,8 @@ ETag : "1425107935796"
       "UPC": "00001",
       "isInternalUPC": true,
       "description": "Apple",
-      "quantity": 5,
+      "quantity": 0,
+      "fractional": 99,
       "packaging": {
         "packageSize": 1.0,
         "unitID": 14,

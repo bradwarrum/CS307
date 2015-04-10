@@ -189,10 +189,10 @@ public class ServerTest {
 		listID = lcr.listID;
 		listVersion = lcr.version;
 		List<ListUpdateItem> items = new ArrayList<ListUpdateItem>();
-		items.add(new ListUpdateItem("029000071858", 3));
-		items.add(new ListUpdateItem( "04963406", 12));
-		items.add(new ListUpdateItem("040000231325", 6));
-		items.add(new ListUpdateItem("00001", 5)); // 1 is the first value for the generated UPC
+		items.add(new ListUpdateItem("029000071858", 3, 0));
+		items.add(new ListUpdateItem( "04963406", 12, 50));
+		items.add(new ListUpdateItem("040000231325", 0, 50));
+		items.add(new ListUpdateItem("00001", 0, 99)); // 1 is the first value for the generated UPC
 		updateList(items);
 		assertEquals("Update list pass", 200, rcode);
 		listVersion = gson.fromJson(response, ListUpdateResJSON.class).timestamp;

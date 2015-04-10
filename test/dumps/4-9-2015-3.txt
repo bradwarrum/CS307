@@ -1,0 +1,862 @@
+Use local server? [Y/N] 
+y
+Connection valid.
+Server running.
+Running setup script from C:\Users\Brad\...REDACTED...\Sprint2Initialization.sql
+Database setup done
+Starting server test
+==========================================================================
+Request: REGISTER
+http://127.0.0.1:8000/users/register
+{
+  "emailAddress": "email1@gmail.com",
+  "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+Response:
+HTTP 201
+
+==========================================================================
+Request: REGISTER
+http://127.0.0.1:8000/users/register
+{
+  "emailAddress": "email1@gmail.com",
+  "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+Response:
+HTTP 403
+{
+  "errorCode" : 6,
+  "errorName" : "EMAIL_TAKEN",
+  "httpStatus" : 403,
+  "errorDescription" : "Cannot register a user for that email address, the email address is already taken"
+}
+
+==========================================================================
+Request: REGISTER
+http://127.0.0.1:8000/users/register
+{
+  "emailAddress": "email2@gmail.com",
+  "password": "d9298a10d1b0735837dc4bd85dac641b0f3cef27a47e5d53a54f2f3f5b2fcffa",
+  "firstName": "Jane",
+  "lastName": "Robinson"
+}
+Response:
+HTTP 201
+
+==========================================================================
+Request: LOGIN 
+http://127.0.0.1:8000/users/login
+{
+  "emailAddress": "email1@gmail.com",
+  "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d9"
+}
+Response:
+HTTP 403
+{
+  "errorCode" : 7,
+  "errorName" : "INVALID_PASSWORD",
+  "httpStatus" : 403,
+  "errorDescription" : "The user's password is incorrect."
+}
+
+==========================================================================
+Request: LOGIN 
+http://127.0.0.1:8000/users/login
+{
+  "emailAddress": "email1@gmail.com",
+  "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+}
+Response:
+HTTP 200
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "userID": 1,
+  "token": "XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT"
+}
+
+==========================================================================
+Request: GET USER INFORMATION
+http://127.0.0.1:8000/users/me?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "userID": 1,
+  "firstName": "John",
+  "lastName": "Doe",
+  "emailAddress": "email1@gmail.com",
+  "households": []
+}
+
+==========================================================================
+Request: CREATE HOUSEHOLD
+http://127.0.0.1:8000/households/create?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "householdName": "Stash",
+  "householdDescription": "Private Inventory"
+}
+Response:
+HTTP 201
+{
+  "householdID": 1
+}
+
+==========================================================================
+Request: LINK UPC
+http://127.0.0.1:8000/households/1/items/029000071858/link?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "description": "Planters Cocktail Peanuts",
+  "packageName": "tins",
+  "packageUnits": 2,
+  "packageSize": 12.0
+}
+Response:
+HTTP 200
+
+==========================================================================
+Request: LINK UPC
+http://127.0.0.1:8000/households/1/items/04963406/link?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "description": "Coca Cola",
+  "packageName": "cans",
+  "packageUnits": 2,
+  "packageSize": 12.0
+}
+Response:
+HTTP 200
+
+==========================================================================
+Request: LINK UPC
+http://127.0.0.1:8000/households/1/items/040000231325/link?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "description": "Starburst FaveRed Jellybeans",
+  "packageName": "bags",
+  "packageUnits": 2,
+  "packageSize": 14.0
+}
+Response:
+HTTP 200
+
+==========================================================================
+Request: GENERATE UPC
+http://127.0.0.1:8000/households/1/items/generate?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "description": "Apple",
+  "packageName": "each",
+  "packageUnits": 14,
+  "packageSize": 1.0
+}
+Response:
+HTTP 200
+{
+  "UPC": "00001"
+}
+
+==========================================================================
+Request: CREATE RECIPE
+http://127.0.0.1:8000/households/1/recipes/create?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "recipeName": "Spaghetti",
+  "recipeDescription": "Grandma\u0027s Special Spaghetti Recipe"
+}
+Response:
+HTTP 201
+{
+  "recipeID": 1,
+  "version": 1428626887398
+}
+
+==========================================================================
+Request: UPDATE RECIPE
+http://127.0.0.1:8000/households/1/recipes/1/update?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "version": 1428626887398,
+  "recipeName": "New Spaghetti",
+  "recipeDescription": "This Spaghetti Is Actually Grandpas",
+  "instructions": [
+    "First put the thing in a pot",
+    "Then put the thing on the stove",
+    "Stir and then drop the spaghetti",
+    "Get on the floor and walk the dinosaur"
+  ],
+  "ingredients": [
+    {
+      "UPC": "029000071858",
+      "quantity": 2,
+      "fractional": 50
+    },
+    {
+      "UPC": "00001",
+      "quantity": 1,
+      "fractional": 99
+    }
+  ]
+}
+Response:
+HTTP 200
+{
+  "version": 1428626887444
+}
+
+==========================================================================
+Request: GET RECIPE
+http://127.0.0.1:8000/households/1/recipes/1?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626887444,
+  "recipeName": "New Spaghetti",
+  "recipeDescription": "This Spaghetti Is Actually Grandpas",
+  "ingredients": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "quantity": 2,
+      "fractional": 50,
+      "packageName": "tins"
+    },
+    {
+      "UPC": "00001",
+      "isInternalUPC": true,
+      "quantity": 1,
+      "fractional": 99,
+      "packageName": "each"
+    }
+  ],
+  "instructions": [
+    "First put the thing in a pot",
+    "Then put the thing on the stove",
+    "Stir and then drop the spaghetti",
+    "Get on the floor and walk the dinosaur"
+  ]
+}
+
+==========================================================================
+Request: CREATE LIST
+http://127.0.0.1:8000/households/1/lists/create?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "listName": "Weekly Shopping"
+}
+Response:
+HTTP 201
+{
+  "listID": 1,
+  "version": 1428626887626
+}
+
+==========================================================================
+Request: UPDATE LIST
+http://127.0.0.1:8000/households/1/lists/1/update?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "version": 1428626887626,
+  "items": [
+    {
+      "UPC": "029000071858",
+      "quantity": 3,
+      "fractional": 0
+    },
+    {
+      "UPC": "04963406",
+      "quantity": 12,
+      "fractional": 50
+    },
+    {
+      "UPC": "040000231325",
+      "quantity": 0,
+      "fractional": 50
+    },
+    {
+      "UPC": "00001",
+      "quantity": 0,
+      "fractional": 99
+    }
+  ]
+}
+Response:
+HTTP 200
+{
+  "version": 1428626887762
+}
+
+==========================================================================
+Request: GET LIST
+http://127.0.0.1:8000/households/1/lists/1?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626887762,
+  "name": "Weekly Shopping",
+  "items": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "description": "Planters Cocktail Peanuts",
+      "quantity": 3,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
+    },
+    {
+      "UPC": "04963406",
+      "isInternalUPC": false,
+      "description": "Coca Cola",
+      "quantity": 12,
+      "fractional": 50,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
+    },
+    {
+      "UPC": "040000231325",
+      "isInternalUPC": false,
+      "description": "Starburst FaveRed Jellybeans",
+      "quantity": 0,
+      "fractional": 50,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
+    },
+    {
+      "UPC": "00001",
+      "isInternalUPC": true,
+      "description": "Apple",
+      "quantity": 0,
+      "fractional": 99,
+      "packaging": {
+        "packageSize": 1.0,
+        "unitID": 14,
+        "unitName": "units",
+        "unitAbbreviation": "units",
+        "packageName": "each"
+      }
+    }
+  ]
+}
+
+==========================================================================
+Request: GET HOUSEHOLD
+http://127.0.0.1:8000/households/1?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "householdID": 1,
+  "householdName": "Stash",
+  "householdDescription": "Private Inventory",
+  "headOfHousehold": 1,
+  "members": [
+    {
+      "userID": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "emailAddress": "email1@gmail.com"
+    }
+  ],
+  "lists": [
+    {
+      "listID": 1,
+      "listName": "Weekly Shopping"
+    }
+  ],
+  "recipes": [
+    {
+      "recipeID": 1,
+      "recipeName": "New Spaghetti",
+      "recipeDescription": "This Spaghetti Is Actually Grandpas"
+    }
+  ]
+}
+
+==========================================================================
+Request: GET HOUSEHOLD INVENTORY
+http://127.0.0.1:8000/households/1/items?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1,
+  "items": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "description": "Planters Cocktail Peanuts",
+      "quantity": 0,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
+    },
+    {
+      "UPC": "04963406",
+      "isInternalUPC": false,
+      "description": "Coca Cola",
+      "quantity": 0,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
+    },
+    {
+      "UPC": "040000231325",
+      "isInternalUPC": false,
+      "description": "Starburst FaveRed Jellybeans",
+      "quantity": 0,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
+    },
+    {
+      "UPC": "00001",
+      "isInternalUPC": true,
+      "description": "Apple",
+      "quantity": 0,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 1.0,
+        "unitID": 14,
+        "unitName": "units",
+        "unitAbbreviation": "units",
+        "packageName": "each"
+      }
+    }
+  ]
+}
+
+==========================================================================
+Request: UPDATE INVENTORY
+http://127.0.0.1:8000/households/1/items/update?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "version": 1,
+  "items": [
+    {
+      "UPC": "029000071858",
+      "quantity": 1,
+      "fractional": 50
+    },
+    {
+      "UPC": "04963406",
+      "quantity": 17,
+      "fractional": 0
+    },
+    {
+      "UPC": "040000231325",
+      "quantity": 1,
+      "fractional": 25
+    }
+  ]
+}
+Response:
+HTTP 200
+{
+  "version": 1428626887884
+}
+
+==========================================================================
+Request: GET HOUSEHOLD INVENTORY
+http://127.0.0.1:8000/households/1/items?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626887884,
+  "items": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "description": "Planters Cocktail Peanuts",
+      "quantity": 1,
+      "fractional": 50,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
+    },
+    {
+      "UPC": "04963406",
+      "isInternalUPC": false,
+      "description": "Coca Cola",
+      "quantity": 17,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "cans"
+      }
+    },
+    {
+      "UPC": "040000231325",
+      "isInternalUPC": false,
+      "description": "Starburst FaveRed Jellybeans",
+      "quantity": 1,
+      "fractional": 25,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
+    },
+    {
+      "UPC": "00001",
+      "isInternalUPC": true,
+      "description": "Apple",
+      "quantity": 0,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 1.0,
+        "unitID": 14,
+        "unitName": "units",
+        "unitAbbreviation": "units",
+        "packageName": "each"
+      }
+    }
+  ]
+}
+
+==========================================================================
+Request: REMOVE INVENTORY ITEM
+http://127.0.0.1:8000/households/1/items/04963406/unlink?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626887925
+}
+
+==========================================================================
+Request: REMOVE INVENTORY ITEM
+http://127.0.0.1:8000/households/1/items/00001/unlink?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626888027
+}
+
+==========================================================================
+Request: GET HOUSEHOLD INVENTORY
+http://127.0.0.1:8000/households/1/items?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626888027,
+  "items": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "description": "Planters Cocktail Peanuts",
+      "quantity": 1,
+      "fractional": 50,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
+    },
+    {
+      "UPC": "040000231325",
+      "isInternalUPC": false,
+      "description": "Starburst FaveRed Jellybeans",
+      "quantity": 1,
+      "fractional": 25,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
+    }
+  ]
+}
+
+==========================================================================
+Request: GET LIST
+http://127.0.0.1:8000/households/1/lists/1?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626888027,
+  "name": "Weekly Shopping",
+  "items": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "description": "Planters Cocktail Peanuts",
+      "quantity": 3,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
+    },
+    {
+      "UPC": "040000231325",
+      "isInternalUPC": false,
+      "description": "Starburst FaveRed Jellybeans",
+      "quantity": 0,
+      "fractional": 50,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
+    }
+  ]
+}
+
+==========================================================================
+Request: GET RECIPE
+http://127.0.0.1:8000/households/1/recipes/1?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626888027,
+  "recipeName": "New Spaghetti",
+  "recipeDescription": "This Spaghetti Is Actually Grandpas",
+  "ingredients": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "quantity": 2,
+      "fractional": 50,
+      "packageName": "tins"
+    }
+  ],
+  "instructions": [
+    "First put the thing in a pot",
+    "Then put the thing on the stove",
+    "Stir and then drop the spaghetti",
+    "Get on the floor and walk the dinosaur"
+  ]
+}
+
+==========================================================================
+Request: LINK UPC
+http://127.0.0.1:8000/households/1/items/04963406/link?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "description": "Coca cola",
+  "packageName": "cans",
+  "packageUnits": 6,
+  "packageSize": 355.0
+}
+Response:
+HTTP 200
+
+==========================================================================
+Request: GET HOUSEHOLD INVENTORY
+http://127.0.0.1:8000/households/1/items?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "version": 1428626888027,
+  "items": [
+    {
+      "UPC": "029000071858",
+      "isInternalUPC": false,
+      "description": "Planters Cocktail Peanuts",
+      "quantity": 1,
+      "fractional": 50,
+      "packaging": {
+        "packageSize": 12.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "tins"
+      }
+    },
+    {
+      "UPC": "04963406",
+      "isInternalUPC": false,
+      "description": "Coca cola",
+      "quantity": 0,
+      "fractional": 0,
+      "packaging": {
+        "packageSize": 355.0,
+        "unitID": 6,
+        "unitName": "milliliters",
+        "unitAbbreviation": "mL",
+        "packageName": "cans"
+      }
+    },
+    {
+      "UPC": "040000231325",
+      "isInternalUPC": false,
+      "description": "Starburst FaveRed Jellybeans",
+      "quantity": 1,
+      "fractional": 25,
+      "packaging": {
+        "packageSize": 14.0,
+        "unitID": 2,
+        "unitName": "ounces",
+        "unitAbbreviation": "oz",
+        "packageName": "bags"
+      }
+    }
+  ]
+}
+
+==========================================================================
+Request: REMOVE LIST
+http://127.0.0.1:8000/households/1/lists/1/remove?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+
+==========================================================================
+Request: GET HOUSEHOLD
+http://127.0.0.1:8000/households/1?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "householdID": 1,
+  "householdName": "Stash",
+  "householdDescription": "Private Inventory",
+  "headOfHousehold": 1,
+  "members": [
+    {
+      "userID": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "emailAddress": "email1@gmail.com"
+    }
+  ],
+  "lists": [],
+  "recipes": [
+    {
+      "recipeID": 1,
+      "recipeName": "New Spaghetti",
+      "recipeDescription": "This Spaghetti Is Actually Grandpas"
+    }
+  ]
+}
+
+==========================================================================
+Request: REMOVE RECIPE
+http://127.0.0.1:8000/households/1/recipes/1/remove?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+
+==========================================================================
+Request: GET HOUSEHOLD
+http://127.0.0.1:8000/households/1?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "householdID": 1,
+  "householdName": "Stash",
+  "householdDescription": "Private Inventory",
+  "headOfHousehold": 1,
+  "members": [
+    {
+      "userID": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "emailAddress": "email1@gmail.com"
+    }
+  ],
+  "lists": [],
+  "recipes": []
+}
+
+==========================================================================
+Request: CREATE HOUSEHOLD
+http://127.0.0.1:8000/households/create?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "householdName": "Apartment",
+  "householdDescription": "John and Julia\u0027s Inventory"
+}
+Response:
+HTTP 201
+{
+  "householdID": 2
+}
+
+==========================================================================
+Request: LINK UPC
+http://127.0.0.1:8000/households/2/items/04963406/link?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+{
+  "description": "Coke",
+  "packageName": "cans",
+  "packageUnits": 6,
+  "packageSize": 355.0
+}
+Response:
+HTTP 200
+
+==========================================================================
+Request: GET ITEM SUGGESTIONS
+http://127.0.0.1:8000/households/2/items/04963406/suggestions?token=XCYAK8jWoj-2i3_Ev9l-qythqCtjVfGT
+Response:
+HTTP 200
+{
+  "UPC": "04963406",
+  "currentLink": {
+    "householdID": 2,
+    "description": "Coke",
+    "packaging": {
+      "packageSize": 355.0,
+      "unitID": 6,
+      "unitName": "milliliters",
+      "unitAbbreviation": "mL",
+      "packageName": "cans"
+    }
+  },
+  "internalSuggestions": [
+    {
+      "householdID": 1,
+      "description": "Coca cola",
+      "packaging": {
+        "packageSize": 355.0,
+        "unitID": 6,
+        "unitName": "milliliters",
+        "unitAbbreviation": "mL",
+        "packageName": "cans"
+      }
+    }
+  ],
+  "externalSuggestions": [
+    {
+      "source": "www.upcdatabase.org",
+      "description": "Coca Cola Classic"
+    }
+  ]
+}
+
