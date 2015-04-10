@@ -6,7 +6,7 @@ bin:
 	rm -rf bin
 	mkdir bin
 	echo "Compiling Backend Server"
-	javac -cp "lib/*" -d bin src/core/*.java src/sql/*.java src/sql/wrappers/*.java src/routes/*.java
+	javac -cp "lib/*" -d bin src/core/*.java src/core/json/*.java src/sql/*.java src/sql/wrappers/*.java src/routes/*.java
 	echo "Done"
 run: compile
 	bash /root/server/scripts/server_run
