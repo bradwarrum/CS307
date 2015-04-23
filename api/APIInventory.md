@@ -31,7 +31,7 @@ HTTP Headers
 Content-Type : application/json
 
 {
-	"UPC" : "<i>:UPC</i>",
+	"UPC" : ":UPC",
 	"version" : 192923750111
 }
 ```
