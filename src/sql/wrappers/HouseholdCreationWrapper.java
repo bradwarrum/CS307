@@ -14,6 +14,8 @@ import core.ResponseCode;
 public class HouseholdCreationWrapper extends BaseWrapper {
 	@Expose(serialize = true)
 	private int householdID = -1;
+	@Expose(serialize = true)
+	private long version = -1;
 	
 	private String householdName, householdDescription;
 	private int userID;
@@ -26,12 +28,13 @@ public class HouseholdCreationWrapper extends BaseWrapper {
 	
 	public ResponseCode create() {
 		int affected = 0;
+		version = System.currentTimeMillis();
 		try {
 			affected = update("INSERT INTO Household (Name, Description, HeadOfHousehold, Version, AvailableProduceID) VALUES (?, ?, ?, ?, ?);",
 					new SQLParam(householdName, SQLType.VARCHAR),
 					new SQLParam(householdDescription, SQLType.VARCHAR),
 					new SQLParam(userID, SQLType.INT),
-					new SQLParam(1, SQLType.LONG),
+					new SQLParam(version, SQLType.LONG),
 					new SQLParam(1, SQLType.INT));
 		} catch (SQLException e) {
 			rollback();
@@ -64,6 +67,7 @@ public class HouseholdCreationWrapper extends BaseWrapper {
 		
 		
 		Permissions perms = Permissions.all();
+
 		try {
 			affected = update("INSERT INTO HouseholdPermissions (UserId, HouseholdId, PermissionLevel) VALUES (?, ?, ?);", 
 					new SQLParam(userID, SQLType.INT),

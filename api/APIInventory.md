@@ -1,5 +1,6 @@
 # Inventory Management
 ##Link a UPC to a Household<br>
+#####This request now requires a version number to execute, due to inconsistencies that arose with shopping list data
 Linking a UPC to a household will set up the description and unit type for that UPC and household only.
 If the UPC is not linked to the household a new record will be created.
 If the UPC is already linked, the description and unit name will be updated in the database.<p>
@@ -14,6 +15,7 @@ HTTP Headers
 Content-Type : application/json
 
 {
+	"version" : 192923742003,
 	"description" : "Planter's Cocktail Peanuts",
 	"packageName" : "tin",
 	"packageUnits" : 3,
@@ -24,6 +26,14 @@ Content-Type : application/json
 #####Creation/Update Successful
 ```
 HTTP 200 OK
+
+HTTP Headers
+Content-Type : application/json
+
+{
+	"UPC" : "<i>:UPC</i>",
+	"version" : 192923750111
+}
 ```
 #####Failures
 Invalid Token, Insufficient Permissions
@@ -42,6 +52,7 @@ Note: Barcodes currently accepted are UPC-A, EAN-13 and UPC-E/EAN-8.  UPC-A and 
 EAN-8 and UPC-E checksums are not calculated because it is not possible to tell if the barcode is UPC-E or EAN-8 (same number of digits)
 
 ##Generate an Internal UPC
+#####This request now requires a version number to execute, due to inconsistencies that arose with shopping list data
 Use this API call to generate a 5-digit internal UPC when an item (such as produce) does not have an associated UPC code.  Once the UPC is generated, it can be treated as a normal UPC in every request that accepts a UPC parameter.<p>
 Note that an internal UPC is ALWAYS 5-digits in size.  This can be used to identify internally generated UPCs; however, most if not all associated API calls now have an "isInternalUPC" boolean field that denotes this identification.
 ####Request Format
@@ -52,6 +63,7 @@ HTTP Headers
 Content-Type : application/json
 
 {
+	"version" : 192923742003,
 	"description" : "Orange",
 	"packageName" : "each",
 	"packageUnits" : 14,
@@ -68,6 +80,7 @@ Content-Type : application/json
 
 {
 	"UPC" : "12345"
+	"version" : 192923750111
 }
 ```
 

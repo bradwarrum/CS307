@@ -40,6 +40,7 @@ public class JSONModels {
 	}
 	public static class HouseholdCreateResJSON {
 		public int householdID;
+		public long version;
 	}
 	
 	@SuppressWarnings("unused")
@@ -48,12 +49,19 @@ public class JSONModels {
 		private final String packageName;
 		private final int packageUnits;
 		private final float packageSize;
-		public LinkReqJSON(String description, String packageName, int packageUnits, float packageSize) {
+		private final long version;
+		public LinkReqJSON(String description, String packageName, int packageUnits, float packageSize, long version) {
 			this.description = description;
 			this.packageName = packageName;
 			this.packageUnits = packageUnits;
 			this.packageSize = packageSize;
+			this.version = version;
 		}
+	}
+	
+	public static class LinkResJSON {
+		public String UPC;
+		public long version;
 	}
 	@SuppressWarnings("unused")
 	public static class ListCreateReqJSON {

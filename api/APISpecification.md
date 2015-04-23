@@ -59,7 +59,7 @@ These enumerations will affect UPC linking and household inventory fetching. <p>
 		<h5><a href="APIHouseholds.md">Household Management</a></h5>
 	</th></tr>
 	<tr>
-		<td>:heavy_check_mark:</td>	
+		<td>:heavy_exclamation_mark:</td>	
 		<td>Create Household</td>
 		<td><code>POST /households/create?token=SESSION_TOKEN</code></td>
 	</tr>
@@ -99,11 +99,11 @@ These enumerations will affect UPC linking and household inventory fetching. <p>
 		<td><code>POST /households/:HOUSEHOLD_ID/items/:UPC/link?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_check_mark:</td>
+		<td>:heavy_exclamation_mark:</td>
 		<td>Generate an Internal UPC</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/items/generate?token=SESSION_TOKEN</code></td>
 	<tr>
-		<td>:heavy_exclamation_mark:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Get UPC Description Suggestions</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/items/:UPC/suggestions?token=SESSION_TOKEN</code></td>
 	</tr>
@@ -113,7 +113,7 @@ These enumerations will affect UPC linking and household inventory fetching. <p>
 		<td><code>POST /households/:HOUSEHOLD_ID/items/update?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_exclamation_mark:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Get Household Inventory</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/items?token=SESSION_TOKEN</code></td>
 	</tr>
@@ -132,12 +132,12 @@ These enumerations will affect UPC linking and household inventory fetching. <p>
 		<td><code>POST /households/:HOUSEHOLD_ID/lists/create?token=SESSION_TOKEN</code></td>
 	</tr>
 	<tr>
-		<td>:heavy_exclamation_mark:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Update Shopping List</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/lists/:LIST_ID/update?token=SESSION_TOKEN</code></td>
 	</tr>	
 	<tr>
-		<td>:heavy_exclamation_mark:</td>
+		<td>:heavy_check_mark:</td>
 		<td>Get Shopping List</td>
 		<td><code>GET /households/:HOUSEHOLD_ID/lists/:LIST_ID?token=SESSION_TOKEN</code></td>
 	</tr>

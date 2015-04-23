@@ -22,7 +22,9 @@ public class UPCLinkWrapper extends BaseWrapper {
 	private float size;
 	@Expose(serialize = true)
 	private String UPC;
-	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, int unitName, float size, String packageName) {
+	@Expose(serialize = true)
+	private long version;
+	public UPCLinkWrapper(int userID, int householdID, Barcode barcode, String description, int unitName, float size, String packageName, long version) {
 		this.userID = userID;
 		this.householdID = householdID;
 		this.barcode = barcode;
@@ -30,9 +32,10 @@ public class UPCLinkWrapper extends BaseWrapper {
 		this.unitName = unitName;
 		this.size = size;
 		this.packageName = packageName;
+		this.version = version;
 	}
-	public UPCLinkWrapper(int userID, int householdID, String description, int unitName, float size, String packageName) {
-		this(userID, householdID, null, description, unitName, size, packageName);
+	public UPCLinkWrapper(int userID, int householdID, String description, int unitName, float size, String packageName, long version) {
+		this(userID, householdID, null, description, unitName, size, packageName, version);
 	}
 
 	public ResponseCode link() {
@@ -41,6 +44,13 @@ public class UPCLinkWrapper extends BaseWrapper {
 		else if (permissionraw == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
 		Permissions permissions = new Permissions(permissionraw);
 		if (!permissions.has(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
+		
+		long serverVersion = readAndLockVersion();
+		if (serverVersion == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
+		if (serverVersion == -1) return ResponseCode.INTERNAL_ERROR;
+		
+		
+		if (serverVersion != version) return ResponseCode.OUTDATED_TIMESTAMP;
 
 		SQLParam householdParam = new SQLParam(householdID, SQLType.INT);
 		if (barcode == null) {
@@ -63,6 +73,8 @@ public class UPCLinkWrapper extends BaseWrapper {
 				release();
 				return ResponseCode.INTERNAL_ERROR;
 			}
+		} else {
+			UPC = barcode.toString();
 		}
 
 
@@ -82,7 +94,52 @@ public class UPCLinkWrapper extends BaseWrapper {
 			release();
 			return ResponseCode.INTERNAL_ERROR;
 		}
+		
+		version = writeVersion();
+		if (version <0) return ResponseCode.INTERNAL_ERROR;
+		
 		release();
 		return ResponseCode.OK;
+	}
+	
+	/**
+	 * Reads the version from a household, and performs an exclusive lock on the household version.
+	 * @return Returns -1 if there was an issue executing the query. <p>
+	 * Returns -2 if there was no information returned (the information does not exist in the database)<p>
+	 * Otherwise returns the version for the household
+	 */
+	private long readAndLockVersion() {
+		long stamp = -1;
+		ResultSet results = null;
+		try {
+			results = query ("SELECT Version FROM Household WHERE HouseholdId=? FOR UPDATE;",
+					new SQLParam(householdID, SQLType.INT));
+			if (results == null) {release(); return -1;}
+			if (!results.next()) {release(results); release(); return -2;}
+			stamp = results.getLong(1);
+		} catch (SQLException e) {
+			rollback();
+			release();
+			return -1;
+		} finally {
+			release(results);
+		}
+		return stamp;
+	}
+	
+	private long writeVersion() {
+		long stamp = System.currentTimeMillis();
+		int affected = -1;
+		try {
+			affected = update("UPDATE Household SET Version=? WHERE HouseholdId=?;",
+					new SQLParam(stamp, SQLType.LONG),
+					new SQLParam(householdID, SQLType.INT));
+		} catch (SQLException e) {
+			rollback();
+			release();
+			return -1;
+		}
+		if (affected <= 0) {rollback(); release(); return -1;}
+		return stamp;
 	}
 }

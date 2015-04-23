@@ -21,7 +21,8 @@ HTTP Headers
 Content-Type : application/json
 
 {
-	"householdID" : 46512
+	"householdID" : 46512,
+	"version" : 191223972942
 }
 ```
 #####Token Expired, Invalid or Not Present

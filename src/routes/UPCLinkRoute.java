@@ -41,7 +41,7 @@ public class UPCLinkRoute extends Route {
 		}
 		UPCLinkWrapper upclw;
 		if (UPC == null) {
-			upclw = new UPCLinkWrapper(userID, householdID, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName);
+			upclw = new UPCLinkWrapper(userID, householdID, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName, upcjson.version);
 		}else {
 			Barcode barcode = new Barcode(UPC);
 			if (barcode.getFormat() == Barcode.Format.INVALID_FORMAT) {
@@ -52,17 +52,13 @@ public class UPCLinkRoute extends Route {
 				error(xchg, ResponseCode.UPC_CHECKSUM_INVALID);
 				return;
 			}
-			upclw = new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName);
+			upclw = new UPCLinkWrapper(userID, householdID, barcode, upcjson.description, upcjson.unitName, upcjson.size, upcjson.packageName, upcjson.version);
 		}
 		ResponseCode result = upclw.link();
 		if (!result.success())
 			error(xchg, result);
 		else
-			if (UPC == null) {
-				respond(xchg, result.getHttpCode(), gson.toJson(upclw, UPCLinkWrapper.class));
-			} else {
-				respond(xchg, result.getHttpCode());
-			}
+			respond(xchg, result.getHttpCode(), gson.toJson(upclw, UPCLinkWrapper.class));
 	}
 
 	public static class UPCJson {
@@ -80,11 +76,15 @@ public class UPCLinkRoute extends Route {
 		@Expose(deserialize = true)
 		public String packageName;
 		
+		@Expose(deserialize = true)
+		public long version;
+		
 		public boolean valid() {
 			if (description == null || description.length() > 40) return false;
 			if (unitName < 0 || unitName > MeasurementUnits.NUM_UNITS) return false;
 			if (packageName == null || packageName.length() > 20) return false;
 			if (size < 0) return false;
+			if (version < 0) return false;
 			return true;
 		}
 	}

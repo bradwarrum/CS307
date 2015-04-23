@@ -25,8 +25,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import json.JSONModels.HouseholdCreateResJSON;
 import json.JSONModels.*;
-
 import core.MeasurementUnits;
 
 
@@ -147,17 +147,30 @@ public class ServerTest {
 		//Household Creation
 		createHousehold("Stash", "Private Inventory");
 		assertEquals("Household creation pass", 201, rcode);
-		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
+		HouseholdCreateResJSON hcr = gson.fromJson(response, HouseholdCreateResJSON.class);
+		householdID = hcr.householdID;
+		inventoryVersion = hcr.version;
 		
 		//Linking
 		link("029000071858", "Planters Cocktail Peanuts", "tins", MeasurementUnits.OZ, 12.0f);
+		LinkResJSON lrj = gson.fromJson(response,  LinkResJSON.class);
+		inventoryVersion = lrj.version;
 		assertEquals("Link 1 pass", 200, rcode);
+		
 		link( "04963406", "Coca Cola", "cans", MeasurementUnits.OZ, 12.0f);
+		lrj = gson.fromJson(response,  LinkResJSON.class);
+		inventoryVersion = lrj.version;
 		assertEquals("Link 2 pass", 200, rcode);
+		
 		link("040000231325", "Starburst FaveRed Jellybeans", "bags", MeasurementUnits.OZ, 14.0f);
 		assertEquals("Link 3 pass", 200, rcode);
+		lrj = gson.fromJson(response,  LinkResJSON.class);
+		inventoryVersion = lrj.version;
+		
 		link(null, "Apple", "each", MeasurementUnits.UNITS, 1.0f);
 		assertEquals("Generate pass", 200, rcode);
+		lrj = gson.fromJson(response,  LinkResJSON.class);
+		inventoryVersion = lrj.version;
 		
 		//Recipe creation
 		createRecipe("Spaghetti", "Grandma's Special Spaghetti Recipe");
@@ -206,7 +219,6 @@ public class ServerTest {
 		assertEquals("Inventory fetch pass", 200, rcode);
 		
 		//Inventory updates
-		inventoryVersion = 1;
 		List<InventoryUpdateItem> invItems = new ArrayList<InventoryUpdateItem>();
 		invItems.add(new InventoryUpdateItem("029000071858", 1, 50));
 		invItems.add(new InventoryUpdateItem("04963406", 17, 0));
@@ -238,7 +250,9 @@ public class ServerTest {
 		//Suggestions
 		createHousehold("Apartment", "John and Julia's Inventory");
 		assertEquals("Household creation pass", 201, rcode);
-		householdID = gson.fromJson(response, HouseholdCreateResJSON.class).householdID;
+		hcr = gson.fromJson(response, HouseholdCreateResJSON.class);
+		householdID = hcr.householdID;
+		inventoryVersion = hcr.version;
 		link( "04963406", "Coke", "cans", MeasurementUnits.ML, 355.0f);
 		assertEquals("Link 3 pass", 200, rcode);
 		getSuggestions("04963406");
@@ -366,7 +380,7 @@ public class ServerTest {
 			request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/generate?token=" + token);
 		}
 		request.setPostMethod();
-		String reqstr = gson.toJson(new LinkReqJSON(description, packageName, packageUnits.getID(), packageSize));
+		String reqstr = gson.toJson(new LinkReqJSON(description, packageName, packageUnits.getID(), packageSize, inventoryVersion));
 		if (UPC == null) {
 			System.out.println(delimiter + "\nRequest: GENERATE UPC");
 		} else {
