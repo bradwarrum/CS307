@@ -100,6 +100,12 @@ All API requests that fail for any reason now return a normalized, enumerated fo
 	    <td>400</td>
 	    <td>One or more of the recipes cannot be found for that household.</td>
     </tr>
+    <tr>
+    	<td>18</td>
+    	<td>ITEM_DUPLICATE_FOUND</td>
+    	<td>409</td>
+    	<td>An item with this name already exists for the specified household.</td>
+    </tr>
 </table>
 
 ###JSON Response Format Example
