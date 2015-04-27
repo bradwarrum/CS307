@@ -19,7 +19,8 @@ public enum ResponseCode {
 	UPC_CHECKSUM_INVALID(400, "UPC-A or EAN-13 barcode has an invalid checksum, try again."),
 	INSUFFICIENT_PERMISSIONS(403, "The user has insufficient household permissions to perform this action."),
 	OUTDATED_TIMESTAMP(409, "The server version of this resource is different than the client's version.  Update the resource on the client and retry."),
-	RECIPE_NOT_FOUND(400, "One or more of the recipies cannot be found for that household.");
+	RECIPE_NOT_FOUND(400, "One or more of the recipies cannot be found for that household."),
+	ITEM_DUPLICATE_FOUND(409, "An item with this name already exists for the specified household.");
 	
 	private final int errorcode;
 	private final int httpcode;

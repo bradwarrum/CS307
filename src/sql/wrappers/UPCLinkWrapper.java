@@ -58,8 +58,17 @@ public class UPCLinkWrapper extends BaseWrapper {
 			ResultSet results = null;
 			int affected = -1;
 			try {
+				// First check to see if there are any items with the exact same name in the household
+				results = query("SELECT UPC FROM InventoryItem WHERE (HouseholdId=? AND UPPER(Description)=UPPER(?));",
+						householdParam,
+						new SQLParam(description, SQLType.VARCHAR));
+				if (results == null) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
+				if (results.next()) {rollback(); release(results); release(); return ResponseCode.ITEM_DUPLICATE_FOUND;}
+				release(results);
+			
 				affected = update("UPDATE Household SET AvailableProduceID=AvailableProduceID + 1;");
 				if (affected <= 0) {rollback(); release(results); release(); return ResponseCode.HOUSEHOLD_NOT_FOUND;}
+				
 				results = query("SELECT AvailableProduceID FROM Household WHERE HouseholdId=?;",
 						householdParam);
 				if (results == null || !results.next()) {rollback(); release(results); release(); return ResponseCode.HOUSEHOLD_NOT_FOUND;}

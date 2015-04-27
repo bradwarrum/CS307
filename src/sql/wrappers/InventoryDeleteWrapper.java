@@ -79,17 +79,22 @@ public class InventoryDeleteWrapper extends BaseWrapper {
 			affected = update("DELETE FROM ShoppingListItem WHERE ItemId=?;",
 					itemIDParam);
 
-			
+
 			// 5) Delete the recipe items referencing the hidden inventory item
 			affected = update("DELETE FROM RecipeItem Where ItemId=?;",
 					itemIDParam);
 			if (affected < 0) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
-			
-			// 6) Hide the inventory item
-			affected = update("UPDATE InventoryItem SET Hidden=?, InventoryQuantity=0 WHERE ItemId=?;",
-					SQLParam.SQLTRUE,
 
-					itemIDParam);
+			// 6) Hide the inventory item if the UPC is normal, or delete the item if it is internally generated
+			if (UPC.length() == 5) {
+				affected = update("DELETE FROM InventoryItem WHERE ItemId=?;",
+						itemIDParam);
+			} else {
+				affected = update("UPDATE InventoryItem SET Hidden=?, InventoryQuantity=0 WHERE ItemId=?;",
+						SQLParam.SQLTRUE,
+
+						itemIDParam);
+			}
 			if (affected <= 0) {rollback(); release(results); release(); return ResponseCode.INTERNAL_ERROR;}
 
 			// 7) Update the version for the inventory and return it
