@@ -46,11 +46,11 @@ public class UPCLinkWrapper extends BaseWrapper {
 		if (!permissions.has(Permissions.Flag.CAN_MODIFY_INVENTORY)) {release(); return ResponseCode.INSUFFICIENT_PERMISSIONS;}
 		
 		long serverVersion = readAndLockVersion();
-		if (serverVersion == -2) return ResponseCode.HOUSEHOLD_NOT_FOUND;
-		if (serverVersion == -1) return ResponseCode.INTERNAL_ERROR;
+		if (serverVersion == -2) {rollback(); release(); return ResponseCode.HOUSEHOLD_NOT_FOUND;}
+		if (serverVersion == -1) {rollback(); release(); return ResponseCode.INTERNAL_ERROR;}
 		
 		
-		if (serverVersion != version) return ResponseCode.OUTDATED_TIMESTAMP;
+		if (serverVersion != version) {rollback(); release(); return ResponseCode.OUTDATED_TIMESTAMP;}
 
 		SQLParam householdParam = new SQLParam(householdID, SQLType.INT);
 		if (barcode == null) {
