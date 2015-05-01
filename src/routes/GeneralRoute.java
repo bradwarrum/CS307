@@ -30,6 +30,9 @@ public class GeneralRoute extends Route {
 	private static final Route RECIPE_FETCH_ROUTE = new RecipeFetchRoute();
 	private static final Route RECIPE_DELETE_ROUTE = new RecipeDeleteRoute();
 	
+	private static final Route HOUSEHOLD_INVITE_CREATE_ROUTE = new HouseholdInviteCreateRoute();
+	private static final Route HOUSEHOLD_INVITE_CHECK_ROUTE = new HouseholdInviteCheckRoute();
+	
 	@Override
 	public void handle(HttpExchange xchg) throws IOException {
 		String path = xchg.getRequestURI().getPath().substring(1);
@@ -70,6 +73,8 @@ public class GeneralRoute extends Route {
 					handleLists(xchg, params);
 				} else if (op.equals("recipes")) {
 					handleRecipes(xchg, params);
+				} else if (op.equalst("invite")) {
+					handleInvite(xchg, params);
 				}
 			}
 		}
@@ -140,6 +145,24 @@ public class GeneralRoute extends Route {
 				RECIPE_UPDATE_ROUTE.handle(xchg); return;
 			} else if (op.equals("remove") && params.isEmpty()) {
 				RECIPE_DELETE_ROUTE.handle(xchg); return;
+			}
+		}
+	}
+	private void handleInvite(HttpEx)HttpExchange xchg, LinkedList<String> params) throws IOException {
+		String op = params.poll();
+		if(op == null){
+			respond(xchg,404);
+			return;
+		}else{
+			int userId = Integer.parseUnsignedInt(op);
+			xchg.setAttribute("userID", userID);
+			op = params.poll();
+			if(op.equals("create")){
+				HOUSEHOLD_INVITE_CREATE_ROUTE.HANDLE(xchg);
+				return;
+			}else{
+				HOUSEHOLD_INVITE_CHECK_ROUTE.handle(xchg);
+				return;
 			}
 		}
 	}

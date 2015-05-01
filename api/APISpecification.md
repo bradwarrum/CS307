@@ -170,6 +170,19 @@ These enumerations will affect UPC linking and household inventory fetching. <p>
 		<td>Remove Recipe</td>
 		<td><code>POST /households/:HOUSEHOLD_ID/recipes/:RECIPE_ID/remove?token=SESSION_TOKEN</code></td>
 	</tr>
+	<tr><th colspan ="3">
+		<h5><a href="APIHouseholdInvitations.md">Invites</a></h5>
+	</th></tr>
+	<tr>
+		<td>:heavy_check_mark:</td>
+		<td>Create Invite</td>
+		<td><code>POST /households/:HOUSEHOLD_ID/invite/:USER_ID/create?token=SESSION_TOKEN</code></td>
+	</tr>
+	<tr>
+		<td>:heavy_check_mark:</td>
+		<td>Check Invite</td>
+		<td><code>GET /households/:HOUSEHOLD_ID/invite/:USER_ID?token=SESSION_TOKEN</code></td>
+	</tr>
 	
 
 	
